@@ -10,6 +10,9 @@ app.use(cors());
 app.use(express.json());
 
 app.get("/healthz", (_req, res) => res.json({ ok: true }));
+app.get('/api/posts', (_req, res) => {
+  res.json([]);
+});
 
 const PORT = process.env.PORT || 4000;
 const URI = process.env.MONGODB_URI;
