@@ -1,46 +1,37 @@
-import { useState, useEffect } from 'react'
-import { BrowserRouter, Routes, Route, Link } from 'react-router-dom'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import Home from './pages/Home'
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import NavBar from './components/NavBar.jsx'
+import Footer from './components/Footer.jsx'
+import Home from './pages/Home.jsx'
+import PostsList from './pages/PostList.jsx'
+import PostDetail from './pages/PostDetail.jsx'
+import PostCreate from './pages/PostCreate.jsx'
+import PostEdit from './pages/PostEdit.jsx'
+import Login from './pages/Login.jsx'
+import Register from './pages/Register.jsx'
+import ForgotPassword from './pages/ForgotPassword.jsx'
+import ResetPassword from './pages/ResetPassword.jsx'
+import Profile from './pages/Profile.jsx'
+import NotFound from './pages/NotFound.jsx'
 import './App.css'
 
-function App() {
-  const [count, setCount] = useState(0)
-
-  useEffect(() => {
-    const API = import.meta.env.VITE_API_URL || 'http://localhost:4000'
-    fetch(`${API}/healthz`)
-      .then(res => {
-        console.log('fetch status', res.status)
-        return res.json()
-      })
-      .then(data => console.log('fetch json', data))
-      .catch(err => console.error('fetch error', err))
-  }, [])
-
+export default function App() {
   return (
     <BrowserRouter>
-      <header className="app-header">
-        <nav>
-          <Link to="/">
-            <img src={viteLogo} className="logo" alt="Vite logo" />
-          </Link>
-          <Link to="/">
-            <img src={reactLogo} className="logo react" alt="React logo" />
-          </Link>
-        </nav>
-      </header>
+      <NavBar />
       <Routes>
         <Route path="/" element={<Home />} />
+        <Route path="/posts" element={<PostsList />} />
+        <Route path="/posts/create" element={<PostCreate />} />
+        <Route path="/posts/:id" element={<PostDetail />} />
+        <Route path="/posts/:id/edit" element={<PostEdit />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
+        <Route path="/profile" element={<Profile />} />
+        <Route path="*" element={<NotFound />} />
       </Routes>
-      <footer className="app-footer">
-        <div className="card">
-          <button onClick={() => setCount((c) => c + 1)}>count is {count}</button>
-        </div>
-      </footer>
+      <Footer />
     </BrowserRouter>
   )
 }
-
-export default App
