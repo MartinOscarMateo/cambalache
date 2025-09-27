@@ -1,28 +1,21 @@
-import express from "express";
-import cors from "cors";
-import dotenv from "dotenv";
-import mongoose from "mongoose";
-
-dotenv.config();
+import 'dotenv/config';
+import express from 'express';
+import cors from 'cors';
+import connectDB from './config/db.js';
 
 const app = express();
-app.use(cors());
+
+app.use(cors({ origin: 'http://localhost:5173' }));
 app.use(express.json());
 
-app.get("/healthz", (_req, res) => res.json({ ok: true }));
-app.get('/api/posts', (_req, res) => {
-  res.json([]);
-});
+app.get('/health', (_req, res) => res.json({ ok: true }));
+app.get('/api/posts', (_req, res) => res.json([]));
 
 const PORT = process.env.PORT || 4000;
-const URI = process.env.MONGODB_URI;
 
-mongoose
-  .connect(URI)
-  .then(() => {
-    app.listen(PORT, () => console.log(`API http://localhost:${PORT}`));
-  })
+connectDB()
+  .then(() => app.listen(PORT, () => console.log(`API http://localhost:${PORT}`)))
   .catch((err) => {
-    console.error("MongoDB error:", err.message);
+    console.error('MongoDB error:', err.message);
     process.exit(1);
   });
