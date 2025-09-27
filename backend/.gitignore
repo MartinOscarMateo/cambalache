@@ -1,0 +1,19 @@
+﻿# Logs
+logs
+*.log
+npm-debug.log*
+yarn-*.log
+pnpm-debug.log*
+
+# Dependencias y build
+node_modules/
+dist/
+build/
+
+# Entornos
+.env
+.env.*
+!.env.example
+
+# Varias
+.DS_Store
