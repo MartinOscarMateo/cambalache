@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getMe } from '../lib/api.js';
+import Alert from '../components/Alert.jsx';
+import Spinner from '../components/Spinner.jsx';
 
 export default function Profile() {
   const [user, setUser] = useState(null);

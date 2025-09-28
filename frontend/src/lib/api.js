@@ -28,9 +28,16 @@ export async function loginUser(payload) {
 export async function getMe() {
   const token = localStorage.getItem('token');
   if (!token) throw new Error('No hay token');
+
   const res = await fetch(`${API}/api/auth/me`, {
     headers: { Authorization: `Bearer ${token}` }
   });
-  if (!res.ok) throw new Error('No autorizado');
+
+  if (!res.ok) {
+    const err = new Error('No autorizado');
+    err.status = res.status;
+    throw err;
+  }
+
   return res.json();
 }
