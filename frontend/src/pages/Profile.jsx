@@ -54,7 +54,7 @@ export default function Profile() {
 
   return (
     <main>
-      <h1>Mi perfil</h1>
+      <h1 className="text-2xl font-semibold">Mi perfil</h1>
       <p><strong>Usuario:</strong> {user?.name || user?.username || '(sin nombre)'}</p>
       <p><strong>Email:</strong> {user?.email}</p>
       {user?.bio && <p><strong>Bio:</strong> {user.bio}</p>}
