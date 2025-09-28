@@ -13,3 +13,22 @@ export async function registerUser(payload) {
   }
   return data;
 }
+
+export async function loginUser(payload) {
+  const res = await fetch(`${API}/api/auth/login`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data?.message || 'Credenciales inválidas');
+  return data;
+}
+
+export async function getMe(token) {
+  const res = await fetch(`${API}/api/auth/me`, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  if (!res.ok) throw new Error('No autorizado');
+  return res.json();
+}
