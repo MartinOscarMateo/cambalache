@@ -1,23 +1,20 @@
-import mongoose from 'mongoose';
+import mongoose from 'mongoose'
 
-const postSchema = new mongoose.Schema(
+const { Schema, model } = mongoose
+
+const PostSchema = new Schema(
   {
-    title: { type: String, required: true, trim: true },
-    description: { type: String, required: true, trim: true },
-    images: [{ type: String }],
-    category: { type: String, trim: true },
-    tags: [{ type: String, trim: true }],
-    location: {
-      type: { type: String, enum: ['Point'], default: 'Point' },
-      coordinates: { type: [Number], default: [0, 0] }
-    },
-    owner: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
-    status: { type: String, enum: ['available', 'reserved', 'exchanged'], default: 'available' }
+    title: { type: String, required: true, trim: true, minlength: 3, maxlength: 120 },
+    description: { type: String, required: true, trim: true, minlength: 10, maxlength: 3000 },
+    images: { type: [String], default: [] },
+    category: { type: String, required: true, trim: true, maxlength: 50, index: true },
+    ownerId: { type: Schema.Types.ObjectId, ref: 'User', required: true, index: true },
+    status: { type: String, enum: ['active', 'paused', 'traded'], default: 'active', index: true }
   },
   { timestamps: true }
-);
+)
 
-postSchema.index({ location: '2dsphere' });
+PostSchema.index({ createdAt: -1 })
+PostSchema.index({ title: 'text', description: 'text' }, { name: 'PostText' })
 
-const Post = mongoose.models.Post || mongoose.model('Post', postSchema);
-export default Post;
+export default model('Post', PostSchema)
