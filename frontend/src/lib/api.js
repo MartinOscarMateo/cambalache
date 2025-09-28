@@ -25,7 +25,9 @@ export async function loginUser(payload) {
   return data;
 }
 
-export async function getMe(token) {
+export async function getMe() {
+  const token = localStorage.getItem('token');
+  if (!token) throw new Error('No hay token');
   const res = await fetch(`${API}/api/auth/me`, {
     headers: { Authorization: `Bearer ${token}` }
   });

@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { createBrowserRouter, RouterProvider, redirect, Outlet } from 'react-router-dom'
 import NavBar from './components/NavBar.jsx'
 import Footer from './components/Footer.jsx'
 import Home from './pages/Home.jsx'
@@ -14,24 +14,41 @@ import Profile from './pages/Profile.jsx'
 import NotFound from './pages/NotFound.jsx'
 import './App.css'
 
-export default function App() {
+function requireAuthLoader() {
+  const token = localStorage.getItem('token');
+  if (!token) throw redirect('/login');
+  return null;
+}
+
+function RootLayout() {
   return (
-    <BrowserRouter>
+    <>
       <NavBar />
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/posts" element={<PostsList />} />
-        <Route path="/posts/create" element={<PostCreate />} />
-        <Route path="/posts/:id" element={<PostDetail />} />
-        <Route path="/posts/:id/edit" element={<PostEdit />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/forgot-password" element={<ForgotPassword />} />
-        <Route path="/reset-password" element={<ResetPassword />} />
-        <Route path="/profile" element={<Profile />} />
-        <Route path="*" element={<NotFound />} />
-      </Routes>
+      <Outlet />
       <Footer />
-    </BrowserRouter>
-  )
+    </>
+  );
+}
+
+const router = createBrowserRouter([
+  {
+    element: <RootLayout />,
+    children: [
+      { path: '/', element: <Home /> },
+      { path: '/posts', element: <PostsList /> },
+      { path: '/posts/create', element: <PostCreate /> },
+      { path: '/posts/:id', element: <PostDetail /> },
+      { path: '/posts/:id/edit', element: <PostEdit /> },
+      { path: '/login', element: <Login /> },
+      { path: '/register', element: <Register /> },
+      { path: '/forgot-password', element: <ForgotPassword /> },
+      { path: '/reset-password', element: <ResetPassword /> },
+      { path: '/profile', element: <Profile />, loader: requireAuthLoader },
+      { path: '*', element: <NotFound /> },
+    ],
+  },
+]);
+
+export default function App() {
+  return <RouterProvider router={router} />;
 }
