@@ -1,3 +1,4 @@
+// frontend/src/components/NavBar.jsx
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
@@ -15,62 +16,61 @@ export default function NavBar() {
   }
 
   return (
-    <header className="py-5 border-b border-[#646cff]">
-      <nav className="flex justify-between items-center w-[92%] mx-auto">
-        <div className="flex items-center">
-          <Link className="text-[#646cff] hover:text-[#535bf2]" to="/">Cambalache</Link>
-        </div>
+    // barra dorada arriba y abajo
+    <header className="bg-gold">
+      {/* franja roja gruesa a todo lo ancho */}
+      <div className="bg-red py-4 md:py-5">
+        <nav className="flex justify-between items-center w-[92%] mx-auto">
+          {/* Brand */}
+          <div className="flex items-center">
+            <Link to="/" className="text-gold-shadow-blue text-xl md:text-2xl hover:opacity-90">
+              <span className="milonga font-normal">Cambalache</span>
+            </Link>
+          </div>
 
-        <div className={`bg-[#242424] md:static absolute md:min-h-fit min-h-[50vh] left-0 ${open ? "top-[9%]" : "top-[-100%]"} md:w-auto w-full flex items-center px-5 text-[#646cff] border-b md:border-0`}>
-          <ul className="flex md:flex-row flex-col md:items-center md:gap-[4vw] gap-8">
-            <li>
-              <Link className="hover:text-[#535bf2]" to="/">Inicio</Link>
-            </li>
-            <li>
-              <Link className="hover:text-[#535bf2]" to="/posts">Publicaciones</Link>
-            </li>
-            <li>
-              <Link className="hover:text-[#535bf2]" to="/posts/create">Crear</Link>
-            </li>
+          {/* Menú */}
+          <div
+            className={`md:static absolute md:min-h-fit min-h-[50vh] left-0 ${
+              open ? 'top-[72px]' : 'top-[-100%]'
+            } md:w-auto w-full flex items-center px-5 bg-red md:bg-transparent`}
+          >
+            <ul className="flex md:flex-row flex-col md:items-center md:gap-[4vw] gap-6 w-full md:w-auto">
+              <li><Link className="text-gold-shadow-blue hover:opacity-90" to="/">Inicio</Link></li>
+              <li><Link className="text-gold-shadow-blue hover:opacity-90" to="/posts">Publicaciones</Link></li>
+              <li><Link className="text-gold-shadow-blue hover:opacity-90" to="/posts/create">Crear</Link></li>
 
-            {token ? (
-              <>
-                <li>
-                  <Link className="hover:text-[#535bf2]" to="/profile">
-                    {user?.name || "Perfil"}
-                  </Link>
-                </li>
-                <li>
-                  <button
-                    onClick={logout}
-                    className="hover:text-[#535bf2]"
-                  >
-                    Salir
-                  </button>
-                </li>
-              </>
-            ) : (
-              <>
-                <li>
-                  <Link className="hover:text-[#535bf2]" to="/register">Registrarse</Link>
-                </li>
-                <li>
-                  <Link className="hover:text-[#535bf2]" to="/login">Ingresar</Link>
-                </li>
-              </>
-            )}
-          </ul>
-        </div>
+              {token ? (
+                <>
+                  <li>
+                    <Link className="text-gold-shadow-blue hover:opacity-90" to="/profile">
+                      {user?.name || 'Perfil'}
+                    </Link>
+                  </li>
+                  <li>
+                    <button onClick={logout} className="text-gold-shadow-blue hover:opacity-90">
+                      Salir
+                    </button>
+                  </li>
+                </>
+              ) : (
+                <>
+                  <li><Link className="btn btn-red" to="/register">Registrarse</Link></li>
+                  <li><Link className="btn btn-blue" to="/login">Ingresar</Link></li>
+                </>
+              )}
+            </ul>
+          </div>
 
-        <div className="flex items-center gap-6 md:hidden">
-          <button onClick={() => setOpen(!open)}>
-            <ion-icon
-              name={open ? "close" : "menu"}
-              className="text-3xl text-[#646cff]"
-            ></ion-icon>
-          </button>
-        </div>
-      </nav>
+          {/* Burger */}
+          <div className="flex items-center gap-4 md:hidden">
+            <button onClick={() => setOpen(!open)} aria-label="Abrir menú">
+              <ion-icon name={open ? 'close' : 'menu'} className="text-3xl text-gold"></ion-icon>
+            </button>
+          </div>
+        </nav>
+      </div>
+      {/* borde dorado inferior visible */}
+      <div className="h-3 bg-gold" />
     </header>
   );
 }
