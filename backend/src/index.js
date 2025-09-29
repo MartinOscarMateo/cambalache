@@ -6,6 +6,7 @@ import authRoutes from './routes/auth.routes.js';
 import postsRoutes from './routes/posts.js';
 import followsRoutes from './routes/follows.js';
 import tradesRouter from './routes/trades.js';
+import userRoutes from './routes/userRoutes.js'
 
 const app = express();
 
@@ -16,6 +17,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/posts', postsRoutes);
 app.use('/api', followsRoutes);
 app.use('/api/trades', tradesRouter);
+app.use('/api/users', userRoutes)
 
 app.get('/health', (_req, res) => res.json({ ok: true }));
 

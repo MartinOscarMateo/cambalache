@@ -14,6 +14,7 @@ import Profile from './pages/Profile.jsx';
 import FollowersList from './pages/FollowersList.jsx';
 import FollowingList from './pages/FollowingList.jsx';
 import Trades from './pages/Trades.jsx';
+import ProfileEdit from './pages/ProfileEdit.jsx';
 import NotFound from './pages/NotFound.jsx';
 import './App.css';
 
@@ -47,10 +48,16 @@ const router = createBrowserRouter([
       { path: '/register', element: <Register /> },
       { path: '/forgot-password', element: <ForgotPassword /> },
       { path: '/reset-password', element: <ResetPassword /> },
+
+      // Perfil
       { path: '/profile', element: <Profile />, loader: requireAuthLoader },
+      { path: '/profile/edit', element: <ProfileEdit />, loader: requireAuthLoader },
       { path: '/profile/:id', element: <Profile />, loader: requireAuthLoader },
+
+      // Seguidores / seguidos
       { path: '/users/:id/followers', element: <FollowersList />, loader: requireAuthLoader },
       { path: '/users/:id/following', element: <FollowingList />, loader: requireAuthLoader },
+
       { path: '*', element: <NotFound /> }
     ]
   }

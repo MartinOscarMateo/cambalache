@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 import User from '../models/User.js';
 import { registerSchema } from '../schemas/auth.js';
 import validate from '../middlewares/validate.js';
