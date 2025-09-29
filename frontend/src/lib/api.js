@@ -79,3 +79,17 @@ export async function getFollowing(userId, limit = 20, cursor = '') {
   if (!res.ok) throw new Error(String(res.status));
   return res.json();
 }
+
+
+export async function createPost(data) {
+  const API = import.meta.env.VITE_API_URL || 'http://localhost:4000';
+  const token = localStorage.getItem('token') || '';
+  const res = await fetch(`${API}/api/posts`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+    body: JSON.stringify(data)
+  });
+  const json = await res.json();
+  if (!res.ok) throw new Error(json?.error || 'Error al crear publicación');
+  return json;
+}
