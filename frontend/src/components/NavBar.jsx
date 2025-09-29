@@ -16,9 +16,7 @@ export default function NavBar() {
   }
 
   return (
-    // barra dorada arriba y abajo
     <header className="bg-gold">
-      {/* franja roja gruesa a todo lo ancho */}
       <div className="bg-red py-4 md:py-5">
         <nav className="flex justify-between items-center w-[92%] mx-auto">
           {/* Brand */}
@@ -61,7 +59,6 @@ export default function NavBar() {
             </ul>
           </div>
 
-          {/* Burger */}
           <div className="flex items-center gap-4 md:hidden">
             <button onClick={() => setOpen(!open)} aria-label="Abrir menú">
               <ion-icon name={open ? 'close' : 'menu'} className="text-3xl text-gold"></ion-icon>
@@ -69,7 +66,7 @@ export default function NavBar() {
           </div>
         </nav>
       </div>
-      {/* borde dorado inferior visible */}
+
       <div className="h-3 bg-gold" />
     </header>
   );

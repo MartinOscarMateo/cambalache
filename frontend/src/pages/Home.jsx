@@ -4,7 +4,7 @@ import bannerImg from '../assets/images/banner-cambalache.jpg'
 
 export default function Home() {
   return (
-    <main className="space-y-12">
+    <main className="space-y-16">
       <section aria-label="Presentación Cambalache">
         <img
           src={bannerImg}
@@ -13,107 +13,93 @@ export default function Home() {
         />
       </section>
 
-      <div className="px-[400px] flex flex-col items-center space-y-12">
-        <section>
-          <p className="text-lg leading-relaxed text-center">
-            <span className="font-semibold text-[#BF133D]">Cambalache</span> es
-            una plataforma P2P para intercambiar objetos y servicios sin dinero.
-            Diseñada para CABA y AMBA en el lanzamiento. Fomenta comunidad,
-            reutilización y consumo responsable con reglas claras y soporte
-            centralizado.
+      <div className="px-[400px] flex flex-col items-center space-y-16">
+        <section className="text-center space-y-4">
+          <h1 className="text-3xl font-extrabold text-[#0E2031]">
+            Bienvenido a{' '}
+            <span className="milonga text-gold-shadow-blue font-normal">
+              Cambalache
+            </span>
+          </h1>
+          <h2 className="text-xl font-semibold text-[#4271B6]">
+            La forma más simple de intercambiar en CABA
+          </h2>
+          <p className="text-lg leading-relaxed text-gray-700">
+            Una plataforma P2P que te conecta con tu comunidad para dar nueva vida a objetos
+            y servicios. Fomentamos la reutilización, la confianza entre vecinos y un consumo
+            responsable, todo sin necesidad de dinero.
           </p>
         </section>
 
         <section className="w-full">
-          <h2 className="text-2xl font-bold mb-6 text-center text-[#0E2031]">
-            Qué podés hacer en Cambalache
+          <h2 className="text-2xl font-bold mb-8 text-center text-[#0E2031]">
+            Cómo funciona
           </h2>
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
             {[
               {
-                t: 'Intercambiar productos y servicios',
-                d: 'Ofrecé lo que ya no usás o tus habilidades, y conseguí lo que necesitás sin gastar dinero.'
+                n: '1',
+                d: 'Creás tu cuenta y verificás tu perfil para generar confianza desde el inicio.'
               },
               {
-                t: 'Encontrar por cercanía',
-                d: 'Buscá ofertas en tu barrio o zona, filtrando por categorías y distancia para concretar rápido.'
+                n: '2',
+                d: 'Publicás lo que ofrecés o buscás y explorás opciones cerca tuyo.'
               },
               {
-                t: 'Construir tu reputación',
-                d: 'Sumá calificaciones positivas y verificá tu perfil para generar confianza en cada intercambio.'
+                n: '3',
+                d: 'Enviás ofertas o contraofertas y chateás para coordinar el intercambio.'
+              },
+              {
+                n: '4',
+                d: 'Concretás en un punto acordado y dejás tu calificación.'
               }
             ].map((item) => (
               <article
-                key={item.t}
-                className="rounded-xl p-5 shadow transition hover:shadow-md"
+                key={item.n}
+                className="rounded-xl p-6 shadow-md transition hover:shadow-lg flex flex-col items-center text-center"
                 style={{
                   backgroundColor: '#F5F5F5',
                   border: '2px solid #4271B6'
                 }}
               >
-                <h3 className="font-semibold text-lg mb-2 text-[#BF133D]">
-                  {item.t}
-                </h3>
+                <div className="text-4xl font-extrabold text-[#BF133D] mb-3">
+                  {item.n}
+                </div>
                 <p className="text-[#0E2031]">{item.d}</p>
               </article>
             ))}
           </div>
         </section>
+      </div>
 
-        <section className="w-full">
-          <h2 className="text-2xl font-bold mb-4 text-center text-[#0E2031]">
-            Cómo funciona
+      <section className="w-full bg-[#F5F5F5] border-t-4 border-[#BF133D] shadow-inner py-16">
+        <div className="max-w-3xl mx-auto px-6 text-center">
+          <h2 className="text-3xl font-extrabold mb-4 text-[#0E2031]">
+            Empezá ahora
           </h2>
-          <ol className="list-decimal list-inside space-y-2 text-gray-700">
-            <li>Creás tu cuenta y verificás tu perfil.</li>
-            <li>Publicás lo que ofrecés o buscás y explorás cerca tuyo.</li>
-            <li>Enviás ofertas o contraofertas y chateás para coordinar.</li>
-            <li>Concretás en un punto acordado y dejás tu calificación.</li>
-          </ol>
-        </section>
-
-        <section className="bg-[#F5F5F5] border border-gray-200 rounded-xl p-6 flex flex-col md:flex-row justify-between items-center gap-6 w-full">
-          <div className="max-w-md text-center md:text-left">
-            <h2 className="text-xl font-bold mb-2 text-[#0E2031]">
-              Empezá ahora
-            </h2>
-            <p className="text-gray-700">
-              Accedé a tu cuenta para publicar, chatear y gestionar tus trueques.
-            </p>
-          </div>
-          <div className="flex gap-4 flex-wrap justify-center">
+          <p className="mb-8 text-lg text-gray-700">
+            Unite a{' '}
+            <span className="milonga text-gold-shadow-blue font-normal">
+              Cambalache
+            </span>{' '}
+            y empezá a publicar, chatear y concretar tus trueques hoy mismo.
+          </p>
+          <div className="flex gap-6 flex-wrap justify-center">
             <Link
               to="/login"
-              className="btn btn-blue"
+              className="btn btn-blue px-6 py-3 text-lg rounded-lg"
             >
-              Ir a Login
+              Iniciar sesión
             </Link>
             <Link
-              to="/posts"
-              className="btn btn-gold"
+              to="/register"
+              className="btn btn-red px-6 py-3 text-lg rounded-lg"
             >
-              Ver publicaciones
-            </Link>
-            <Link
-              to="/posts/create"
-              className="btn btn-red"
-            >
-              Crear publicación
+              Quiero registrarme
             </Link>
           </div>
-        </section>
-
-        <section className="w-full">
-          <h2 className="text-2xl font-bold mb-2 text-center text-[#0E2031]">
-            Seguridad y confianza
-          </h2>
-          <p className="text-gray-700 max-w-2xl text-center">
-            Moderación activa, perfiles verificados y reputación pública. Enfoque
-            en cercanía, reglas claras e inclusión para una experiencia simple y
-            justa.
-          </p>
-        </section>
-      </div>
+        </div>
+      </section>
     </main>
   )
 }
