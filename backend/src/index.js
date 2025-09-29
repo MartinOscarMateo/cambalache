@@ -5,6 +5,7 @@ import connectDB from './config/db.js';
 import authRoutes from './routes/auth.routes.js';
 import postsRoutes from './routes/posts.js';
 import followsRoutes from './routes/follows.js';
+import tradesRouter from './routes/trades.js';
 
 const app = express();
 
@@ -14,6 +15,7 @@ app.use(express.json());
 app.use('/api/auth', authRoutes);
 app.use('/api/posts', postsRoutes);
 app.use('/api', followsRoutes);
+app.use('/api/trades', tradesRouter);
 
 app.get('/health', (_req, res) => res.json({ ok: true }));
 
