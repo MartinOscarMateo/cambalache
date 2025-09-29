@@ -7,10 +7,7 @@ export async function registerUser(payload) {
     body: JSON.stringify(payload)
   });
   const data = await res.json().catch(() => ({}));
-  if (!res.ok) {
-    const msg = data?.message || 'Request failed';
-    throw new Error(msg);
-  }
+  if (!res.ok) throw new Error(data?.message || 'Request failed');
   return data;
 }
 
@@ -27,17 +24,58 @@ export async function loginUser(payload) {
 
 export async function getMe() {
   const token = localStorage.getItem('token');
-  if (!token) throw new Error('No hay token');
-
+  if (!token) {
+    const e = new Error('No hay token');
+    e.status = 401;
+    throw e;
+  }
   const res = await fetch(`${API}/api/auth/me`, {
     headers: { Authorization: `Bearer ${token}` }
   });
-
   if (!res.ok) {
-    const err = new Error('No autorizado');
-    err.status = res.status;
-    throw err;
+    const e = new Error('No autorizado');
+    e.status = res.status;
+    throw e;
   }
+  return res.json();
+}
 
+export async function followUser(userId) {
+  const token = localStorage.getItem('token');
+  const res = await fetch(`${API}/api/follows/${userId}`, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  if (!res.ok) throw new Error(String(res.status));
+  return res.json();
+}
+
+export async function unfollowUser(userId) {
+  const token = localStorage.getItem('token');
+  const res = await fetch(`${API}/api/follows/${userId}`, {
+    method: 'DELETE',
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  if (!res.ok && res.status !== 204) throw new Error(String(res.status));
+  return true;
+}
+
+export async function getFollowers(userId, limit = 20, cursor = '') {
+  const token = localStorage.getItem('token');
+  const q = new URLSearchParams({ limit: String(limit), ...(cursor ? { cursor } : {}) });
+  const res = await fetch(`${API}/api/users/${userId}/followers?${q}`, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  if (!res.ok) throw new Error(String(res.status));
+  return res.json();
+}
+
+export async function getFollowing(userId, limit = 20, cursor = '') {
+  const token = localStorage.getItem('token');
+  const q = new URLSearchParams({ limit: String(limit), ...(cursor ? { cursor } : {}) });
+  const res = await fetch(`${API}/api/users/${userId}/following?${q}`, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  if (!res.ok) throw new Error(String(res.status));
   return res.json();
 }
