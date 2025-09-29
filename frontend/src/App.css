@@ -1,17 +1,19 @@
+body, #root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+main {
+  flex: 1;
+}
+
 #root {
-  margin: 0 auto;
+  margin: 0 ;
 }
 
 main, footer {
   text-align: center;
-}
-
-main {
-  margin-top: 3rem;
-}
-
-main * {
-  margin: 10px 0px;
 }
 
 input, textarea {
@@ -19,8 +21,6 @@ input, textarea {
   padding: 5px 10px;
   border-radius: 10px;
 }
-
-
 
 
 

@@ -30,15 +30,17 @@ export default function Login() {
   }
 
    return (
-    <main>
-      <h1>Iniciar sesión</h1>
-      <form onSubmit={onSubmit}>
+    <main className="p-4 max-w-md mx-auto">
+      <h1 className="text-2xl font-semibold">Iniciar sesión</h1>
+      <form onSubmit={onSubmit} className="mt-4 space-y-3">
         <p><label>Email<br /><input name="email" type="email" value={form.email} onChange={onChange} placeholder="correo@ejemplo.com" required /></label></p>
         <p><label>Contraseña<br /><input name="password" type="password" value={form.password} onChange={onChange} placeholder="••••••••" required /></label></p>
         {error && <p style={{ color: 'crimson' }}>{error}</p>}
         <p><button type="submit" disabled={loading}>{loading ? 'Ingresando...' : 'Ingresar'}</button></p>
       </form>
-      <p><Link to="/forgot-password">¿Olvidaste tu contraseña?</Link></p>
+      <p className='mt-3'>
+        <Link to="/forgot-password">¿Olvidaste tu contraseña?</Link>
+      </p>
     </main>
   );
 }
