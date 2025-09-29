@@ -89,8 +89,8 @@ export async function createPost(data) {
     headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
     body: JSON.stringify(data)
   });
-  const json = await res.json();
-  if (!res.ok) throw new Error(json?.error || 'Error al crear publicación');
+  const json = await res.json().catch(()=> ({}));
+  if (!res.ok) throw new Error(`${json.code || res.status}: ${json.error || 'Error al crear publicación'}`);
   return json;
 }
 

@@ -15,7 +15,6 @@ export default function PostCreate() {
     const { name, value } = e.target;
     setForm(prev => ({ ...prev, [name]: value }));
   }
-
   function onFile(e) {
     const f = e.target.files?.[0] || null;
     setFile(f);
@@ -25,23 +24,18 @@ export default function PostCreate() {
   async function onSubmit(e) {
     e.preventDefault();
     setError('');
-    if (!form.title.trim() || !form.description.trim() || !form.category.trim()) {
-      setError('Completá título, descripción y categoría');
-      return;
-    }
+    const title = form.title.trim();
+    const description = form.description.trim();
+    const category = form.category.trim().toLowerCase();
+    if (title.length < 5) return setError('Título mínimo 5 caracteres');
+    if (description.length < 10) return setError('Descripción mínima 10 caracteres');
+    if (!category) return setError('Categoría requerida');
+    if (!file) return setError('Subí al menos una imagen');
+
     setLoading(true);
     try {
-      let images = [];
-      if (file) {
-        const up = await uploadToCloudinary(file);
-        images = [up.url];
-      }
-      const payload = {
-        title: form.title.trim(),
-        description: form.description.trim(),
-        category: form.category.trim(),
-        images
-      };
+      const up = await uploadToCloudinary(file);
+      const payload = { title, description, category, images: [up.url] };
       const post = await createPost(payload);
       const id = post.id || post._id;
       navigate(`/posts/${id}`);
@@ -61,7 +55,7 @@ export default function PostCreate() {
         <label>Descripción</label>
         <textarea name="description" value={form.description} onChange={onChange} disabled={loading} />
         <label>Categoría</label>
-        <input name="category" value={form.category} onChange={onChange} disabled={loading} />
+        <input name="category" value={form.category} onChange={onChange} disabled={loading} placeholder="ej: bicicletas" />
         <label>Imagen</label>
         <input type="file" accept="image/*" onChange={onFile} disabled={loading} />
         {preview && <img src={preview} alt="preview" style={{maxWidth:240, display:'block', margin:'8px 0'}} />}
