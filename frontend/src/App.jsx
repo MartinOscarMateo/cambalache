@@ -13,6 +13,7 @@ import ResetPassword from './pages/ResetPassword.jsx';
 import Profile from './pages/Profile.jsx';
 import FollowersList from './pages/FollowersList.jsx';
 import FollowingList from './pages/FollowingList.jsx';
+import Trades from './pages/Trades.jsx';
 import NotFound from './pages/NotFound.jsx';
 import './App.css';
 
@@ -41,6 +42,7 @@ const router = createBrowserRouter([
       { path: '/posts/create', element: <PostCreate />, loader: requireAuthLoader },
       { path: '/posts/:id', element: <PostDetail /> },
       { path: '/posts/:id/edit', element: <PostEdit />, loader: requireAuthLoader },
+      { path: '/trades', element: <Trades />, loader: requireAuthLoader },
       { path: '/login', element: <Login /> },
       { path: '/register', element: <Register /> },
       { path: '/forgot-password', element: <ForgotPassword /> },
