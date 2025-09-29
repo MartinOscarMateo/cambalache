@@ -6,21 +6,11 @@ main, footer {
   text-align: center;
 }
 
-main {
-  margin-top: 3rem;
-}
-
-main * {
-  margin: 10px 0px;
-}
-
 input, textarea {
   border: 1px solid #646cff;
   padding: 5px 10px;
   border-radius: 10px;
 }
-
-
 
 
 
