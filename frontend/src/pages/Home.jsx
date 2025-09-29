@@ -103,7 +103,7 @@ export default function Home() {
         </p>
         <div className="flex w-[70%] mx-auto gap-4 mt-5">
           {samples.map((p) => (
-            <article key={p.id} className="border border-[#646cff] h-[340px]">
+            <article key={p.id} className="border border-[#646cff] rounded h-[340px]">
               <div className="w-[%100] h-[55%] border-b border-[#646cff]"></div>
               <div className="flex flex-col justify-center h-[45%] w-[90%] mx-auto text-left">
                 <h2 className="text-[1.5rem]">{p.title}</h2>
