@@ -45,14 +45,14 @@ export default function Profile() {
     })();
   }, [navigate]);
 
-  if (loading) return <main><p>Cargando…</p></main>;
+  if (loading) return <main className="p-4"><Spinner label="Cargando perfil…" /></main>;
   if (error) return (
-    <main>
-      <h1>Mi perfil</h1>
-      <p style={{ color: 'crimson' }}>{error}</p>
-      <button onClick={logout}>Salir</button>
+    <main className="p-4">
+      <h1 className="text-2xl font-semibold">Mi perfil</h1>
+      <Alert>{error}</Alert>
+      <button onClick={logout} className="mt-3">Salir</button>
     </main>
-  );
+);
 
   return (
     <main>
