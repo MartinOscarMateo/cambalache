@@ -93,3 +93,17 @@ export async function createPost(data) {
   if (!res.ok) throw new Error(json?.error || 'Error al crear publicación');
   return json;
 }
+
+
+export async function listTrades({ role = 'inbox', page = 1, limit = 10 } = {}) {
+  const API = import.meta.env.VITE_API_URL || 'http://localhost:4000';
+  const token = localStorage.getItem('token') || '';
+  const url = new URL(`${API}/api/trades`);
+  url.searchParams.set('role', role);
+  url.searchParams.set('page', page);
+  url.searchParams.set('limit', limit);
+  const res = await fetch(url, { headers: { 'Authorization': `Bearer ${token}` } });
+  const json = await res.json();
+  if (!res.ok) throw new Error(json?.error || 'Error listando trueques');
+  return Array.isArray(json.items) ? json : { page: 1, limit: json.length || 0, total: json.length || 0, items: json };
+}
