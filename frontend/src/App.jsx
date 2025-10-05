@@ -16,6 +16,7 @@ import FollowingList from './pages/FollowingList.jsx';
 import Trades from './pages/Trades.jsx';
 import ProfileEdit from './pages/ProfileEdit.jsx';
 import Chat from './pages/Chat.jsx';
+import ChatsList from './pages/ChatsList.jsx';
 import NotFound from './pages/NotFound.jsx';
 import './App.css';
 
@@ -50,6 +51,10 @@ const router = createBrowserRouter([
       { path: '/forgot-password', element: <ForgotPassword /> },
       { path: '/reset-password', element: <ResetPassword /> },
       { path: '/chat', element: <Chat />, loader: requireAuthLoader },
+
+      // Chat
+      { path: '/chats', element: <ChatsList />, loader: requireAuthLoader },
+      { path: '/chat/:otherUserId', element: <Chat />, loader: requireAuthLoader },
 
       // Perfil
       { path: '/profile', element: <Profile />, loader: requireAuthLoader },

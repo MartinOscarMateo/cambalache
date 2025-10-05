@@ -40,10 +40,17 @@ export default function NavBar() {
               {token ? (
                 <>
                   <li>
+                    <Link className="text-gold-shadow-blue hover:opacity-90" to="/chats">
+                      Chats
+                    </Link>
+                  </li>
+
+                  <li>
                     <Link className="text-gold-shadow-blue hover:opacity-90" to="/profile">
                       {user?.name || 'Perfil'}
                     </Link>
                   </li>
+                  
                   <li>
                     <button onClick={logout} className="text-gold-shadow-blue hover:opacity-90">
                       Salir
@@ -56,6 +63,7 @@ export default function NavBar() {
                   <li><Link className="btn btn-blue" to="/login">Ingresar</Link></li>
                 </>
               )}
+
             </ul>
           </div>
 
