@@ -9,7 +9,9 @@ const userSchema = new mongoose.Schema(
     avatar: {
       type: String,
       default: 'https://res.cloudinary.com/dfxpztpoi/image/upload/v1759185376/default-avatar_kohur4.png'
-    }
+    },
+    followers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User', default: [] }],
+    following: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User', default: [] }]
   },
   { timestamps: true }
 )
