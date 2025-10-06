@@ -69,10 +69,12 @@ export default function PostDetail() {
   useEffect(() => {
     const uid = idOf(owner?._id) || idOf(post?.ownerId);
     if (!uid || !post?._id) return;
-    getPostsByUser(uid, { page: 1, limit: 8 })
+    getPostsByUser(uid, { page: 1, limit: 10 })
       .then(res => {
         const items = Array.isArray(res) ? res : (res.items || []);
-        setMorePosts(items.filter(p => p._id !== post._id));
+        const filtered = items.filter(p => p._id !== post._id);
+        // solo muestra si el propietario tiene 3 o mas publicaciones activas
+        setMorePosts(filtered.length >= 2 ? filtered : []);
       })
       .catch(() => setMorePosts([]));
   }, [owner, post]);
@@ -204,7 +206,7 @@ export default function PostDetail() {
         </div>
 
         {/* Mas publis */}
-        {morePosts.length > 0 && (
+        {morePosts.length >= 2 && (
           <div className="border-t px-6 py-6 bg-gray-50">
             <h2 className="text-xl font-semibold mb-4">Más publicaciones de este usuario</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

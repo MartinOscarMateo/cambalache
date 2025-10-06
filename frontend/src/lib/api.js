@@ -146,7 +146,7 @@ export async function getPostsByUser(userId, { page = 1, limit = 12 } = {}) {
   if (!uid) throw new Error('userId inválido');
 
   const url = new URL(`${API}/api/posts`);
-  url.searchParams.set('owner', uid);
+  url.searchParams.set('ownerId', uid);
   url.searchParams.set('page', String(page));
   url.searchParams.set('limit', String(limit));
 
