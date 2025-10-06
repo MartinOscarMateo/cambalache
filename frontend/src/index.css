@@ -1,85 +1,122 @@
+@import url("https://use.typekit.net/vxv7afc.css"); /* Lato */
+@import url("https://use.typekit.net/isy5fdc.css"); /* VAG Rundschrift D */
 @import "tailwindcss";
 
-/* Paleta Cambalache */
+/* ===== Paleta Cambalache ===== */
 :root {
-  --c-navy: #0E2031;
-  --c-cream: #F5F5F5;
-  --c-gold: #EFC55A;
-  --c-red:  #BF133D;
-  --c-teal: #8CB8B7;
-  --c-blue: #0E2031;
-
-  --c-bg:   #FFFFFF;
-  --c-text: #0E2031;
+  --c-bg:   #f6f2ff;   /* fondo */
+  --c-text: #2727d1;   /* texto principal */
+  --c-brand: #ff52b9;  /* títulos (VAG Rundschrift D) */
+  --c-accent: #ffdb3e; /* color secundario / hover */
 
   color-scheme: light;
-  font-family: "Lato", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  font-family: "lato", sans-serif;
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Base */
+/* ===== Base ===== */
 html, body { height: 100%; }
 body {
   margin: 0;
   background-color: var(--c-bg);
   color: var(--c-text);
+  font-family: "lato", sans-serif;
 }
 
-/* Tipografia global */
-h1 { font-weight: 800; line-height: 1.1; }
-h2 { font-weight: 700; }
-h3 { font-weight: 600; }
-p, li, a, button, input, textarea { font-weight: 400; }
+/* ===== Tipografía global ===== */
+h1, h2, h3, h4 {
+  font-family: "vag-rundschrift-d", sans-serif;
+  color: var(--c-brand);
+}
+h1 { font-weight: 400; line-height: 1.1; }
+h2 { font-weight: 400; }
+h3 { font-weight: 400; }
+h4 { font-weight: 400; }
 
-/* Enlaces fuera del nav */
+p, li, a, button, input, textarea {
+  font-family: "lato", sans-serif;
+  font-weight: 400;
+}
+
+/* ===== Enlaces fuera del nav ===== */
 main a {
-  color: var(--c-blue);
+  color: var(--c-text);
   text-decoration: none;
-  font-weight: 500;
+  font-weight: 600;
+  transition: color 0.2s ease;
 }
-main a:hover { color:#2f5a97; }
+main a:hover { color: var(--c-accent); }
 
-/* Botones base y variantes de la paleta */
+/* ===== Botones base ===== */
 .btn {
   border-radius: 8px;
   border: 1px solid transparent;
   padding: .6em 1.2em;
   font-size: 1rem;
-  font-weight: 600;
+  font-weight: 700;
   cursor: pointer;
-  transition: filter .2s ease, opacity .2s ease;
+  font-family: "lato", sans-serif;
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 .btn:hover { filter: brightness(0.95); }
-.btn-blue { background: var(--c-blue); color:#fff; }
-.btn-red  { background: var(--c-red);  color:#fff; }
-.btn-gold { background: var(--c-gold); color:#0E2031; }
 
-/* Bordes y tarjetas */
+/* variantes Cambalache */
+.btn-blue { background: var(--c-text); color:#fff; }
+.btn-pink { background: var(--c-brand); color:#fff; }
+.btn-yellow { background: var(--c-accent); color:var(--c-text); }
+
+/* ===== Tarjetas ===== */
 .card {
   background:#fff;
   border:1px solid #e6e6e6;
   border-radius:12px;
+  color: var(--c-text);
 }
 
-/* Utilitarias de color */
-.bg-navy  { background: var(--c-navy); }
-.text-cream { color: var(--c-cream); }
-.text-gold  { color: var(--c-gold); }
-.text-blue  { color: var(--c-blue); }
-.text-red   { color: var(--c-red); }
+/* ===== Utilitarias ===== */
+.bg-brand { background: var(--c-brand); }
+.text-brand { color: var(--c-brand); }
+.text-accent { color: var(--c-accent); }
 
-/* Tipografia Cambalache */
-.milonga { font-family: "Milonga", serif; font-weight: 600; }
-
-/* Estilo especial para navbar */
-.text-gold-shadow-blue {
-  color: var(--c-gold);
-  text-shadow: 2px 2px 0 var(--c-blue);
-  font-weight: 700;
+/* ===== NavBar (mantener existente) ===== */
+:root {
+  --nav-bg: #2727d1;
+  --nav-text: #ffffff;
+  --nav-hover: #ffdb3e;
+  --nav-brand: #f6f2ff;
+}
+.navbar {
+  background-color: var(--nav-bg);
+  color: var(--nav-text);
+  font-family: "lato", sans-serif;
+}
+.navbar a,
+.navbar button {
+  color: var(--nav-text);
+  font-family: "lato", sans-serif;
+  transition: color 0.2s ease;
+}
+.navbar a:hover,
+.navbar button:hover {
+  color: var(--nav-hover);
+}
+.navbar-brand {
+  font-family: "vag-rundschrift-d", sans-serif;
+  color: var(--nav-brand);
 }
 
-/* franjas */
-.bg-gold { background: var(--c-gold); }
-.bg-red  { background: var(--c-red); }
+/* ===== Footer Cambalache ===== */
+.footer {
+  background-color: var(--nav-bg);
+  color: var(--nav-text);
+  text-align: center;
+  font-family: "lato", sans-serif;
+  padding: 1.5rem 0;
+}
+.footer small { font-weight: 500; }
+.footer .footer-brand {
+  font-family: "vag-rundschrift-d", sans-serif;
+  color: var(--nav-brand);
+}

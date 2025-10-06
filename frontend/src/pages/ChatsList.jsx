@@ -12,7 +12,7 @@ export default function ChatsList() {
     async function loadChats() {
       try {
         const token = localStorage.getItem('token')
-        const res = await fetch(`${API_URL}/api/chat`, {
+        const res = await fetch(`${API_URL}/api/chats`, {
           headers: { Authorization: `Bearer ${token}` }
         })
         if (!res.ok) throw new Error('Error al obtener los chats')
