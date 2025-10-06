@@ -9,7 +9,13 @@ const PostSchema = new Schema(
     images: { type: [String], default: [] },
     category: { type: String, required: true, trim: true, maxlength: 50, index: true },
     ownerId: { type: Schema.Types.ObjectId, ref: 'User', required: true, index: true },
-    status: { type: String, enum: ['active', 'paused', 'traded'], default: 'active', index: true }
+    status: { type: String, enum: ['active', 'paused', 'traded'], default: 'active', index: true },
+    condition: { type: String, enum: ['nuevo', 'usado', 'no-funciona'], required: true },
+    hasDetails: { type: Boolean, default: false },
+    detailsText: { type: String, trim: true, maxlength: 1000 },
+    location: { type: String, trim: true, maxlength: 100 },
+    openToOffers: { type: Boolean, default: true },
+    interestsText: { type: String, trim: true, maxlength: 1000 }
   },
   { timestamps: true }
 )

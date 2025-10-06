@@ -74,7 +74,7 @@ export default function PostDetail() {
         const items = Array.isArray(res) ? res : (res.items || []);
         const filtered = items.filter(p => p._id !== post._id);
         // solo muestra si el propietario tiene 3 o mas publicaciones activas
-        setMorePosts(filtered.length >= 2 ? filtered : []);
+        setMorePosts(filtered.length >= 3 ? filtered : []);
       })
       .catch(() => setMorePosts([]));
   }, [owner, post]);
@@ -170,6 +170,21 @@ export default function PostDetail() {
 
           <p className="text-gray-700 leading-relaxed">{post.description}</p>
 
+          {/* Nuevos campos del modelo */}
+          <div className="bg-gray-50 rounded-lg p-4 space-y-2">
+            {post.condition && <p><strong>Estado:</strong> {post.condition}</p>}
+            {post.hasDetails && post.detailsText && (
+              <p><strong>Detalles:</strong> {post.detailsText}</p>
+            )}
+            {post.location && <p><strong>Zona:</strong> {post.location}</p>}
+            <p>
+              <strong>Abierto a ofertas:</strong> {post.openToOffers ? 'Sí' : 'No'}
+            </p>
+            {!post.openToOffers && post.interestsText && (
+              <p><strong>Intereses:</strong> {post.interestsText}</p>
+            )}
+          </div>
+
           {isOwner ? (
             <p className="text-gray-500 text-center">Sos el dueño de esta publicación</p>
           ) : (
@@ -206,7 +221,7 @@ export default function PostDetail() {
         </div>
 
         {/* Mas publis */}
-        {morePosts.length >= 2 && (
+        {morePosts.length >= 3 && (
           <div className="border-t px-6 py-6 bg-gray-50">
             <h2 className="text-xl font-semibold mb-4">Más publicaciones de este usuario</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

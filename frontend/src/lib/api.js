@@ -86,11 +86,26 @@ export async function createPost(data) {
   const token = localStorage.getItem('token') || '';
   const res = await fetch(`${API}/api/posts`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-    body: JSON.stringify(data)
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    },
+    body: JSON.stringify({
+      title: data.title,
+      description: data.description,
+      category: data.category,
+      condition: data.condition,
+      hasDetails: data.hasDetails,
+      detailsText: data.detailsText,
+      location: data.location,
+      openToOffers: data.openToOffers,
+      interestsText: data.interestsText,
+      images: data.images || []
+    })
   });
-  const json = await res.json().catch(()=> ({}));
-  if (!res.ok) throw new Error(`${json.code || res.status}: ${json.error || 'Error al crear publicación'}`);
+
+  const json = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(json?.error || json?.message || 'Error al crear publicación');
   return json;
 }
 
@@ -157,3 +172,28 @@ export async function getPostsByUser(userId, { page = 1, limit = 12 } = {}) {
 }
 
 
+export async function updatePost(id, data) {
+  const token = localStorage.getItem('token') || '';
+  const res = await fetch(`${API}/api/posts/${id}`, {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    },
+    body: JSON.stringify(data)
+  });
+  const json = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(json?.error || json?.message || 'Error al actualizar la publicación');
+  return json;
+}
+
+export async function deletePost(id) {
+  const token = localStorage.getItem('token') || '';
+  const res = await fetch(`${API}/api/posts/${id}`, {
+    method: 'DELETE',
+    headers: { 'Authorization': `Bearer ${token}` }
+  });
+  const json = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(json?.error || json?.message || 'Error al eliminar la publicación');
+  return json;
+}
