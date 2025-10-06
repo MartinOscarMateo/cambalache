@@ -46,7 +46,7 @@ export default function Profile() {
             <div className="flex flex-col gap-3 p-4 border rounded-xl border-yellow-400 bg-white shadow-sm">
               <button onClick={() => navigate('/profile/edit')} className="text-left hover:text-yellow-600">Editar perfil</button>
               <button onClick={() => navigate('/posts/manage')} className="text-left hover:text-yellow-600">Gestionar publicaciones</button>
-              <button onClick={() => navigate('/trades/manage')} className="text-left hover:text-yellow-600">Gestionar trueques</button>
+              <button onClick={() => navigate('/my-trades')} className="text-left hover:text-yellow-600">Gestionar trueques</button>
             </div>
           </aside>
         )}

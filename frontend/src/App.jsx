@@ -17,6 +17,7 @@ import Trades from './pages/Trades.jsx';
 import ProfileEdit from './pages/ProfileEdit.jsx';
 import Chat from './pages/Chat.jsx';
 import ChatsList from './pages/ChatsList.jsx';
+import MyPosts from './pages/MyPosts.jsx';
 import NotFound from './pages/NotFound.jsx';
 import './App.css';
 
@@ -45,6 +46,7 @@ const router = createBrowserRouter([
       { path: '/posts/create', element: <PostCreate />, loader: requireAuthLoader },
       { path: '/posts/:id', element: <PostDetail /> },
       { path: '/posts/:id/edit', element: <PostEdit />, loader: requireAuthLoader },
+      { path: '/posts/manage', element: <MyPosts />, loader: requireAuthLoader },
       { path: '/trades', element: <Trades />, loader: requireAuthLoader },
       { path: '/login', element: <Login /> },
       { path: '/register', element: <Register /> },
