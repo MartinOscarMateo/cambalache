@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { createTrade, listTrades, getTrade, changeStatus, counterOffer } from '../controllers/tradesController.js';
-import requireAuth from '../middlewares/requireAuth.js';
+import requireAuth from '../middlewares/auth.js';
 
 const router = Router();
 router.use(requireAuth);

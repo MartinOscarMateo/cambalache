@@ -4,7 +4,7 @@ import User from '../models/User.js'
 import { registerSchema, loginSchema } from '../schemas/auth.js'
 import validate from '../middlewares/validate.js'
 import jwt from 'jsonwebtoken'
-import authRequired from '../middlewares/authRequired.js'
+import authRequired from '../middlewares/auth.js'
 
 const router = Router()
 

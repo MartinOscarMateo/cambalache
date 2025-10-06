@@ -197,3 +197,45 @@ export async function deletePost(id) {
   if (!res.ok) throw new Error(json?.error || json?.message || 'Error al eliminar la publicación');
   return json;
 }
+
+
+
+// chat automatico tras propuesta de trueque
+export async function createChatWithMessage(receiverId, text) {
+  const API = import.meta.env.VITE_API_URL || 'http://localhost:4000';
+  const token = localStorage.getItem('token') || '';
+  if (!receiverId) throw new Error('receiverId faltante');
+
+  // crea o recupera un chat entre usuarios
+  const chatRes = await fetch(`${API}/api/chats`, {
+    method: 'POST',
+    headers: { 
+      'Content-Type': 'application/json', 
+      'Authorization': `Bearer ${token}` 
+    },
+    body: JSON.stringify({ userId: receiverId })
+  });
+
+  const chatJson = await chatRes.json().catch(() => ({}));
+  if (!chatRes.ok) throw new Error(chatJson?.error || 'Error creando chat');
+
+  const chatId = chatJson._id || chatJson.id;
+  if (!chatId) throw new Error('Chat no válido');
+
+  // envía mensaje inicial (usa la ruta correcta)
+  if (text && text.trim()) {
+    const msgRes = await fetch(`${API}/api/chats/messages`, {
+      method: 'POST',
+      headers: { 
+        'Content-Type': 'application/json', 
+        'Authorization': `Bearer ${token}` 
+      },
+      body: JSON.stringify({ chatId, text })
+    });
+
+    const msgJson = await msgRes.json().catch(() => ({}));
+    if (!msgRes.ok) throw new Error(msgJson?.error || 'Error enviando mensaje');
+  }
+
+  return chatJson;
+}
