@@ -128,3 +128,32 @@ export async function listTrades({ role = 'inbox', page = 1, limit = 10 } = {}) 
   if (!res.ok) throw new Error(json?.error || 'Error listando trueques');
   return Array.isArray(json.items) ? json : { page: 1, limit: json.length || 0, total: json.length || 0, items: json };
 }
+
+
+export async function getPostById(id) {
+  const token = localStorage.getItem('token') || '';
+  const headers = token ? { Authorization: `Bearer ${token}` } : {};
+  const res = await fetch(`${API}/api/posts/${id}`, { headers });
+  const json = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(json?.message || 'Error obteniendo la publicación');
+  return json;
+}
+
+export async function getPostsByUser(userId, { page = 1, limit = 12 } = {}) {
+  const token = localStorage.getItem('token') || '';
+  const headers = token ? { Authorization: `Bearer ${token}` } : {};
+  const uid = typeof userId === 'object' ? (userId._id || userId.id || userId.userId) : String(userId);
+  if (!uid) throw new Error('userId inválido');
+
+  const url = new URL(`${API}/api/posts`);
+  url.searchParams.set('owner', uid);
+  url.searchParams.set('page', String(page));
+  url.searchParams.set('limit', String(limit));
+
+  const res = await fetch(url, { headers });
+  const json = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(json?.error || json?.message || 'Error listando publicaciones');
+  return Array.isArray(json) ? { page: 1, limit: json.length || 0, total: json.length || 0, items: json } : json;
+}
+
+

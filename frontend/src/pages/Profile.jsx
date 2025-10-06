@@ -10,33 +10,32 @@ export default function Profile() {
   const [error, setError] = useState('')
 
   useEffect(() => {
-    async function fetchUser() {
+    (async () => {
       try {
         if (!params.id) {
-          const me = await getMe()
-          setUser(me)
+          setUser(await getMe())
         } else {
-          const res = await fetch(`${import.meta.env.VITE_API_URL}/api/users/${params.id}`, {
-            headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-          })
+          const API = import.meta.env.VITE_API_URL || 'http://localhost:4000'
+          const token = localStorage.getItem('token') || ''
+          const headers = token ? { Authorization: `Bearer ${token}` } : {}
+          const res = await fetch(`${API}/api/users/${params.id}`, { headers })
           if (!res.ok) throw new Error('Usuario no encontrado')
-          const other = await res.json()
-          setUser(other)
+          setUser(await res.json())
         }
       } catch (err) {
         setError(err.message || 'Error cargando perfil')
       } finally {
         setLoading(false)
       }
-    }
-    fetchUser()
+    })();
   }, [params.id])
 
   if (loading) return <main className="container p-6"><p>Cargando…</p></main>
   if (error) return <main className="container p-6"><p className="text-red-600">{error}</p></main>
   if (!user) return null
 
-  const myId = JSON.parse(localStorage.getItem('user') || '{}').id
+  const stored = JSON.parse(localStorage.getItem('user') || '{}')
+  const myId = stored.id || stored._id
   const viewingOwn = !params.id || String(params.id) === String(myId)
 
   return (
@@ -56,26 +55,20 @@ export default function Profile() {
           <div className="border border-yellow-400 rounded-xl bg-white p-6 shadow-sm space-y-6">
             <div className="flex items-center gap-16">
               <div className="w-24 h-24 rounded-full bg-gray-200 overflow-hidden">
-                {user.avatar && (
-                  <img src={user.avatar} alt="avatar" className="w-full h-full object-cover" />
-                )}
+                {user.avatar && <img src={user.avatar} alt="avatar" className="w-full h-full object-cover" />}
               </div>
-
               <div className="flex flex-col pl-6">
                 <h1 className="text-2xl font-bold text-gray-900">{user.name || user.email}</h1>
                 <p className="text-gray-500">{user.email}</p>
-
                 <div className="flex gap-10 mt-4 text-center">
                   <button onClick={() => navigate(`/users/${params.id || myId}/followers`)}>
                     <span className="block font-semibold text-gray-900">{user.followersCount ?? 0}</span>
                     <span className="text-sm text-gray-600">Seguidores</span>
                   </button>
-
                   <button onClick={() => navigate(`/users/${params.id || myId}/following`)}>
                     <span className="block font-semibold text-gray-900">{user.followingCount ?? 0}</span>
                     <span className="text-sm text-gray-600">Seguidos</span>
                   </button>
-
                   <div>
                     <span className="block font-semibold text-gray-900">{user.tradesCount ?? 0}</span>
                     <span className="text-sm text-gray-600">Trueques</span>
@@ -87,5 +80,5 @@ export default function Profile() {
         </section>
       </div>
     </main>
-  )
+  );
 }

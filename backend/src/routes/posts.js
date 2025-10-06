@@ -5,6 +5,7 @@ import auth from '../middlewares/auth.js'
 
 const router = express.Router()
 
+// obtiene publicaciones con filtros
 router.get('/', async (req, res) => {
   try {
     const { q, category, ownerId, status, sort, page = '1', limit = '12' } = req.query
@@ -26,7 +27,12 @@ router.get('/', async (req, res) => {
     if (sort === 'recent') sortSpec = { createdAt: -1 }
 
     const [items, total] = await Promise.all([
-      Post.find(filter, projection).sort(sortSpec).skip(skip).limit(limitNum).lean(),
+      Post.find(filter, projection)
+        .populate('ownerId', 'name avatar') // trae datos del propietario
+        .sort(sortSpec)
+        .skip(skip)
+        .limit(limitNum)
+        .lean(),
       Post.countDocuments(filter)
     ])
 
@@ -36,11 +42,16 @@ router.get('/', async (req, res) => {
   }
 })
 
+// obtiene una publicacion por id
 router.get('/:id', async (req, res) => {
   try {
     const { id } = req.params
     if (!mongoose.isValidObjectId(id)) return res.status(400).json({ error: 'INVALID_ID' })
-    const post = await Post.findById(id).lean()
+
+    const post = await Post.findById(id)
+      .populate('ownerId', 'name avatar')
+      .lean()
+
     if (!post || post.status === 'traded') return res.status(404).json({ error: 'NOT_FOUND' })
     res.json(post)
   } catch {
@@ -48,6 +59,28 @@ router.get('/:id', async (req, res) => {
   }
 })
 
+// obtiene mas publicaciones de un usuario
+router.get('/user/:userId', async (req, res) => {
+  try {
+    const { userId } = req.params
+    if (!mongoose.isValidObjectId(userId)) return res.status(400).json({ error: 'INVALID_ID' })
+
+    const posts = await Post.find({
+      ownerId: userId,
+      status: 'active'
+    })
+      .sort({ createdAt: -1 })
+      .limit(6)
+      .populate('ownerId', 'name avatar')
+      .lean()
+
+    res.json(posts)
+  } catch {
+    res.status(500).json({ error: 'SERVER_ERROR' })
+  }
+})
+
+// crea una publicacion
 router.post('/', auth, async (req, res) => {
   try {
     const ownerId = req.user && req.user.id
@@ -70,6 +103,7 @@ router.post('/', auth, async (req, res) => {
   }
 })
 
+// actualiza una publicacion
 router.patch('/:id', auth, async (req, res) => {
   try {
     const { id } = req.params
@@ -95,6 +129,7 @@ router.patch('/:id', auth, async (req, res) => {
   }
 })
 
+// elimina (pausa) una publicacion
 router.delete('/:id', auth, async (req, res) => {
   try {
     const { id } = req.params

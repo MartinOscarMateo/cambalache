@@ -13,11 +13,21 @@ export default function NavBar() {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     navigate('/login', { replace: true });
+    setOpen(false);
   }
 
   return (
-    <header className="bg-gold">
-      <div className="bg-red py-4 md:py-5">
+    <header className="bg-gold relative">
+      {/* Overlay móvil por detrás del panel */}
+      {open && (
+        <div
+          className="fixed inset-0 bg-black/40 z-[1000] md:hidden"
+          onClick={() => setOpen(false)}
+          aria-hidden="true"
+        />
+      )}
+
+      <div className="bg-red py-4 md:py-5 relative z-[1001]">
         <nav className="flex justify-between items-center w-[92%] mx-auto">
           {/* Brand */}
           <div className="flex items-center">
@@ -28,25 +38,25 @@ export default function NavBar() {
 
           {/* Menú */}
           <div
-            className={`md:static absolute md:min-h-fit min-h-[50vh] left-0 ${
-              open ? 'top-[72px]' : 'top-[-100%]'
-            } md:w-auto w-full flex items-center px-5 bg-red md:bg-transparent`}
+            className={`md:static fixed md:min-h-fit min-h-[50vh] left-0 ${
+              open ? 'top-[72px]' : '-top-full'
+            } md:w-auto w-full flex items-center px-5 bg-red md:bg-transparent z-[1001]`}
           >
             <ul className="flex md:flex-row flex-col md:items-center md:gap-[4vw] gap-6 w-full md:w-auto">
-              <li><Link className="text-gold-shadow-blue hover:opacity-90" to="/">Inicio</Link></li>
-              <li><Link className="text-gold-shadow-blue hover:opacity-90" to="/posts">Publicaciones</Link></li>
-              <li><Link className="text-gold-shadow-blue hover:opacity-90" to="/posts/create">Crear</Link></li>
+              <li><Link className="text-gold-shadow-blue hover:opacity-90" to="/" onClick={() => setOpen(false)}>Inicio</Link></li>
+              <li><Link className="text-gold-shadow-blue hover:opacity-90" to="/posts" onClick={() => setOpen(false)}>Publicaciones</Link></li>
+              <li><Link className="text-gold-shadow-blue hover:opacity-90" to="/posts/create" onClick={() => setOpen(false)}>Crear</Link></li>
 
               {token ? (
                 <>
                   <li>
-                    <Link className="text-gold-shadow-blue hover:opacity-90" to="/chats">
+                    <Link className="text-gold-shadow-blue hover:opacity-90" to="/chats" onClick={() => setOpen(false)}>
                       Chats
                     </Link>
                   </li>
 
                   <li>
-                    <Link className="text-gold-shadow-blue hover:opacity-90" to="/profile">
+                    <Link className="text-gold-shadow-blue hover:opacity-90" to="/profile" onClick={() => setOpen(false)}>
                       {user?.name || 'Perfil'}
                     </Link>
                   </li>
@@ -59,14 +69,14 @@ export default function NavBar() {
                 </>
               ) : (
                 <>
-                  <li><Link className="btn btn-red" to="/register">Registrarse</Link></li>
-                  <li><Link className="btn btn-blue" to="/login">Ingresar</Link></li>
+                  <li><Link className="btn btn-red" to="/register" onClick={() => setOpen(false)}>Registrarse</Link></li>
+                  <li><Link className="btn btn-blue" to="/login" onClick={() => setOpen(false)}>Ingresar</Link></li>
                 </>
               )}
-
             </ul>
           </div>
 
+          {/* Toggle */}
           <div className="flex items-center gap-4 md:hidden">
             <button onClick={() => setOpen(!open)} aria-label="Abrir menú">
               <ion-icon name={open ? 'close' : 'menu'} className="text-3xl text-gold"></ion-icon>
