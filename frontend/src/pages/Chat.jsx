@@ -12,10 +12,20 @@ export default function Chat() {
 
   const token = localStorage.getItem('token')
   const currentUser = JSON.parse(localStorage.getItem('user') || '{}')
+  const myId = String(currentUser._id || currentUser.id || '')
 
-  console.log('otherUserId:', otherUserId, 'currentUserId:', currentUser.id)
+  function normalizeMessage(m) {
+    const rawFrom = m.from ?? m.senderId ?? m.sender?._id ?? m.sender ?? m.authorId
+    const from = String(rawFrom || '')
+    const name = m.senderName ?? m.sender?.name ?? 'Usuario'
+    return {
+      from,
+      senderName: from === myId ? 'Tú' : name,
+      text: m.text ?? '',
+      createdAt: m.createdAt ?? new Date().toISOString()
+    }
+  }
 
-  // conecta el socket con el token
   useEffect(() => {
     if (!token) return
     const newSocket = io(API_URL, { auth: { token } })
@@ -26,13 +36,12 @@ export default function Chat() {
     })
 
     newSocket.on('private_message', msg => {
-      setMessages(prev => [...prev, msg])
+      setMessages(prev => [...prev, normalizeMessage(msg)])
     })
 
     return () => newSocket.disconnect()
   }, [token])
 
-  // obtiene el historial de los chat
   useEffect(() => {
     async function loadChat() {
       if (!otherUserId) {
@@ -57,13 +66,7 @@ export default function Chat() {
         if (!messagesRes.ok) throw new Error(`Error obteniendo mensajes: ${messagesRes.status}`)
         const messagesData = await messagesRes.json()
 
-        // normaliza para que from siempre sea string y agregue nombre xd
-        const normalized = messagesData.map(m => ({
-          from: String(m.sender?._id || m.sender || m.from),
-          senderName: m.sender?.name || (m.senderName ?? 'Usuario'),
-          text: m.text,
-          createdAt: m.createdAt
-        }))
+        const normalized = messagesData.map(m => normalizeMessage(m))
         setMessages(normalized)
       } catch (err) {
         console.error('Error cargando mensajes:', err)
@@ -97,7 +100,9 @@ export default function Chat() {
       })
 
       socket?.emit('private_message', { to: otherUserId, text: message })
-      setMessages(prev => [...prev, { from: currentUser.id, senderName: 'Tú', to: otherUserId, text: message }])
+
+      const localMsg = normalizeMessage({ from: myId, senderName: 'Tú', to: otherUserId, text: message })
+      setMessages(prev => [...prev, localMsg])
       setMessage('')
     } catch (err) {
       console.error('Error enviando mensaje:', err)
@@ -110,25 +115,28 @@ export default function Chat() {
         <h2 className="text-xl font-semibold text-[#ff52b9] border-b px-4 py-2 text-center">Chat</h2>
 
         <div className="flex-1 overflow-y-auto p-4 space-y-3 min-h-[400px] bg-[#f6f2ff] rounded-b-xl">
-          {messages.map((msg, i) => (
-            <div
-              key={i}
-              className={`flex flex-col ${msg.from === currentUser.id ? 'items-end' : 'items-start'}`}
-            >
-              <p className="text-xs text-gray-500 mb-1">
-                {msg.from === currentUser.id ? 'Tú' : msg.senderName}
-              </p>
+          {messages.map((msg, i) => {
+            const isMine = msg.from === myId
+            return (
               <div
-                className={`px-4 py-2 rounded-2xl shadow-sm max-w-[75%] break-words ${
-                  msg.from === currentUser.id
-                    ? 'bg-yellow-300 text-gray-900 rounded-br-none'
-                    : 'bg-gray-100 text-gray-800 rounded-bl-none'
-                }`}
+                key={i}
+                className={`flex flex-col ${isMine ? 'items-end' : 'items-start'}`}
               >
-                {msg.text}
+                <p className="text-xs text-gray-500 mb-1">
+                  {isMine ? 'Tú' : msg.senderName}
+                </p>
+                <div
+                  className={`px-4 py-2 rounded-2xl shadow-sm max-w-[75%] break-words ${
+                    isMine
+                      ? 'bg-yellow-300 text-gray-900 rounded-br-none'
+                      : 'bg-gray-100 text-gray-800 rounded-bl-none'
+                  }`}
+                >
+                  {msg.text}
+                </div>
               </div>
-            </div>
-          ))}
+            )
+          })}
         </div>
 
         <div className="flex gap-2 border-t p-3 bg-white rounded-b-xl">
