@@ -38,8 +38,10 @@ export default function ProfileEdit() {
   }
 
   async function onSubmit(e) {
-    e.preventDefault()
-    const current = JSON.parse(localStorage.getItem('user') || '{}')
+  e.preventDefault()
+  const current = JSON.parse(localStorage.getItem('user') || '{}')
+  const API = import.meta.env.VITE_API_URL || 'http://localhost:4000'
+  const token = localStorage.getItem('token')
 
     // Solo actualizamos campos modificados
     const updated = { ...current }
@@ -48,19 +50,46 @@ export default function ProfileEdit() {
     if (form.password && form.password === form.confirm) updated.password = form.password
     if (form.avatar && form.avatar !== current.avatar) updated.avatar = form.avatar
 
-    // Guardar en localStorage (más adelante acá iría la API call)
-    localStorage.setItem('user', JSON.stringify(updated))
+  try {
+  const userId = current._id || current.id
+  const res = await fetch(`${API}/api/users/${userId}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`
+    },
+    body: JSON.stringify(updated)
+  })
+  if (!res.ok) throw new Error('Error al actualizar usuario')
 
-    navigate('/profile')
-  }
+  const updatedUser = await res.json()
+  localStorage.setItem('user', JSON.stringify(updatedUser))
+  navigate('/profile')
+} catch (err) {
+  alert(err.message || 'Error al guardar cambios')
+}
+}
 
-  async function onDelete() {
-    if (confirm('¿Seguro que querés eliminar tu cuenta? Esta acción no se puede deshacer.')) {
-      // Aquí debería ir la API call para eliminar la cuenta
+async function onDelete() {
+  if (confirm('¿Seguro que querés eliminar tu cuenta? Esta acción no se puede deshacer.')) {
+    const current = JSON.parse(localStorage.getItem('user') || '{}')
+    const API = import.meta.env.VITE_API_URL || 'http://localhost:4000'
+    const token = localStorage.getItem('token')
+
+    try {
+      const res = await fetch(`${API}/api/users/${current._id}`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` }
+      })
+      if (!res.ok) throw new Error('Error al eliminar cuenta')
+
       localStorage.clear()
       navigate('/register')
+    } catch (err) {
+      alert(err.message || 'Error al eliminar cuenta')
     }
   }
+}
 
   return (
     <main className="flex justify-center p-6">

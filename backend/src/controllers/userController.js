@@ -42,13 +42,15 @@ export async function updateUser(req, res) {
     const user = await User.findById(req.params.id)
     if (!user) return res.status(404).json({ message: 'Usuario no encontrado' })
 
+    // actualizamos solo los campos enviados en el body
     if (req.body.name) user.name = req.body.name
     if (req.body.email) user.email = req.body.email
     if (req.body.password) user.password = req.body.password
     if (req.body.avatar) user.avatar = req.body.avatar
 
-    await user.save()
-    res.json(user)
+    // guardamos y devolvemos el usuario actualizado :v
+    const updatedUser = await user.save()
+    res.json(updatedUser)
   } catch (err) {
     res.status(500).json({ message: err.message })
   }
