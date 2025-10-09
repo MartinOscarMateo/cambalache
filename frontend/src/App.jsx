@@ -55,8 +55,8 @@ const router = createBrowserRouter([
       { path: '/chat', element: <Chat />, loader: requireAuthLoader },
 
       // Chat
-      { path: '/chats', element: <ChatsList />, loader: requireAuthLoader },
-      { path: '/chat/:otherUserId', element: <Chat />, loader: requireAuthLoader },
+      { path: '/chats', element: <ChatsList />, loader: requireAuthLoader }, // lista de chats
+      { path: '/chat/:otherUserId', element: <Chat />, loader: requireAuthLoader }, // chat individual
 
       // Perfil
       { path: '/profile', element: <Profile />, loader: requireAuthLoader },

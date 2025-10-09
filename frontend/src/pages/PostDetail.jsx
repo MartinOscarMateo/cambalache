@@ -129,7 +129,7 @@ export default function PostDetail() {
       setShowModal(false);
 
       // Redirige al chat con el propietario
-      navigate(`/chat/${post.ownerId}`);
+      navigate(`/chat/${owner?._id}`);
     } catch (e) {
       setError(e.message || 'Error al enviar propuesta');
     } finally {

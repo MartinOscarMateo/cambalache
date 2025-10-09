@@ -2,6 +2,8 @@
 import mongoose from 'mongoose';
 import Trade, { TRADE_STATUS } from '../models/Trade.js';
 import Post from '../models/Post.js';
+import Chat from '../models/Chat.js'
+import Message from '../models/Message.js'
 
 const ALLOWED_STATUS = new Set(TRADE_STATUS);
 const TERMINAL = new Set(['accepted','rejected','canceled']);
@@ -70,7 +72,24 @@ export async function createTrade(req, res) {
       history: [{ by: userId, action: 'created' }]
     });
 
-    res.status(201).json(trade);
+    let chat = await Chat.findOne({ participants: { $all: [userId, receiverId] } })
+    if (!chat) {
+      chat = await Chat.create({ participants: [userId, receiverId] })
+    }
+
+    const autoText = `Hola! Te envié una solicitud de trueque por tu publicación "${postRequested.title}".`
+    await Message.create({
+      chatId: chat._id,
+      sender: userId,
+      text: autoText
+    })
+
+    await Chat.findByIdAndUpdate(chat._id, {
+      lastMessage: autoText,
+      updatedAt: new Date()
+    })
+
+    res.status(201).json(trade)
   } catch (err) {
     res.status(400).json({ code: err.code || 'TRADE_CREATE_ERROR', error: err.message });
   }
