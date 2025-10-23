@@ -14,6 +14,7 @@ import followsRoutes from './routes/follows.js'
 import tradesRouter from './routes/trades.js'
 import userRoutes from './routes/userRoutes.js'
 import chatRoutes from './routes/chats.js'
+import adminUsersRouter from './routes/admin.users.js'
 
 const app = express()
 const server = createServer(app)
@@ -38,6 +39,7 @@ app.use('/api', followsRoutes)
 app.use('/api/trades', tradesRouter)
 app.use('/api/users', userRoutes)
 app.use('/api/chats', chatRoutes)
+app.use('/api/admin/users', adminUsersRouter)
 
 // ruta healthcheck
 app.get('/health', (_req, res) => res.json({ ok: true }))

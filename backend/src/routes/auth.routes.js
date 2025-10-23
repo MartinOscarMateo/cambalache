@@ -15,10 +15,17 @@ router.post('/register', validate(registerSchema), async (req, res) => {
     const exists = await User.findOne({ email })
     if (exists) return res.status(409).json({ message: 'Email already registered' })
 
-    // 👉 NO hasheamos acá, dejamos que lo haga el pre('save') en User.js
-    const user = await User.create({ name, email, password })
+    const user = await User.create({ name, email, password, role: 'user' })
 
-    res.status(201).json(user)
+    res.status(201).json({
+      id: user._id,
+      name: user.name,
+      email: user.email,
+      avatar: user.avatar,
+      role: user.role,
+      active: user.active,
+      createdAt: user.createdAt
+    })
   } catch (err) {
     res.status(500).json({ message: err.message })
   }
@@ -31,6 +38,8 @@ router.post('/login', validate(loginSchema), async (req, res) => {
     const user = await User.findOne({ email })
     if (!user) return res.status(401).json({ message: 'Credenciales inválidas' })
 
+    if (!user.active) return res.status(403).json({ message: 'Cuenta deshabilitada' })
+
     const match = await bcrypt.compare(password, user.password)
     if (!match) return res.status(401).json({ message: 'Credenciales inválidas' })
 
@@ -42,7 +51,14 @@ router.post('/login', validate(loginSchema), async (req, res) => {
 
     res.json({
       token,
-      user: { id: user._id, name: user.name, email: user.email, avatar: user.avatar }
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        avatar: user.avatar,
+        role: user.role,
+        active: user.active
+      }
     })
   } catch (err) {
     res.status(500).json({ message: err.message })
@@ -51,7 +67,7 @@ router.post('/login', validate(loginSchema), async (req, res) => {
 
 // Perfil del usuario autenticado
 router.get('/me', authRequired, async (req, res) => {
-  const user = await User.findById(req.user.id).select('name email avatar createdAt')
+  const user = await User.findById(req.user.id).select('name email avatar role active createdAt')
   if (!user) return res.status(404).json({ message: 'No encontrado' })
   res.json(user)
 })

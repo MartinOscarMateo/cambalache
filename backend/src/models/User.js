@@ -11,10 +11,14 @@ const userSchema = new mongoose.Schema(
       default: 'https://res.cloudinary.com/dfxpztpoi/image/upload/v1759185376/default-avatar_kohur4.png'
     },
     followers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User', default: [] }],
-    following: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User', default: [] }]
+    following: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User', default: [] }],
+    role: {type: String, enum:['user', 'admin'], default: 'user', index: true},
+    active: {type: Boolean, default: true, index: true }
   },
   { timestamps: true }
 )
+
+userSchema.index({ name: 'text', email: 'text' })
 
 userSchema.pre('save', async function (next) {
   if (!this.isModified('password')) return next()
