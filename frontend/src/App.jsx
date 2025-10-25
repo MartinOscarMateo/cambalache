@@ -26,6 +26,9 @@ import AdminLayout from './layouts/AdminLayout.jsx';
 import AdminUsersList from './pages/admin/AdminUsersList.jsx';
 import AdminUserEdit from './pages/admin/AdminUserEdit.jsx';
 
+// mapa:
+import MapView from './pages/MapView.jsx';
+
 import './App.css';
 
 function requireAuthLoader() {
@@ -49,6 +52,7 @@ const router = createBrowserRouter([
     element: <RootLayout />,
     children: [
       { path: '/', element: <Home /> },
+      { path: '/mapa', element: <MapView /> },
       { path: '/posts', element: <PostsList /> },
       { path: '/posts/create', element: <PostCreate />, loader: requireAuthLoader },
       { path: '/posts/:id', element: <PostDetail /> },
