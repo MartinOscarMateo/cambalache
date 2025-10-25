@@ -19,6 +19,13 @@ import Chat from './pages/Chat.jsx';
 import ChatsList from './pages/ChatsList.jsx';
 import MyPosts from './pages/MyPosts.jsx';
 import NotFound from './pages/NotFound.jsx';
+
+// admin:
+import AdminGuard from './components/AdminGuard.jsx';
+import AdminLayout from './layouts/AdminLayout.jsx';
+import AdminUsersList from './pages/admin/AdminUsersList.jsx';
+import AdminUserEdit from './pages/admin/AdminUserEdit.jsx';
+
 import './App.css';
 
 function requireAuthLoader() {
@@ -66,6 +73,20 @@ const router = createBrowserRouter([
       // Seguidores / seguidos
       { path: '/users/:id/followers', element: <FollowersList />, loader: requireAuthLoader },
       { path: '/users/:id/following', element: <FollowingList />, loader: requireAuthLoader },
+
+      // admin:
+      {
+        path: '/admin',
+        element: (
+          <AdminGuard>
+            <AdminLayout />
+          </AdminGuard>
+        ),
+        children: [
+          { path: 'users', element: <AdminUsersList /> },
+          { path: 'users/:id', element: <AdminUserEdit /> }
+        ]
+      },
 
       { path: '*', element: <NotFound /> }
     ]

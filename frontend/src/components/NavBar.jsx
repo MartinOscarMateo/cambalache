@@ -1,20 +1,51 @@
 // frontend/src/components/NavBar.jsx
-import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import logo from '../assets/logo-svg.svg'; // importa tu logo SVG
+import { useEffect, useState } from 'react';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
+import logo from '../assets/logo-svg.svg';
+import { getMe } from '../lib/api.js';
 
 export default function NavBar() {
   const [open, setOpen] = useState(false);
+  const [me, setMe] = useState(() => {
+    try { return JSON.parse(localStorage.getItem('user') || 'null'); } catch { return null; }
+  });
   const navigate = useNavigate();
+  const location = useLocation();
 
   const token = localStorage.getItem('token');
-  const user = JSON.parse(localStorage.getItem('user') || 'null');
+
+  useEffect(() => {
+    let mounted = true;
+    async function hydrate() {
+      if (!token) {
+        setMe(null);
+        return;
+      }
+      try {
+        const data = await getMe();
+        if (!mounted) return;
+        setMe(data);
+        localStorage.setItem('user', JSON.stringify(data));
+      } catch {
+        // token invalido o 401 -limpiar sesion
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        setMe(null);
+      }
+    }
+    hydrate();
+    return () => { mounted = false; };
+  }, [token]);
 
   function logout() {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     navigate('/login', { replace: true });
     setOpen(false);
+  }
+
+  function isActive(path) {
+    return location.pathname === path;
   }
 
   return (
@@ -29,7 +60,7 @@ export default function NavBar() {
 
       <div className="py-4 md:py-5 relative z-[1001]">
         <nav className="flex justify-between items-center w-[92%] mx-auto">
-          {/* Logo Cambalache */}
+          {/* logo */}
           <div className="flex items-center">
             <Link to="/" onClick={() => setOpen(false)}>
               <img
@@ -40,35 +71,98 @@ export default function NavBar() {
             </Link>
           </div>
 
-          {/* Menú */}
+          {/* menu */}
           <div
             className={`md:static fixed md:min-h-fit min-h-[50vh] left-0 ${
               open ? 'top-[72px]' : '-top-full'
             } md:w-auto w-full flex items-center px-5 bg-[#2727d1] md:bg-transparent z-[1001]`}
           >
             <ul className="flex md:flex-row flex-col md:items-center md:gap-[4vw] gap-6 w-full md:w-auto text-white text-base">
-              <li><Link className="hover:text-[#ffdb3e]" to="/" onClick={() => setOpen(false)}>Inicio</Link></li>
-              <li><Link className="hover:text-[#ffdb3e]" to="/posts" onClick={() => setOpen(false)}>Publicaciones</Link></li>
-              <li><Link className="hover:text-[#ffdb3e]" to="/posts/create" onClick={() => setOpen(false)}>Crear</Link></li>
+              <li>
+                <Link
+                  className={`hover:text-[#ffdb3e] ${isActive('/') ? 'underline' : ''}`}
+                  to="/"
+                  onClick={() => setOpen(false)}
+                >
+                  inicio
+                </Link>
+              </li>
+
+              <li>
+                <Link
+                  className={`hover:text-[#ffdb3e] ${isActive('/posts') ? 'underline' : ''}`}
+                  to="/posts"
+                  onClick={() => setOpen(false)}
+                >
+                  publicaciones
+                </Link>
+              </li>
+
+              {token && (
+                <li>
+                  <Link
+                    className={`hover:text-[#ffdb3e] ${isActive('/posts/create') ? 'underline' : ''}`}
+                    to="/posts/create"
+                    onClick={() => setOpen(false)}
+                  >
+                    crear
+                  </Link>
+                </li>
+              )}
+
+              {/* admin solo si role === 'admin' */}
+              {token && me?.role === 'admin' && (
+                <li>
+                  <Link
+                    className={`hover:text-[#ffdb3e] ${location.pathname.startsWith('/admin') ? 'underline' : ''}`}
+                    to="/admin/users"
+                    onClick={() => setOpen(false)}
+                  >
+                    admin
+                  </Link>
+                </li>
+              )}
 
               {token ? (
                 <>
-                  <li><Link className="hover:text-[#ffdb3e]" to="/chats" onClick={() => setOpen(false)}>Chats</Link></li>
-                  <li><Link className="hover:text-[#ffdb3e]" to="/profile" onClick={() => setOpen(false)}>{user?.name || 'Perfil'}</Link></li>
-                  <li><button onClick={logout} className="hover:text-[#ffdb3e]">Salir</button></li>
+                  <li>
+                    <Link
+                      className={`hover:text-[#ffdb3e] ${isActive('/chats') ? 'underline' : ''}`}
+                      to="/chats"
+                      onClick={() => setOpen(false)}
+                    >
+                      chats
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      className={`hover:text-[#ffdb3e] ${isActive('/profile') ? 'underline' : ''}`}
+                      to="/profile"
+                      onClick={() => setOpen(false)}
+                    >
+                      {me?.name || 'perfil'}
+                    </Link>
+                  </li>
+                  <li>
+                    <button onClick={logout} className="hover:text-[#ffdb3e]">salir</button>
+                  </li>
                 </>
               ) : (
                 <>
-                  <li><Link className="hover:text-[#ffdb3e]" to="/register" onClick={() => setOpen(false)}>Registrarse</Link></li>
-                  <li><Link className="hover:text-[#ffdb3e]" to="/login" onClick={() => setOpen(false)}>Ingresar</Link></li>
+                  <li>
+                    <Link className="hover:text-[#ffdb3e]" to="/register" onClick={() => setOpen(false)}>registrarse</Link>
+                  </li>
+                  <li>
+                    <Link className="hover:text-[#ffdb3e]" to="/login" onClick={() => setOpen(false)}>ingresar</Link>
+                  </li>
                 </>
               )}
             </ul>
           </div>
 
-          {/* Toggle móvil */}
+          {/* toggle movil */}
           <div className="flex items-center gap-4 md:hidden">
-            <button onClick={() => setOpen(!open)} aria-label="Abrir menú">
+            <button onClick={() => setOpen(!open)} aria-label="abrir menu">
               <ion-icon name={open ? 'close' : 'menu'} className="text-3xl text-white"></ion-icon>
             </button>
           </div>

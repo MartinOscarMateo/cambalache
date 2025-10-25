@@ -7,17 +7,21 @@ import { createUserSchema, updateUserSchema } from '../schemas/adminUsers.js'
 
 const router = Router()
 
-// GET /api/admin/users?q=&page=&limit=&active=- listado con busqueda y paginacion
+// GET /api/admin/users?q=&page=&limit=&active=
 router.get('/', auth, isAdmin, async (req, res) => {
   try {
     const q = String(req.query.q || '').trim()
     const page = Math.max(parseInt(req.query.page || '1', 10), 1)
     const limit = Math.min(Math.max(parseInt(req.query.limit || '10', 10), 1), 100)
-    const active = req.query.active === 'true' ? true : req.query.active === 'false' ? false : undefined
+
+    // si no se especifica ?active=, por defecto solo activos
+    const activeParam = req.query.active
+    const hasActive = activeParam === 'true' || activeParam === 'false'
+    const active = hasActive ? activeParam === 'true' : true
 
     const filter = {}
     if (q) filter.$text = { $search: q }
-    if (typeof active === 'boolean') filter.active = active
+    filter.active = active
 
     const [items, total] = await Promise.all([
       User.find(filter)
@@ -28,18 +32,13 @@ router.get('/', auth, isAdmin, async (req, res) => {
       User.countDocuments(filter)
     ])
 
-    res.json({
-      page,
-      limit,
-      total,
-      items
-    })
+    res.json({ page, limit, total, items })
   } catch {
     res.status(500).json({ error: 'INTERNAL_ERROR' })
   }
 })
 
-// GET /api/admin/users/:id detalle de usuario
+// GET /api/admin/users/:id
 router.get('/:id', auth, isAdmin, async (req, res) => {
   try {
     const user = await User.findById(req.params.id).select('name email role active avatar createdAt')
@@ -50,7 +49,7 @@ router.get('/:id', auth, isAdmin, async (req, res) => {
   }
 })
 
-// POST /api/admin/users - crear usuario
+// POST /api/admin/users
 router.post('/', auth, isAdmin, validate(createUserSchema), async (req, res) => {
   try {
     const { name, email, password, role, active } = req.body
@@ -78,7 +77,7 @@ router.post('/', auth, isAdmin, validate(createUserSchema), async (req, res) => 
   }
 })
 
-// PUT /api/admin/users/:id - actualizar usuario
+// PUT /api/admin/users/:id
 router.put('/:id', auth, isAdmin, validate(updateUserSchema), async (req, res) => {
   try {
     const allowed = ['name', 'email', 'role', 'active']
@@ -94,13 +93,15 @@ router.put('/:id', auth, isAdmin, validate(updateUserSchema), async (req, res) =
   }
 })
 
-// DELETE /api/admin/users/:id - la baja
+// DELETE /api/admin/users/:id
 router.delete('/:id', auth, isAdmin, async (req, res) => {
   try {
-    const user = await User.findByIdAndUpdate(req.params.id, { active: false }, { new: true })
-      .select('name email role active createdAt')
-    if (!user) return res.status(404).json({ error: 'NOT_FOUND' })
-    res.json(user)
+    const { id } = req.params
+    if (String(req.user.id) === String(id)) return res.status(400).json({ error: 'NO_SELF_DISABLE' })
+
+    const updated = await User.findByIdAndUpdate(id, { $set: { active: false } }, { new: true })
+    if (!updated) return res.status(404).json({ error: 'NOT_FOUND' })
+    res.json({ ok: true })
   } catch {
     res.status(500).json({ error: 'INTERNAL_ERROR' })
   }

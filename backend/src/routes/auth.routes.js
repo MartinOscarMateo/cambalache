@@ -38,7 +38,7 @@ router.post('/login', validate(loginSchema), async (req, res) => {
     const user = await User.findOne({ email })
     if (!user) return res.status(401).json({ message: 'Credenciales inválidas' })
 
-    if (!user.active) return res.status(403).json({ message: 'Cuenta deshabilitada' })
+    if (user.active === false) return res.status(403).json({ message: 'Cuenta deshabilitada' })
 
     const match = await bcrypt.compare(password, user.password)
     if (!match) return res.status(401).json({ message: 'Credenciales inválidas' })
