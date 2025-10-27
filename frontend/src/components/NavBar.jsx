@@ -27,7 +27,6 @@ export default function NavBar() {
         setMe(data);
         localStorage.setItem('user', JSON.stringify(data));
       } catch {
-        // token invalido o 401 -limpiar sesion
         localStorage.removeItem('token');
         localStorage.removeItem('user');
         setMe(null);
@@ -60,7 +59,6 @@ export default function NavBar() {
 
       <div className="py-4 md:py-5 relative z-[1001]">
         <nav className="flex justify-between items-center w-[92%] mx-auto">
-          {/* logo */}
           <div className="flex items-center">
             <Link to="/" onClick={() => setOpen(false)}>
               <img
@@ -71,11 +69,8 @@ export default function NavBar() {
             </Link>
           </div>
 
-          {/* menu */}
           <div
-            className={`md:static fixed md:min-h-fit min-h-[50vh] left-0 ${
-              open ? 'top-[72px]' : '-top-full'
-            } md:w-auto w-full flex items-center px-5 bg-[#2727d1] md:bg-transparent z-[1001]`}
+            className={`md:static fixed md:min-h-fit min-h-[50vh] left-0 ${open ? 'top-[72px]' : '-top-full'} md:w-auto w-full flex items-center px-5 bg-[#2727d1] md:bg-transparent z-[1001]`}
           >
             <ul className="flex md:flex-row flex-col md:items-center md:gap-[4vw] gap-6 w-full md:w-auto text-white text-base">
               <li>
@@ -98,6 +93,16 @@ export default function NavBar() {
                 </Link>
               </li>
 
+              <li>
+                <Link
+                  className={`hover:text-[#ffdb3e] ${isActive('/mapa') ? 'underline' : ''}`}
+                  to="/mapa"
+                  onClick={() => setOpen(false)}
+                >
+                  mapa
+                </Link>
+              </li>
+
               {token && (
                 <li>
                   <Link
@@ -110,7 +115,6 @@ export default function NavBar() {
                 </li>
               )}
 
-              {/* admin solo si role === 'admin' */}
               {token && me?.role === 'admin' && (
                 <li>
                   <Link
@@ -150,17 +154,28 @@ export default function NavBar() {
               ) : (
                 <>
                   <li>
-                    <Link className="hover:text-[#ffdb3e]" to="/register" onClick={() => setOpen(false)}>registrarse</Link>
+                    <Link
+                      className="hover:text-[#ffdb3e]"
+                      to="/register"
+                      onClick={() => setOpen(false)}
+                    >
+                      registrarse
+                    </Link>
                   </li>
                   <li>
-                    <Link className="hover:text-[#ffdb3e]" to="/login" onClick={() => setOpen(false)}>ingresar</Link>
+                    <Link
+                      className="hover:text-[#ffdb3e]"
+                      to="/login"
+                      onClick={() => setOpen(false)}
+                    >
+                      ingresar
+                    </Link>
                   </li>
                 </>
               )}
             </ul>
           </div>
 
-          {/* toggle movil */}
           <div className="flex items-center gap-4 md:hidden">
             <button onClick={() => setOpen(!open)} aria-label="abrir menu">
               <ion-icon name={open ? 'close' : 'menu'} className="text-3xl text-white"></ion-icon>
