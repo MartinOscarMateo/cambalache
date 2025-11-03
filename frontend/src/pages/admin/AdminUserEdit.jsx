@@ -57,38 +57,89 @@ export default function AdminUserEdit() {
   if (loading) return null;
 
   return (
-    <section>
-      <h1 className="text-2xl font-bold text-[#2727d1] mb-4">editar usuario</h1>
+    <main
+      className="min-h-screen px-4 py-8"
+      style={{ background: 'var(--c-text)' }}
+    >
+      <div className="max-w-4xl mx-auto">
+        <section className="rounded-2xl bg-white p-5 sm:p-6 border border-[color:var(--c-mid-blue)]/60 shadow-[0_20px_60px_rgba(0,0,0,.25)]">
+          <header className="mb-6">
+            <h1
+              className="text-2xl font-bold"
+              style={{ color: 'var(--c-brand)', fontFamily: 'vag-rundschrift-d, sans-serif' }}
+            >
+              editar usuario
+            </h1>
+          </header>
 
-      <form onSubmit={onSubmit} className="space-y-4 max-w-xl">
-        <div>
-          <label className="block mb-1">name</label>
-          <input name="name" value={form.name} onChange={onChange} className="border px-3 py-2 w-full" />
-        </div>
+          <form onSubmit={onSubmit} className="space-y-4 max-w-xl">
+            <div>
+              <label className="block mb-1 text-sm font-medium" style={{ color: 'var(--c-text)' }}>name</label>
+              <input
+                name="name"
+                value={form.name}
+                onChange={onChange}
+                disabled={saving}
+                className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 outline-none ring-2 ring-transparent focus:ring-[color:var(--c-info)]"
+              />
+            </div>
 
-        <div>
-          <label className="block mb-1">email</label>
-          <input name="email" type="email" value={form.email} onChange={onChange} className="border px-3 py-2 w-full" />
-        </div>
+            <div>
+              <label className="block mb-1 text-sm font-medium" style={{ color: 'var(--c-text)' }}>email</label>
+              <input
+                name="email"
+                type="email"
+                value={form.email}
+                onChange={onChange}
+                disabled={saving}
+                className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 outline-none ring-2 ring-transparent focus:ring-[color:var(--c-info)]"
+              />
+            </div>
 
-        <div>
-          <label className="block mb-1">role</label>
-          <select name="role" value={form.role} onChange={onChange} className="border px-3 py-2 w-full">
-            <option value="user">user</option>
-            <option value="admin">admin</option>
-          </select>
-        </div>
+            <div>
+              <label className="block mb-1 text-sm font-medium" style={{ color: 'var(--c-text)' }}>role</label>
+              <select
+                name="role"
+                value={form.role}
+                onChange={onChange}
+                disabled={saving}
+                className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 outline-none ring-2 ring-transparent focus:ring-[color:var(--c-info)]"
+              >
+                <option value="user">user</option>
+                <option value="admin">admin</option>
+              </select>
+            </div>
 
-        <label className="inline-flex items-center gap-2">
-          <input name="active" type="checkbox" checked={form.active} onChange={onChange} />
-          <span>active</span>
-        </label>
+            <label className="inline-flex items-center gap-2">
+              <input
+                name="active"
+                type="checkbox"
+                checked={form.active}
+                onChange={onChange}
+                disabled={saving}
+              />
+              <span className="text-sm" style={{ color: 'var(--c-text)' }}>active</span>
+            </label>
 
-        <div className="flex gap-2">
-          <button type="submit" className="px-4 py-2 border" disabled={saving}>guardar</button>
-          <Link to="/admin/users" className="px-4 py-2 border">cancelar</Link>
-        </div>
-      </form>
-    </section>
+            <div className="flex gap-3 pt-2">
+              <button
+                type="submit"
+                disabled={saving}
+                className="px-5 py-3 rounded-xl font-semibold text-white bg-[color:var(--c-brand)] hover:brightness-110 transition disabled:opacity-60"
+              >
+                {saving ? 'guardando…' : 'guardar'}
+              </button>
+              <Link
+                to="/admin/users"
+                className="px-5 py-3 rounded-xl border border-[color:var(--c-mid-blue)]/60 hover:bg-[color:var(--c-mid-blue)]/15 transition"
+                style={{ color: 'var(--c-text)' }}
+              >
+                cancelar
+              </Link>
+            </div>
+          </form>
+        </section>
+      </div>
+    </main>
   );
 }
