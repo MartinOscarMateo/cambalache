@@ -1,0 +1,13 @@
+/* Enlaces dentro de main que no son botones */
+main a:not(.btn) {
+  color: var(--c-text);
+  text-decoration: none;
+  font-weight: 600;
+  transition: color .2s ease;
+}
+
+main a:not(.btn):hover,
+main a:not(.btn):focus-visible {
+  color: var(--c-accent);
+  outline: none;
+}

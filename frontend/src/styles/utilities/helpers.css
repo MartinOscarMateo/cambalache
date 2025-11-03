@@ -1,0 +1,17 @@
+/* Colores de info */
+.bg-info { background: var(--c-info); }
+.text-info { color: var(--c-info); }
+
+/* intermedios */
+.bg-mid-blue { background: var(--c-mid-blue); }
+.bg-mid-pink { background: var(--c-mid-pink); }
+.bg-mid-yellow { background: var(--c-mid-yellow); }
+.bg-mid-cyan { background: var(--c-mid-cyan); }
+
+/* Sobre intermedios texto azul */
+.on-mid,
+.on-mid h1, .on-mid h2, .on-mid h3, .on-mid h4, .on-mid h5, .on-mid h6,
+.on-mid p, .on-mid a, .on-mid li, .on-mid small, .on-mid strong, .on-mid span,
+.on-mid button, .on-mid input, .on-mid textarea, .on-mid label {
+  color: var(--c-text) !important;
+}

@@ -1,0 +1,30 @@
+.btn {
+  border-radius: 8px;
+  border: 1px solid transparent;
+  padding: .6em 1.2em;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: "lato", sans-serif;
+  transition: background-color .2s ease, color .2s ease, filter .2s ease;
+}
+
+.btn:hover { filter: brightness(0.95); }
+.btn:focus-visible { outline: 2px solid var(--c-accent); outline-offset: 2px; }
+.btn:disabled { opacity: .6; cursor: not-allowed; }
+
+/* variantes Cambalache */
+.btn-blue { background: var(--c-text); color: #fff; }
+.btn-pink { background: var(--c-brand); color: #fff; }
+.btn-yellow { background: var(--c-accent); color: var(--c-text); }
+.btn-cyan { background: var(--c-info); color:#fff; }
+
+/* Hovers intermedios y texto azul */
+.btn-blue:hover   { background: var(--c-mid-blue);   color: var(--c-text); }
+.btn-pink:hover   { background: var(--c-mid-pink);   color: var(--c-text); }
+.btn-yellow:hover { background: var(--c-mid-yellow); color: var(--c-text); }
+.btn-cyan:hover   { background: var(--c-mid-cyan);   color: var(--c-text); }
+
+
+/* aseguramos que los <a.btn> no hereden ningun estilo de links xD */
+a.btn, a.btn:hover, a.btn:focus-visible { color: inherit; text-decoration: none; }

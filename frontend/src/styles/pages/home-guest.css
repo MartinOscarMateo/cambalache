@@ -1,0 +1,79 @@
+/* frontend/src/styles/pages/home-guest.css */
+
+.home-guest {
+  display: flex;
+  flex-direction: column;
+  gap: 3rem;
+}
+
+/* utilitario accesible */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0,0,1px,1px);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Banner con botones superpuestos */
+.home-guest__banner-box { position: relative; }
+.home-guest__banner img {
+  width: 100%;
+  height: clamp(180px, 35vw, 420px);
+  object-fit: cover;
+  border-radius: 16px;
+}
+.home-guest__banner-actions {
+  position: absolute;
+  left: 16px;
+  bottom: 16px;
+  display: inline-flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.home-guest__banner-actions .btn { box-shadow: 0 6px 18px rgba(0,0,0,.18); }
+@media (min-width: 1024px) {
+  .home-guest__banner-actions { left: 24px; bottom: 24px; }
+}
+
+/* Pasos */
+.home-guest__steps h2 {
+  text-align: left;
+  margin: 0 0 1.25rem;
+}
+.home-guest__grid {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: 1fr;
+}
+@media (min-width: 640px) { .home-guest__grid { grid-template-columns: repeat(2, 1fr); } }
+@media (min-width: 1024px) { .home-guest__grid { grid-template-columns: repeat(4, 1fr); } }
+.home-guest__step {
+  background: #fff;
+  border: 2px dotted var(--c-brand);
+  border-radius: 12px;
+  padding: 16px;
+  text-align: center;
+  color: var(--c-text);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+.home-guest__badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 999px;
+  background: var(--c-text);
+  color: var(--c-bg);
+  font-weight: 800;
+  font-size: 1.25rem;
+}
+.home-guest__step p { margin: 0; }

@@ -29,8 +29,6 @@ import AdminUserEdit from './pages/admin/AdminUserEdit.jsx';
 // mapa:
 import MapView from './pages/MapView.jsx';
 
-import './App.css';
-
 function requireAuthLoader() {
   const token = localStorage.getItem('token');
   if (!token) throw redirect('/login');

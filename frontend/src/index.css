@@ -4,10 +4,16 @@
 
 /* ===== Paleta Cambalache ===== */
 :root {
-  --c-bg:   #f6f2ff;   /* fondo */
-  --c-text: #2727d1;   /* texto principal */
-  --c-brand: #ff52b9;  /* títulos (VAG Rundschrift D) */
-  --c-accent: #ffdb3e; /* color secundario / hover */
+  --c-bg:   #ececec;
+  --c-text: #2727d1;
+  --c-brand: #ff52b9;
+  --c-accent: #ffdb3e;
+  --c-info: #00afe7;
+
+    --c-mid-blue:   #bbbbe5;
+  --c-mid-pink:   #f1c6df;
+  --c-mid-yellow: #f1e8c1;
+  --c-mid-cyan:   #b1ddeb;
 
   color-scheme: light;
   font-family: "lato", sans-serif;
@@ -23,100 +29,4 @@ body {
   background-color: var(--c-bg);
   color: var(--c-text);
   font-family: "lato", sans-serif;
-}
-
-/* ===== Tipografía global ===== */
-h1, h2, h3, h4 {
-  font-family: "vag-rundschrift-d", sans-serif;
-  color: var(--c-brand);
-}
-h1 { font-weight: 400; line-height: 1.1; }
-h2 { font-weight: 400; }
-h3 { font-weight: 400; }
-h4 { font-weight: 400; }
-
-p, li, a, button, input, textarea {
-  font-family: "lato", sans-serif;
-  font-weight: 400;
-}
-
-/* ===== Enlaces fuera del nav ===== */
-main a {
-  color: var(--c-text);
-  text-decoration: none;
-  font-weight: 600;
-  transition: color 0.2s ease;
-}
-main a:hover { color: var(--c-accent); }
-
-/* ===== Botones base ===== */
-.btn {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: .6em 1.2em;
-  font-size: 1rem;
-  font-weight: 700;
-  cursor: pointer;
-  font-family: "lato", sans-serif;
-  transition: background-color 0.2s ease, color 0.2s ease;
-}
-.btn:hover { filter: brightness(0.95); }
-
-/* variantes Cambalache */
-.btn-blue { background: var(--c-text); color:#fff; }
-.btn-pink { background: var(--c-brand); color:#fff; }
-.btn-yellow { background: var(--c-accent); color:var(--c-text); }
-
-/* ===== Tarjetas ===== */
-.card {
-  background:#fff;
-  border:1px solid #e6e6e6;
-  border-radius:12px;
-  color: var(--c-text);
-}
-
-/* ===== Utilitarias ===== */
-.bg-brand { background: var(--c-brand); }
-.text-brand { color: var(--c-brand); }
-.text-accent { color: var(--c-accent); }
-
-/* ===== NavBar (mantener existente) ===== */
-:root {
-  --nav-bg: #2727d1;
-  --nav-text: #ffffff;
-  --nav-hover: #ffdb3e;
-  --nav-brand: #f6f2ff;
-}
-.navbar {
-  background-color: var(--nav-bg);
-  color: var(--nav-text);
-  font-family: "lato", sans-serif;
-}
-.navbar a,
-.navbar button {
-  color: var(--nav-text);
-  font-family: "lato", sans-serif;
-  transition: color 0.2s ease;
-}
-.navbar a:hover,
-.navbar button:hover {
-  color: var(--nav-hover);
-}
-.navbar-brand {
-  font-family: "vag-rundschrift-d", sans-serif;
-  color: var(--nav-brand);
-}
-
-/* ===== Footer Cambalache ===== */
-.footer {
-  background-color: var(--nav-bg);
-  color: var(--nav-text);
-  text-align: center;
-  font-family: "lato", sans-serif;
-  padding: 1.5rem 0;
-}
-.footer small { font-weight: 500; }
-.footer .footer-brand {
-  font-family: "vag-rundschrift-d", sans-serif;
-  color: var(--nav-brand);
 }

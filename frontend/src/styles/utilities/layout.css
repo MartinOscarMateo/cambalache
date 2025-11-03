@@ -1,0 +1,23 @@
+:root {
+  --container-max: 1120px;
+  --gutter-x: 16px
+}
+
+@media (min-width: 1024px) {
+  :root { --gutter-x: 24px }
+}
+
+.container {
+  max-width: var(--container-max);
+  margin: 0 auto;
+  padding-left: var(--gutter-x);
+  padding-right: var(--gutter-x)
+}
+
+.container--wide {
+  max-width: 1360px
+}
+
+.full-bleed {
+  width: 100%
+}
