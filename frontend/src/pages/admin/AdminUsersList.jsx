@@ -72,66 +72,148 @@ export default function AdminUsersList() {
   }
 
   return (
-    <section>
-      <h1 className="text-2xl font-bold text-[#2727d1] mb-4">usuarios</h1>
+    <main
+      className="min-h-screen px-4 py-8"
+      style={{ background: 'var(--c-text)' }}
+    >
+      <div className="max-w-6xl mx-auto">
+        <section className="rounded-2xl bg-white p-5 sm:p-6 border border-[color:var(--c-mid-blue)]/60 shadow-[0_20px_60px_rgba(0,0,0,.25)]">
+          <header className="mb-5">
+            <h1
+              className="text-2xl font-bold"
+              style={{ color: 'var(--c-brand)', fontFamily: 'vag-rundschrift-d, sans-serif' }}
+            >
+              usuarios
+            </h1>
+          </header>
 
-      <form onSubmit={onSearch} className="flex gap-2 mb-4">
-        <input
-          value={q}
-          onChange={(e) => setQ(e.target.value)}
-          placeholder="buscar por nombre o email"
-          className="border px-3 py-2 w-full"
-        />
-        <button type="submit" className="px-4 py-2 border">buscar</button>
-      </form>
+          <form onSubmit={onSearch} className="flex flex-col sm:flex-row gap-2 mb-4">
+            <input
+              value={q}
+              onChange={(e) => setQ(e.target.value)}
+              placeholder="buscar por nombre o email"
+              className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 outline-none ring-2 ring-transparent focus:ring-[color:var(--c-info)]"
+            />
+            <button
+              type="submit"
+              className="px-4 py-3 rounded-xl font-semibold text-white bg-[color:var(--c-info)] hover:brightness-110 transition"
+            >
+              buscar
+            </button>
+          </form>
 
-      <div className="overflow-x-auto border rounded">
-        <table className="min-w-full text-sm">
-          <thead>
-            <tr className="bg-[#f6f2ff]">
-              <th className="text-left p-2">name</th>
-              <th className="text-left p-2">email</th>
-              <th className="text-left p-2">role</th>
-              <th className="text-left p-2">active</th>
-              <th className="text-left p-2">createdAt</th>
-              <th className="text-left p-2">acciones</th>
-            </tr>
-          </thead>
-          <tbody>
-            {data.items.map(u => {
-              const id = u._id || u.id;
-              return (
-                <tr key={id} className="border-t">
-                  <td className="p-2">{u.name}</td>
-                  <td className="p-2">{u.email}</td>
-                  <td className="p-2">{u.role}</td>
-                  <td className="p-2">{String(u.active)}</td>
-                  <td className="p-2">{u.createdAt ? new Date(u.createdAt).toLocaleString() : '-'}</td>
-                  <td className="p-2 flex gap-2">
-                    <Link to={`/admin/users/${id}`} className="px-2 py-1 border">modificar</Link>
-                    <button onClick={() => handleDelete(id)} className="px-2 py-1 border">eliminar</button>
-                  </td>
+          <div className="overflow-x-auto rounded-2xl border border-[color:var(--c-mid-blue)]/60">
+            <table className="min-w-full text-sm">
+              <thead>
+                <tr className="bg-[color:var(--c-mid-blue)]/20 text-left">
+                  <th className="p-3" style={{ color: 'var(--c-text)' }}>name</th>
+                  <th className="p-3" style={{ color: 'var(--c-text)' }}>email</th>
+                  <th className="p-3" style={{ color: 'var(--c-text)' }}>role</th>
+                  <th className="p-3" style={{ color: 'var(--c-text)' }}>active</th>
+                  <th className="p-3" style={{ color: 'var(--c-text)' }}>createdAt</th>
+                  <th className="p-3" style={{ color: 'var(--c-text)' }}>acciones</th>
                 </tr>
-              );
-            })}
-            {data.items.length === 0 && (
-              <tr><td className="p-2" colSpan={6}>sin resultados</td></tr>
-            )}
-          </tbody>
-        </table>
-      </div>
+              </thead>
+              <tbody>
+                {data.items.map(u => {
+                  const id = u._id || u.id;
+                  const isActive = !!u.active;
+                  const role = String(u.role || '').toLowerCase();
+                  return (
+                    <tr key={id} className="border-t hover:bg-[color:var(--c-mid-blue)]/10">
+                      <td className="p-3 text-[color:var(--c-text)]">{u.name}</td>
+                      <td className="p-3 text-[color:var(--c-text)]">{u.email}</td>
+                      <td className="p-3">
+                        <span
+                          className={`px-2 py-1 rounded-full text-xs font-semibold ${
+                            role === 'admin'
+                              ? 'bg-[color:var(--c-brand)] text-white'
+                              : 'bg-[color:var(--c-accent)]/50 text-[color:var(--c-text)]'
+                          }`}
+                        >
+                          {u.role}
+                        </span>
+                      </td>
+                      <td className="p-3">
+                        <span
+                          className={`px-2 py-1 rounded-full text-xs font-semibold ${
+                            isActive
+                              ? 'bg-[color:var(--c-mid-cyan)]/40 text-[color:var(--c-text)]'
+                              : 'bg-slate-200 text-slate-600'
+                          }`}
+                        >
+                          {String(u.active)}
+                        </span>
+                      </td>
+                      <td className="p-3 text-slate-600">
+                        {u.createdAt ? new Date(u.createdAt).toLocaleString() : '-'}
+                      </td>
+                      <td className="p-3">
+                        <div className="flex flex-wrap gap-2 justify-start">
+                          <Link
+                            to={`/admin/users/${id}`}
+                            className="px-3 py-1.5 rounded-xl border border-[color:var(--c-mid-blue)]/60 hover:bg-[color:var(--c-mid-blue)]/15 transition text-[color:var(--c-text)]"
+                          >
+                            modificar
+                          </Link>
+                          <button
+                            onClick={() => handleDelete(id)}
+                            className="px-3 py-1.5 rounded-xl bg-[color:var(--c-brand)] text-white hover:brightness-110 transition"
+                          >
+                            eliminar
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+                {data.items.length === 0 && (
+                  <tr>
+                    <td className="p-3" colSpan={6} style={{ color: 'var(--c-text)' }}>
+                      sin resultados
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
 
-      <div className="flex items-center gap-3 mt-4">
-        <button onClick={() => setPage(p => Math.max(1, p - 1))} className="px-3 py-1 border" disabled={loading}>prev</button>
-        <span>page {page}</span>
-        <button onClick={() => setPage(p => p + 1)} className="px-3 py-1 border" disabled={loading}>next</button>
-        <select value={limit} onChange={(e) => setLimit(parseInt(e.target.value, 10))} className="border px-2 py-1">
-          <option value={10}>10</option>
-          <option value={25}>25</option>
-          <option value={50}>50</option>
-        </select>
-        <span>total {data.total}</span>
+          <div className="flex flex-wrap items-center gap-3 mt-4">
+            <button
+              onClick={() => setPage(p => Math.max(1, p - 1))}
+              className="px-3 py-2 rounded-full border border-[color:var(--c-mid-blue)]/60 hover:bg-[color:var(--c-mid-blue)]/15 transition"
+              disabled={loading}
+              style={{ color: 'var(--c-text)' }}
+            >
+              prev
+            </button>
+            <span className="px-3 py-2 rounded-full bg-[color:var(--c-accent)]/50 text-sm font-semibold" style={{ color: 'var(--c-text)' }}>
+              page {page}
+            </span>
+            <button
+              onClick={() => setPage(p => p + 1)}
+              className="px-3 py-2 rounded-full border border-[color:var(--c-mid-blue)]/60 hover:bg-[color:var(--c-mid-blue)]/15 transition"
+              disabled={loading}
+              style={{ color: 'var(--c-text)' }}
+            >
+              next
+            </button>
+            <select
+              value={limit}
+              onChange={(e) => setLimit(parseInt(e.target.value, 10))}
+              className="rounded-xl border border-slate-200 bg-white px-3 py-2 outline-none ring-2 ring-transparent focus:ring-[color:var(--c-info)]"
+              style={{ color: 'var(--c-text)' }}
+            >
+              <option value={10}>10</option>
+              <option value={25}>25</option>
+              <option value={50}>50</option>
+            </select>
+            <span className="ml-auto text-sm" style={{ color: 'var(--c-text)' }}>
+              total {data.total}
+            </span>
+          </div>
+        </section>
       </div>
-    </section>
+    </main>
   );
 }
