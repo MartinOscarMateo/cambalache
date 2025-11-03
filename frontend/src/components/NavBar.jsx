@@ -3,14 +3,15 @@ import { useEffect, useState, useRef } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import logo from '../assets/logo-svg.svg';
 import { getMe } from '../lib/api.js';
+import '../styles/components/navbar.css';
 
 export default function NavBar() {
-  const [open, setOpen] = useState(false); // estado del drawer mobile
+  const [open, setOpen] = useState(false); // estado drawer mobile
   const [me, setMe] = useState(() => {
     try { return JSON.parse(localStorage.getItem('user') || 'null'); } catch { return null; }
   });
-  const [menuUserOpen, setMenuUserOpen] = useState(false); // estado del menu del avatar
-  const [unreadChats, setUnreadChats] = useState(0); // contador simple de chats no leidos
+  const [menuUserOpen, setMenuUserOpen] = useState(false); // estado menu avatar
+  const [unreadChats, setUnreadChats] = useState(0); // contador chats no leidos
   const navigate = useNavigate();
   const location = useLocation();
   const menuRef = useRef(null);
@@ -40,7 +41,7 @@ export default function NavBar() {
   }, [token]);
 
   useEffect(() => {
-    // cierra menu usuario al hacer click fuera
+    // cierra menu usuario al click fuera
     function onDocClick(e) {
       if (!menuRef.current) return;
       if (!menuRef.current.contains(e.target)) setMenuUserOpen(false);
@@ -73,7 +74,7 @@ export default function NavBar() {
 
       <div className="py-3 md:py-4 relative z-[1001]">
         <nav className="flex justify-between items-center w-[92%] mx-auto">
-          {/* zona izquierda: logo */}
+          {/* izquierda: logo */}
           <div className="flex items-center">
             <Link to="/" onClick={() => setOpen(false)} className="flex items-center gap-2">
               <img
@@ -84,29 +85,32 @@ export default function NavBar() {
             </Link>
           </div>
 
-          {/* zona centro: links principales */}
+          {/* centro: links principales con pildora activa */}
           <div className="hidden md:flex">
-            <ul className="flex items-center gap-8 text-[#f6f2ff] text-[15px]">
+            <ul className="flex items-center gap-2 text-[15px]">
               <li>
                 <Link
-                  className={`hover:text-[#ffdb3e] ${isActive('/') ? 'text-[#ffdb3e] underline' : ''}`}
                   to="/"
+                  onClick={() => setOpen(false)}
+                  className={`nav-pill ${isActive('/') ? 'nav-pill--active' : 'text-[#f6f2ff] hover:text-[#ffdb3e]'}`}
                 >
                   inicio
                 </Link>
               </li>
               <li>
                 <Link
-                  className={`hover:text-[#ffdb3e] ${isActive('/posts') ? 'text-[#ffdb3e] underline' : ''}`}
                   to="/posts"
+                  onClick={() => setOpen(false)}
+                  className={`nav-pill ${isActive('/posts') ? 'nav-pill--active' : 'text-[#f6f2ff] hover:text-[#ffdb3e]'}`}
                 >
                   publicaciones
                 </Link>
               </li>
               <li>
                 <Link
-                  className={`hover:text-[#ffdb3e] ${isActive('/mapa') ? 'text-[#ffdb3e] underline' : ''}`}
                   to="/mapa"
+                  onClick={() => setOpen(false)}
+                  className={`nav-pill ${isActive('/mapa') ? 'nav-pill--active' : 'text-[#f6f2ff] hover:text-[#ffdb3e]'}`}
                 >
                   mapa
                 </Link>
@@ -114,15 +118,13 @@ export default function NavBar() {
             </ul>
           </div>
 
-          {/* zona derecha: iconos y avatar */}
-          <div className="hidden md:flex items-center gap-5 text-white">
+          {/* derecha: botones e iconos */}
+          <div className="hidden md:flex items-center gap-4">
             {!token && (
-              <Link
-                to="/login"
-                className="px-3 py-1.5 rounded-md bg-[#ff52b9] hover:opacity-90 transition-opacity"
-              >
-                ingresar
-              </Link>
+              <>
+                <Link to="/register" className="btn-nav btn-nav--cyan">registrarse</Link>
+                <Link to="/login" className="btn-nav btn-nav--pink">ingresar</Link>
+              </>
             )}
 
             {token && (
@@ -144,11 +146,12 @@ export default function NavBar() {
                   aria-label="notificaciones"
                   title="notificaciones"
                   aria-disabled="true"
-                  className="relative nav-icon text-[#ffdb3e] cursor-default opacity-90">
+                  className="relative nav-icon text-[#ffdb3e] cursor-default opacity-90"
+                >
                   <ion-icon name="notifications" className="text-2xl align-middle"></ion-icon>
                 </button>
 
-                {/* avatar y menu de cuenta */}
+                {/* avatar y menu */}
                 <div className="relative" ref={menuRef}>
                   <button
                     onClick={() => setMenuUserOpen(v => !v)}
@@ -187,7 +190,7 @@ export default function NavBar() {
             )}
           </div>
 
-          {/* boton hamburguesa - mobile */}
+          {/* hamburguesa mobile */}
           <div className="flex items-center gap-4 md:hidden">
             <button
               onClick={() => setOpen(!open)}
@@ -201,7 +204,7 @@ export default function NavBar() {
         </nav>
       </div>
 
-      {/* drawer mobile: basicamnente tiene todo xddd*/}
+      {/* drawer mobile */}
       <div
         id="mobile-drawer"
         className={`md:hidden fixed left-0 ${open ? 'top-[56px]' : '-top-full'} w-full bg-[#2727d1] z-[1001] transition-all`}
@@ -226,13 +229,13 @@ export default function NavBar() {
           {!token && (
             <>
               <li>
-                <Link className="hover:text-[#ffdb3e]" to="/login" onClick={() => setOpen(false)}>
-                  ingresar
+                <Link className="btn-nav btn-nav--cyan inline-block w-max" to="/register" onClick={() => setOpen(false)}>
+                  registrarse
                 </Link>
               </li>
               <li>
-                <Link className="hover:text-[#ffdb3e]" to="/register" onClick={() => setOpen(false)}>
-                  registrarse
+                <Link className="btn-nav btn-nav--pink inline-block w-max" to="/login" onClick={() => setOpen(false)}>
+                  ingresar
                 </Link>
               </li>
             </>
@@ -251,7 +254,7 @@ export default function NavBar() {
                 </Link>
               </li>
               <li className="flex items-center gap-2 text-[#ffdb3e]">
-                <ion-icon name="notifications-outline" className="text-xl align-middle"></ion-icon>
+                <ion-icon name="notifications" className="text-xl align-middle"></ion-icon>
                 <span>notificaciones</span>
               </li>
               <li>

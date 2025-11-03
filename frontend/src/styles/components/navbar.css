@@ -1,3 +1,38 @@
+/* frontend/src/styles/components/navbar.css */
+
+/* items navbar */
+.nav-pill {
+  padding: 6px 12px;
+  border-radius: 9999px;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+.nav-pill--active {
+  background: #f6f2ff;
+  color: #2727d1 !important;
+  font-weight: 700;
+}
+
+/* botones navbar */
+.btn-nav {
+  display: inline-block;
+  padding: 8px 14px;
+  border-radius: 10px;
+  font-weight: 700;
+  color: #ffffff;
+  line-height: 1;
+  transition: opacity 0.15s ease, transform 0.02s ease;
+}
+.btn-nav:hover { opacity: 0.9; }
+.btn-nav:active { transform: translateY(0.5px); }
+
+.btn-nav--cyan { background: #00afe7; }
+.btn-nav--pink { background: #ff52b9; }
+
+/* icono base */
+.nav-icon { transition: opacity 0.15s ease; }
+.nav-icon:hover { opacity: 0.9; }
+
+/* badge sobre icono de chats */
 .nav-badge {
   position: absolute;
   top: -4px;
@@ -11,9 +46,9 @@
   border-radius: 9999px;
   font-size: 10px;
   line-height: 1;
-  background: #ff4d6d; /* rojo badge */
+  background: #ff52b9;
   color: #ffffff;
-  box-shadow: 0 0 0 2px rgba(31,41,55,1); /* borde para contraste con barra */
+  box-shadow: 0 0 0 2px #2727d1;
 }
 
 /* transicion suavecita del drawer mobile */
