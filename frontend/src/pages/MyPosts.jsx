@@ -38,6 +38,7 @@ export default function MyPosts() {
     })();
   }, [userId]);
 
+  // confirm de borrado
   async function handleDeleteConfirm() {
     if (!selectedPost) return;
     try {
@@ -51,120 +52,180 @@ export default function MyPosts() {
     }
   }
 
-  if (loading) return <main className="p-6"><p>Cargando…</p></main>;
-  if (error) return <main className="p-6"><p className="text-red-600">{error}</p></main>;
+  // estado con paleta
+  function StatusPill({ status }) {
+    const s = String(status || '').toLowerCase();
+    const map = {
+      active: { bg: 'bg-[color:var(--c-mid-cyan)]/30', text: 'Activa' },
+      paused: { bg: 'bg-[color:var(--c-accent)]/40', text: 'Pausada' },
+      finished: { bg: 'bg-slate-200', text: 'Finalizada' }
+    };
+    const cfg = map[s] || map.finished;
+    return (
+      <span className={`px-2 py-1 rounded-full text-xs font-semibold ${cfg.bg}`} style={{ color: 'var(--c-text)' }}>
+        {cfg.text}
+      </span>
+    );
+  }
+
+  if (loading) return (
+    <main className="min-h-screen flex items-center justify-center px-4 py-10" style={{ background: '#f6f2ff' }}>
+      <p style={{ color: 'var(--c-text)' }}>Cargando…</p>
+    </main>
+  );
+  if (error) return (
+    <main className="min-h-screen flex items-center justify-center px-4 py-10" style={{ background: '#f6f2ff' }}>
+      <p className="rounded-lg bg-red-50 border border-red-200 text-red-700 px-4 py-2">{error}</p>
+    </main>
+  );
 
   return (
-    <main className="max-w-6xl mx-auto p-6">
-      <h1 className="text-2xl font-bold mb-6">Mis publicaciones</h1>
+    <main className="min-h-screen px-4 py-8" style={{ background: '#f6f2ff' }}>
+      <div className="max-w-6xl mx-auto">
+        {/* encabezado */}
+        <header className="mb-6">
+          <h1
+            className="text-2xl sm:text-3xl font-bold tracking-tight"
+            style={{ color: 'var(--c-brand)', fontFamily: 'vag-rundschrift-d, sans-serif' }}
+          >
+            Mis publicaciones
+          </h1>
+          <p className="mt-1 text-sm" style={{ color: 'var(--c-text)' }}>
+            Administra lo que ofreces y ajusta su estado.
+          </p>
+        </header>
 
-      {success && (
-        <div className="mb-4 p-3 rounded bg-green-100 text-green-700 border border-green-300">
-          {success}
-        </div>
-      )}
+        {/* alertas */}
+        {success && (
+          <div className="mb-4 rounded-xl border border-emerald-300 bg-emerald-50 px-3 py-2 text-emerald-800 text-sm">
+            {success}
+          </div>
+        )}
 
-      {posts.length === 0 ? (
-        <p className="text-gray-600">No tenés publicaciones creadas.</p>
-      ) : (
-        <div className="overflow-x-auto bg-white border rounded-xl shadow-sm">
-          <table className="w-full text-left border-collapse">
-            <thead className="bg-gray-100 border-b">
-              <tr>
-                <th className="p-3">Imagen</th>
-                <th className="p-3">Título</th>
-                <th className="p-3">Fecha</th>
-                <th className="p-3">Estado</th>
-                <th className="p-3 text-right">Acciones</th>
-              </tr>
-            </thead>
-            <tbody>
-              {posts.map(p => (
-                <tr key={p._id} className="border-b hover:bg-gray-50">
-                  <td className="p-3">
-                    {p.images?.[0] ? (
-                      <img
-                        src={p.images[0]}
-                        alt={p.title}
-                        className="w-16 h-16 object-cover rounded"
-                      />
-                    ) : (
-                      <div className="w-16 h-16 bg-gray-200 rounded" />
-                    )}
-                  </td>
-                  <td className="p-3 font-medium text-gray-900">{p.title}</td>
-                  <td className="p-3 text-gray-600 text-sm">
-                    {new Date(p.createdAt).toLocaleDateString('es-AR')}
-                  </td>
-                  <td className="p-3">
-                    <span
-                      className={`px-2 py-1 rounded text-xs font-medium ${
-                        p.status === 'active'
-                          ? 'bg-green-100 text-green-700'
-                          : p.status === 'paused'
-                          ? 'bg-yellow-100 text-yellow-700'
-                          : 'bg-gray-200 text-gray-600'
-                      }`}
-                    >
-                      {p.status === 'active'
-                        ? 'Activa'
-                        : p.status === 'paused'
-                        ? 'Pausada'
-                        : 'Finalizada'}
-                    </span>
-                  </td>
-                  <td className="p-3 text-right space-x-3">
-                    <button
-                      onClick={() => navigate(`/posts/${p._id}`)}
-                      className="text-blue-600 hover:underline text-sm"
-                    >
-                      Ver
-                    </button>
-                    <button
-                      onClick={() => navigate(`/posts/${p._id}/edit`)}
-                      className="text-yellow-600 hover:underline text-sm"
-                    >
-                      Editar
-                    </button>
-                    <button
-                      onClick={() => setSelectedPost(p)}
-                      className="text-red-600 hover:underline text-sm"
-                    >
-                      Eliminar
-                    </button>
-                  </td>
+        {posts.length === 0 ? (
+          <div className="rounded-2xl bg-white p-10 text-center border border-[color:var(--c-mid-blue)]/60 shadow-[0_10px_30px_rgba(0,0,0,.12)]">
+            <p style={{ color: 'var(--c-text)' }}>No tenes publicaciones creadas.</p>
+            <button
+              onClick={() => navigate('/posts/create')}
+              className="mt-4 px-4 py-2 rounded-xl font-semibold text-white hover:brightness-110 transition"
+              style={{ background: 'var(--c-text)' }}
+            >
+              Crear publicacion
+            </button>
+          </div>
+        ) : (
+          <div className="overflow-x-auto rounded-2xl bg-white border border-[color:var(--c-mid-blue)]/60 shadow-[0_10px_30px_rgba(0,0,0,.12)]">
+            <table className="w-full text-left border-collapse">
+              <thead className="bg-[color:var(--c-mid-blue)]/20">
+                <tr>
+                  <th className="p-3 text-sm font-semibold" style={{ color: 'var(--c-text)' }}>Imagen</th>
+                  <th className="p-3 text-sm font-semibold" style={{ color: 'var(--c-text)' }}>Titulo</th>
+                  <th className="p-3 text-sm font-semibold" style={{ color: 'var(--c-text)' }}>Fecha</th>
+                  <th className="p-3 text-sm font-semibold" style={{ color: 'var(--c-text)' }}>Estado</th>
+                  <th className="p-3 text-right text-sm font-semibold" style={{ color: 'var(--c-text)' }}>Acciones</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
+              </thead>
+              <tbody>
+                {posts.map(p => (
+                  <tr key={p._id} className="border-t border-[color:var(--c-mid-blue)]/40 hover:bg-[color:var(--c-mid-blue)]/10">
+                    <td className="p-3">
+                      {p.images?.[0] ? (
+                        <img
+                          src={p.images[0]}
+                          alt={p.title}
+                          className="w-16 h-16 object-cover rounded-lg"
+                        />
+                      ) : (
+                        <div
+                          className="w-16 h-16 rounded-lg"
+                          style={{
+                            background:
+                              'radial-gradient(60% 60% at 30% 30%, var(--c-accent), transparent 70%), radial-gradient(60% 60% at 70% 70%, var(--c-info), transparent 70%), #f6f6ff'
+                          }}
+                        />
+                      )}
+                    </td>
+                    <td className="p-3">
+                      <div className="max-w-xs">
+                        <p className="font-semibold truncate" style={{ color: 'var(--c-text)' }}>{p.title}</p>
+                        {p.location && (
+                          <p className="text-xs mt-0.5 px-2 py-0.5 inline-block rounded-full bg-[color:var(--c-accent)]/35" style={{ color: 'var(--c-text)' }}>
+                            Zona: {p.location}
+                          </p>
+                        )}
+                      </div>
+                    </td>
+                    <td className="p-3 text-sm text-gray-600">
+                      {p.createdAt ? new Date(p.createdAt).toLocaleDateString('es-AR') : '-'}
+                    </td>
+                    <td className="p-3">
+                      <StatusPill status={p.status} />
+                    </td>
+                    <td className="p-3 text-right">
+                      <div className="inline-flex items-center gap-2">
+                        <button
+                          onClick={() => navigate(`/posts/${p._id}`)}
+                          className="px-3 py-1.5 rounded-xl text-sm font-semibold border border-[color:var(--c-mid-blue)]/60 hover:bg-[color:var(--c-mid-blue)]/15 transition"
+                          style={{ color: 'var(--c-text)' }}
+                        >
+                          Ver
+                        </button>
+                        <button
+                          onClick={() => navigate(`/posts/${p._id}/edit`)}
+                          className="px-3 py-1.5 rounded-xl text-sm font-semibold border border-[color:var(--c-info)]/60 hover:bg-[color:var(--c-info)]/15 transition"
+                          style={{ color: 'var(--c-text)' }}
+                        >
+                          Editar
+                        </button>
+                        <button
+                          onClick={() => setSelectedPost(p)}
+                          className="px-3 py-1.5 rounded-xl text-sm font-semibold text-white hover:brightness-110 transition"
+                          style={{ background: 'var(--c-brand)' }}
+                        >
+                          Eliminar
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
 
-      {/* Modal */}
-      {selectedPost && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg w-80 text-center">
-            <h2 className="text-lg font-semibold mb-3">Eliminar publicación</h2>
-            <p className="text-gray-700 mb-6">
-              ¿Seguro que querés eliminar <strong>{selectedPost.title}</strong>?
-            </p>
-            <div className="flex justify-center gap-4">
-              <button
-                onClick={() => setSelectedPost(null)}
-                className="px-4 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300 transition"
+        {/* modal de confirmacion */}
+        {selectedPost && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+            <div className="w-[92%] max-w-sm rounded-2xl bg-white p-6 border border-[color:var(--c-mid-blue)]/60 shadow-[0_20px_60px_rgba(0,0,0,.25)]">
+              <h2
+                className="text-lg font-bold text-center"
+                style={{ color: 'var(--c-brand)', fontFamily: 'vag-rundschrift-d, sans-serif' }}
               >
-                Cancelar
-              </button>
-              <button
-                onClick={handleDeleteConfirm}
-                className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition"
-              >
-                Eliminar
-              </button>
+                Eliminar publicacion
+              </h2>
+              <p className="text-sm mt-3 text-center" style={{ color: 'var(--c-text)' }}>
+                Seguro que queres eliminar <strong>{selectedPost.title}</strong>?
+              </p>
+              <div className="mt-6 flex items-center justify-center gap-3">
+                <button
+                  onClick={() => setSelectedPost(null)}
+                  className="px-4 py-2 rounded-xl font-semibold border border-[color:var(--c-mid-blue)]/60 hover:bg-[color:var(--c-mid-blue)]/15 transition"
+                  style={{ color: 'var(--c-text)' }}
+                >
+                  Cancelar
+                </button>
+                <button
+                  onClick={handleDeleteConfirm}
+                  className="px-4 py-2 rounded-xl font-semibold text-white hover:brightness-110 transition"
+                  style={{ background: 'var(--c-brand)' }}
+                >
+                  Eliminar
+                </button>
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </main>
   );
 }
