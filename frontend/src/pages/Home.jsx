@@ -5,7 +5,7 @@ import '../styles/pages/home-guest.css'
 
 export default function Home() {
   return (
-    <main className="home-guest">
+    <main className="min-h-[85vh] home-guest">
       <section className="home-guest__banner" aria-labelledby="home-hero-title">
         <div className="container">
           <h1 id="home-hero-title" className="sr-only">Cambalache — trueque simple y local</h1>
@@ -18,7 +18,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="home-guest__steps" aria-labelledby="como-funciona">
+      <section className="home-guest__steps mb-4" aria-labelledby="como-funciona">
         <div className="container">
           <h2 id="como-funciona">¿Cómo funciona?</h2>
           <div className="home-guest__grid">

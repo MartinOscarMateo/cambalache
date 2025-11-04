@@ -24,21 +24,21 @@ export default function PostList() {
 
   if (loading) {
     return (
-      <main className="min-h-screen flex items-center justify-center px-4 py-10" style={{ background: '#f6f2ff' }}>
+      <main className="min-h-[85vh] flex items-center justify-center px-4 py-10" style={{ background: '#f6f2ff' }}>
         <p style={{ color: 'var(--c-text)' }}>Cargando…</p>
       </main>
     );
   }
   if (error) {
     return (
-      <main className="min-h-screen flex items-center justify-center px-4 py-10" style={{ background: '#f6f2ff' }}>
+      <main className="min-h-[85vh] flex items-center justify-center px-4 py-10" style={{ background: '#f6f2ff' }}>
         <p className="rounded-lg bg-red-50 border border-red-200 text-red-700 px-4 py-2">{error}</p>
       </main>
     );
   }
   if (!items.length) {
     return (
-      <main className="min-h-screen flex items-center justify-center px-4 py-10" style={{ background: '#f6f2ff' }}>
+      <main className="min-h-[85vh] flex items-center justify-center px-4 py-10" style={{ background: '#f6f2ff' }}>
         <p style={{ color: 'var(--c-text)' }}>No hay publicaciones</p>
       </main>
     );
@@ -111,7 +111,7 @@ export default function PostList() {
   }
 
   return (
-    <main className="min-h-screen px-4 py-8" style={{ background: '#f6f2ff' }}>
+    <main className="min-h-[85vh] px-4 py-8" style={{ background: '#f6f2ff' }}>
       <div className="max-w-6xl mx-auto">
         <header className="mb-6">
           <h1

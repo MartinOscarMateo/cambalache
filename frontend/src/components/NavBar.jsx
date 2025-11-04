@@ -94,7 +94,7 @@ export default function NavBar() {
                   onClick={() => setOpen(false)}
                   className={`nav-pill ${isActive('/') ? 'nav-pill--active' : 'text-[#f6f2ff] hover:text-[#ffdb3e]'}`}
                 >
-                  inicio
+                  Inicio
                 </Link>
               </li>
               <li>
@@ -103,7 +103,7 @@ export default function NavBar() {
                   onClick={() => setOpen(false)}
                   className={`nav-pill ${isActive('/posts') ? 'nav-pill--active' : 'text-[#f6f2ff] hover:text-[#ffdb3e]'}`}
                 >
-                  publicaciones
+                  Publicaciones
                 </Link>
               </li>
               <li>
@@ -112,7 +112,7 @@ export default function NavBar() {
                   onClick={() => setOpen(false)}
                   className={`nav-pill ${isActive('/mapa') ? 'nav-pill--active' : 'text-[#f6f2ff] hover:text-[#ffdb3e]'}`}
                 >
-                  mapa
+                  Mapa
                 </Link>
               </li>
             </ul>
@@ -122,8 +122,8 @@ export default function NavBar() {
           <div className="hidden md:flex items-center gap-4">
             {!token && (
               <>
-                <Link to="/register" className="btn-nav btn-nav--cyan">registrarse</Link>
-                <Link to="/login" className="btn-nav btn-nav--pink">ingresar</Link>
+                <Link to="/register" className="btn-nav btn-nav--cyan">Registrarse</Link>
+                <Link to="/login" className="btn-nav btn-nav--pink">Ingresar</Link>
               </>
             )}
 
@@ -173,15 +173,15 @@ export default function NavBar() {
                       className="absolute right-0 mt-2 w-44 rounded-md bg-white text-sm text-gray-800 shadow-lg overflow-hidden"
                     >
                       <Link to="/profile" className="block px-3 py-2 hover:bg-gray-100" onClick={() => setMenuUserOpen(false)}>
-                        perfil
+                        Perfil
                       </Link>
                       {me?.role === 'admin' && (
                         <Link to="/admin/users" className="block px-3 py-2 hover:bg-gray-100" onClick={() => setMenuUserOpen(false)}>
-                          admin
+                          Admin
                         </Link>
                       )}
                       <button className="w-full text-left px-3 py-2 hover:bg-gray-100" onClick={logout}>
-                        salir
+                        Salir
                       </button>
                     </div>
                   )}
@@ -212,17 +212,17 @@ export default function NavBar() {
         <ul className="flex flex-col gap-4 px-5 py-5 text-[#f6f2ff] text-base">
           <li>
             <Link className={`hover:text-[#ffdb3e] ${isActive('/') ? 'text-[#ffdb3e] underline' : ''}`} to="/" onClick={() => setOpen(false)}>
-              inicio
+              Inicio
             </Link>
           </li>
           <li>
             <Link className={`hover:text-[#ffdb3e] ${isActive('/posts') ? 'text-[#ffdb3e] underline' : ''}`} to="/posts" onClick={() => setOpen(false)}>
-              publicaciones
+              Publicaciones
             </Link>
           </li>
           <li>
             <Link className={`hover:text-[#ffdb3e] ${isActive('/mapa') ? 'text-[#ffdb3e] underline' : ''}`} to="/mapa" onClick={() => setOpen(false)}>
-              mapa
+              Mapa
             </Link>
           </li>
 
@@ -230,12 +230,12 @@ export default function NavBar() {
             <>
               <li>
                 <Link className="btn-nav btn-nav--cyan inline-block w-max" to="/register" onClick={() => setOpen(false)}>
-                  registrarse
+                  Registrarse
                 </Link>
               </li>
               <li>
                 <Link className="btn-nav btn-nav--pink inline-block w-max" to="/login" onClick={() => setOpen(false)}>
-                  ingresar
+                  Ingresar
                 </Link>
               </li>
             </>
@@ -245,33 +245,33 @@ export default function NavBar() {
             <>
               <li>
                 <Link className={`hover:text-[#ffdb3e] ${isActive('/posts/create') ? 'text-[#ffdb3e] underline' : ''}`} to="/posts/create" onClick={() => setOpen(false)}>
-                  crear
+                  Crear
                 </Link>
               </li>
               <li>
                 <Link className={`hover:text-[#ffdb3e] ${isActive('/chats') ? 'text-[#ffdb3e] underline' : ''}`} to="/chats" onClick={() => setOpen(false)}>
-                  chats
+                  Chats
                 </Link>
               </li>
               <li className="flex items-center gap-2 text-[#ffdb3e]">
                 <ion-icon name="notifications" className="text-xl align-middle"></ion-icon>
-                <span>notificaciones</span>
+                <span>Notificaciones</span>
               </li>
               <li>
                 <Link className={`hover:text-[#ffdb3e] ${isActive('/profile') ? 'text-[#ffdb3e] underline' : ''}`} to="/profile" onClick={() => setOpen(false)}>
-                  perfil
+                  Perfil
                 </Link>
               </li>
               {me?.role === 'admin' && (
                 <li>
                   <Link className="hover:text-[#ffdb3e]" to="/admin/users" onClick={() => setOpen(false)}>
-                    admin
+                    Admin
                   </Link>
                 </li>
               )}
               <li>
                 <button onClick={logout} className="hover:text-[#ffdb3e]">
-                  salir
+                  Salir
                 </button>
               </li>
             </>

@@ -180,7 +180,7 @@ export default function PostCreate() {
 
               <div className="grid sm:grid-cols-2 gap-4">
                 <div className="grid gap-1">
-                  <label htmlFor="category" className="text-sm font-medium" style={{ color: 'var(--c-text)' }}>Categoría</label>
+                  <label htmlFor="category" className="text-sm font-medium h-[20px]" style={{ color: 'var(--c-text)' }}>Categoría</label>
                   <input
                     id="category"
                     name="category"
@@ -198,8 +198,8 @@ export default function PostCreate() {
                   </div>
                 </div>
 
-                <div className="grid gap-1">
-                  <label htmlFor="condition" className="text-sm font-medium" style={{ color: 'var(--c-text)' }}>Estado</label>
+                <div className="grid grid-rows-[20px_1fr] gap-1 sm:grid-rows-[20px_1fr_20px]">
+                  <label htmlFor="condition" className="text-sm font-medium h-[20px]" style={{ color: 'var(--c-text)' }}>Estado</label>
                   <select
                     id="condition"
                     name="condition"

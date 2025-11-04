@@ -153,8 +153,8 @@ export default function PostDetail() {
   const images = Array.isArray(post.images) ? post.images : [];
 
   return (
-    <main className="flex justify-center p-4 md:p-10" style={{ background: '#f6f2ff' }}>
-      <article className="w-full max-w-5xl grid md:grid-cols-[360px_minmax(0,1fr)] rounded-2xl overflow-hidden border border-[color:var(--c-mid-blue)]/60 shadow-[0_20px_60px_rgba(0,0,0,.15)] bg-white">
+    <main className="min-h-[85vh] flex justify-center p-4 md:p-10" style={{ background: '#f6f2ff' }}>
+      <article className="w-full max-w-5xl h-[100%] grid md:grid-cols-[360px_minmax(0,1fr)] rounded-2xl overflow-hidden border border-[color:var(--c-mid-blue)]/60 shadow-[0_20px_60px_rgba(0,0,0,.15)] bg-white">
         {/* left: gallery compacta */}
         <aside className="bg-white">
           <div className="relative">
