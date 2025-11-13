@@ -2,6 +2,7 @@ import { createBrowserRouter, RouterProvider, redirect, Outlet } from 'react-rou
 import NavBar from './components/NavBar.jsx';
 import Footer from './components/Footer.jsx';
 import Home from './pages/Home.jsx';
+import LandingPage from './pages/LandingPage.jsx';
 import PostsList from './pages/PostList.jsx';
 import PostDetail from './pages/PostDetail.jsx';
 import PostCreate from './pages/PostCreate.jsx';
@@ -62,6 +63,7 @@ const router = createBrowserRouter([
       { path: '/forgot-password', element: <ForgotPassword /> },
       { path: '/reset-password', element: <ResetPassword /> },
       { path: '/chat', element: <Chat />, loader: requireAuthLoader },
+      {path: '/landing-page', element: <LandingPage />},
 
       // Chat
       { path: '/chats', element: <ChatsList />, loader: requireAuthLoader }, // lista de chats
