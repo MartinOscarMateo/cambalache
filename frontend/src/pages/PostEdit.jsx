@@ -1,12 +1,12 @@
 // frontend/src/pages/PostEdit.jsx
-import { useEffect, useState } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
-import { getPostById, updatePost } from '../lib/api.js'
-import { uploadMany } from '../lib/upload.js'
+import { useEffect, useState } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { getPostById, updatePost } from '../lib/api.js';
+import { uploadMany } from '../lib/upload.js';
 
 export default function PostEdit() {
-  const { id } = useParams()
-  const navigate = useNavigate()
+  const { id } = useParams();
+  const navigate = useNavigate();
 
   const [form, setForm] = useState({
     title: '',
@@ -19,18 +19,31 @@ export default function PostEdit() {
     openToOffers: 'yes',
     interestsText: ''
   })
-  const [files, setFiles] = useState([])
-  const [previews, setPreviews] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState('')
-  const [success, setSuccess] = useState('')
+  const [files, setFiles] = useState([]);
+  const [previews, setPreviews] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
+
+  // límites
+  const LIMITS = {
+    titleMax: 80,
+    titleMin: 5,
+    descMax: 800,
+    descMin: 10,
+    catMax: 40,
+    locMax: 80,
+    detailsMax: 300,
+    interestsMax: 300,
+    imagesMax: 6
+  };
 
   // cargar datos existentes
   useEffect(() => {
     async function fetchPost() {
       try {
-        setLoading(true)
-        const data = await getPostById(id)
+        setLoading(true);
+        const data = await getPostById(id);
         setForm({
           title: data.title || '',
           description: data.description || '',
@@ -44,50 +57,54 @@ export default function PostEdit() {
         })
         setPreviews(Array.isArray(data.images) ? data.images : [])
       } catch (e) {
-        setError(e.message || 'Error al cargar la publicación')
+        setError(e.message || 'Error al cargar la publicación');
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
     }
-    fetchPost()
-  }, [id])
+    fetchPost();
+  }, [id]);
 
   function onChange(e) {
-    const { name, value } = e.target
-    setForm(prev => ({ ...prev, [name]: value }))
+    const { name, value } = e.target;
+    setForm(prev => ({ ...prev, [name]: value }));
   }
 
   function onFiles(e) {
-    const arr = Array.from(e.target.files || [])
-    setFiles(arr)
-    setPreviews(arr.map(f => URL.createObjectURL(f)))
+    const arr = Array.from(e.target.files || []);
+    const kept = arr.slice(0, LIMITS.imagesMax);
+    setFiles(kept);
+    setPreviews(kept.map(f => URL.createObjectURL(f)));
+    if (arr.length > LIMITS.imagesMax) {
+      setError(`Máximo ${LIMITS.imagesMax} imágenes. Se tomaron las primeras ${LIMITS.imagesMax}.`);
+    }
   }
 
   async function onSubmit(e) {
-    e.preventDefault()
-    setError('')
-    setSuccess('')
+    e.preventDefault();
+    setError('');
+    setSuccess('');
 
-    const title = form.title.trim()
-    const description = form.description.trim()
-    const category = form.category.trim().toLowerCase()
-    const condition = form.condition
-    const location = form.location.trim()
-    const hasDetails = form.hasDetails === 'yes'
-    const detailsText = hasDetails ? form.detailsText.trim() : ''
-    const openToOffers = form.openToOffers === 'yes'
-    const interestsText = !openToOffers ? form.interestsText.trim() : ''
+    const title = form.title.trim();
+    const description = form.description.trim();
+    const category = form.category.trim().toLowerCase();
+    const condition = form.condition;
+    const location = form.location.trim();
+    const hasDetails = form.hasDetails === 'yes';
+    const detailsText = hasDetails ? form.detailsText.trim() : '';
+    const openToOffers = form.openToOffers === 'yes';
+    const interestsText = !openToOffers ? form.interestsText.trim() : '';
 
-    if (title.length < 5) return setError('Título mínimo 5 caracteres')
-    if (description.length < 10) return setError('Descripción mínima 10 caracteres')
-    if (!category) return setError('Categoría requerida')
-    if (!condition) return setError('Seleccioná el estado del artículo')
+    if (title.length < LIMITS.titleMin) return setError(`Título mínimo ${LIMITS.titleMin} caracteres`);
+    if (description.length < LIMITS.descMin) return setError(`Descripción mínima ${LIMITS.descMin} caracteres`);
+    if (!category) return setError('Categoría requerida');
+    if (!condition) return setError('Seleccioná el estado del artículo');
 
     setLoading(true)
     try {
-      let images = previews
+      let images = previews;
       if (files.length > 0) {
-        images = await uploadMany(files.slice(0, 6))
+        images = await uploadMany(files.slice(0, 6));
       }
 
       await updatePost(id, {
@@ -103,12 +120,12 @@ export default function PostEdit() {
         images
       })
 
-      setSuccess('Publicación actualizada con éxito')
-      setTimeout(() => navigate(`/posts/${id}`), 1200)
+      setSuccess('Publicación actualizada con éxito');
+      setTimeout(() => navigate(`/posts/${id}`), 1200);
     } catch (err) {
-      setError(err.message || 'Error al actualizar')
+      setError(err.message || 'Error al actualizar');
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
   }
 
@@ -144,6 +161,7 @@ export default function PostEdit() {
               <label className='text-sm font-medium' style={{ color: 'var(--c-text)' }}>Imágenes</label>
               <div className='mt-2 rounded-xl border-2 border-dashed border-[color:var(--c-mid-blue)]/70 p-4'>
                 <input className='w-full hidden sm:block' type='file' accept='image/*' multiple onChange={onFiles} disabled={loading} />
+                
                 <label className="block w-full cursor-pointer sm:hidden">
                   <input
                     id="images"
@@ -154,6 +172,7 @@ export default function PostEdit() {
                     disabled={loading}
                     className="sr-only"
                   />
+                  
                   <div className="w-full rounded-md bg-white text-slate-700 border border-transparent">
                     <div className="text-sm text-[var(--c-text)]">Hacé click para elegir archivos</div>
                     <div className="mt-2 text-sm text-slate-700 whitespace-normal break-words max-h-20 overflow-auto">
@@ -169,6 +188,10 @@ export default function PostEdit() {
                     </div>
                   </div>
                 </label>
+                <div className="mt-2 flex items-center justify-between text-xs text-slate-500">
+                  <span>Máximo {LIMITS.imagesMax} imágenes.</span>
+                  <span>{previews.length}/{LIMITS.imagesMax}</span>
+                </div>
                 {!!previews.length && (
                   <div className='mt-3 grid grid-cols-3 sm:grid-cols-4 gap-2'>
                     {previews.map((src,i)=>(
@@ -189,9 +212,14 @@ export default function PostEdit() {
                   value={form.title}
                   onChange={onChange}
                   disabled={loading}
+                  maxLength={LIMITS.titleMax}
                   className='w-full rounded-xl border border-slate-200 bg-white px-4 py-3 outline-none ring-2 ring-transparent focus:ring-[color:var(--c-info)]'
                   placeholder='Ej: Bicicleta urbana rodado 28'
                 />
+                <div id="title-help" className="mt-1 flex items-center justify-between text-xs text-slate-500">
+                  <span>Mínimo {LIMITS.titleMin}, máximo {LIMITS.titleMax}.</span>
+                  <span>{form.title.length}/{LIMITS.titleMax}</span>
+                </div>
               </div>
 
               <div className='grid gap-1'>
@@ -202,10 +230,15 @@ export default function PostEdit() {
                   value={form.description}
                   onChange={onChange}
                   disabled={loading}
+                  maxLength={LIMITS.descMax}
                   className='w-full rounded-xl border border-slate-200 bg-white px-4 py-3 outline-none ring-2 ring-transparent focus:ring-[color:var(--c-info)]'
                   rows={4}
                   placeholder='Contá el estado y qué incluye…'
                 />
+                <div id="title-help" className="mt-1 flex items-center justify-between text-xs text-slate-500">
+                  <span>Mínimo {LIMITS.descMin}, máximo {LIMITS.descMax}.</span>
+                  <span>{form.description.length}/{LIMITS.descMax}</span>
+                </div>
               </div>
 
               <div className='grid sm:grid-cols-2 gap-4'>
@@ -217,12 +250,17 @@ export default function PostEdit() {
                     value={form.category}
                     onChange={onChange}
                     disabled={loading}
+                    maxLength={LIMITS.catMax}
                     className='w-full rounded-xl border border-slate-200 bg-white px-4 py-3 outline-none ring-2 ring-transparent focus:ring-[color:var(--c-info)]'
                     placeholder='Ej: bicicletas'
                   />
+                  <div id="cat-help" className="mt-1 flex items-center justify-between text-xs text-slate-500">
+                    <span>Máximo {LIMITS.catMax}.</span>
+                    <span>{form.category.length}/{LIMITS.catMax}</span>
+                  </div>
                 </div>
 
-                <div className='grid gap-1'>
+                <div className='grid grid-rows-[20px_1fr] gap-1 sm:grid-rows-[20px_1fr_20px]'>
                   <label htmlFor='condition' className='text-sm font-medium' style={{ color: 'var(--c-text)' }}>Estado</label>
                   <select
                     id='condition'
@@ -265,14 +303,21 @@ export default function PostEdit() {
               </div>
 
               {form.hasDetails === 'yes' && (
-                <textarea
-                  name='detailsText'
-                  value={form.detailsText}
-                  onChange={onChange}
-                  disabled={loading}
-                  className='w-full rounded-xl border border-slate-200 bg-white px-4 py-3 outline-none ring-2 ring-transparent focus:ring-[color:var(--c-info)]'
-                  placeholder='Describí rayas, golpes o faltantes…'
-                />
+                <>
+                  <textarea
+                    name='detailsText'
+                    value={form.detailsText}
+                    onChange={onChange}
+                    disabled={loading}
+                    maxLength={LIMITS.detailsMax}
+                    className='w-full rounded-xl border border-slate-200 bg-white px-4 py-3 outline-none ring-2 ring-transparent focus:ring-[color:var(--c-info)]'
+                    placeholder='Describí rayas, golpes o faltantes…'
+                  />
+                  <div id="details-help" className="mt-1 flex items-center justify-between text-xs text-slate-500">
+                    <span>Máximo {LIMITS.detailsMax}.</span>
+                    <span>{form.detailsText.length}/{LIMITS.detailsMax}</span>
+                  </div>
+                </>
               )}
 
               <div className='grid gap-1'>
@@ -283,9 +328,14 @@ export default function PostEdit() {
                   value={form.location}
                   onChange={onChange}
                   disabled={loading}
+                  maxLength={LIMITS.locMax}
                   className='w-full rounded-xl border border-slate-200 bg-white px-4 py-3 outline-none ring-2 ring-transparent focus:ring-[color:var(--c-info)]'
                   placeholder='Ej: Palermo, Buenos Aires'
                 />
+                <div id="loc-help" className="mt-1 flex items-center justify-between text-xs text-slate-500">
+                  <span>Máximo {LIMITS.locMax}.</span>
+                  <span>{form.location.length}/{LIMITS.locMax}</span>
+                </div>
               </div>
             </section>
 
