@@ -4,6 +4,8 @@ import { useNavigate } from 'react-router-dom'
 
 export default function ProfileEdit() {
   const navigate = useNavigate()
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
   const [form, setForm] = useState({
     name: '',
     email: '',
@@ -173,25 +175,46 @@ export default function ProfileEdit() {
         <section className="grid gap-4 sm:grid-cols-2 mb-6">
           <div className="grid gap-1">
             <label className="text-sm font-medium" style={{ color: 'var(--c-text)' }}>Nueva contrasena</label>
-            <input
-              type="password"
-              name="password"
-              value={form.password}
-              onChange={onChange}
-              className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 outline-none ring-2 ring-transparent focus:ring-[color:var(--c-info)]"
-              placeholder="Minimo 6 caracteres"
-            />
+            <div className='relative'>
+              <input
+                type={showPassword ? 'text' : 'password'}
+                name="password"
+                value={form.password}
+                onChange={onChange}
+                className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 outline-none ring-2 ring-transparent focus:ring-[color:var(--c-info)]"
+                placeholder="Minimo 6 caracteres"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(v => !v)}
+                className="absolute right-2 top-1/2 -translate-y-1/2 rounded-lg px-3 py-1 text-sm text-[color:var(--c-text)] hover:bg-slate-100"
+                aria-label={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+              >
+                {showPassword ? 'Ocultar' : 'Ver'}
+              </button>
+            </div>
           </div>
           <div className="grid gap-1">
             <label className="text-sm font-medium" style={{ color: 'var(--c-text)' }}>Confirmar contrasena</label>
-            <input
-              type="password"
-              name="confirm"
-              value={form.confirm}
-              onChange={onChange}
-              className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 outline-none ring-2 ring-transparent focus:ring-[color:var(--c-info)]"
-              placeholder="Repite la contrasena"
-            />
+            <div className='relative'>
+              <input
+                type={showConfirm ? 'text' : 'password'}
+                name="confirm"
+                value={form.confirm}
+                onChange={onChange}
+                className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 outline-none ring-2 ring-transparent focus:ring-[color:var(--c-info)]"
+                placeholder="Repite la contrasena"
+              />
+              <button
+                type="button"
+                onClick={() => setShowConfirm(v => !v)}
+                className="absolute right-2 top-1/2 -translate-y-1/2 rounded-lg px-3 py-1 text-sm text-[color:var(--c-text)] hover:bg-slate-100"
+                aria-label={showConfirm ? 'Ocultar confirmación' : 'Mostrar confirmación'}
+              >
+                {showConfirm ? 'Ocultar' : 'Ver'}
+              </button>
+            </div>
+            
           </div>
         </section>
 
@@ -200,7 +223,7 @@ export default function ProfileEdit() {
           <button
             type="button"
             onClick={onDelete}
-            className="text-red-600 hover:underline"
+            className="px-4 py-3 rounded-xl text-red-600 hover:underline"
           >
             Eliminar cuenta
           </button>
@@ -209,14 +232,14 @@ export default function ProfileEdit() {
             <button
               type="button"
               onClick={() => navigate('/profile')}
-              className="px-4 py-3 rounded-xl border border-[color:var(--c-mid-blue)]/60 hover:bg-[color:var(--c-mid-blue)]/15 transition font-semibold"
+              className="w-[40%]  px-4 py-3 rounded-xl border border-[color:var(--c-mid-blue)]/60 hover:bg-[color:var(--c-mid-blue)]/15 transition font-semibold"
               style={{ color: 'var(--c-text)' }}
             >
               Cancelar
             </button>
             <button
               type="submit"
-              className="px-4 py-3 rounded-xl font-semibold text-white hover:brightness-110 transition"
+              className="w-[60%] sm:w-[70%] px-4 py-3 rounded-xl font-semibold text-white hover:brightness-110 transition"
               style={{ background: 'var(--c-text)' }}
             >
               Guardar cambios
