@@ -18,6 +18,7 @@ import ProfileEdit from './pages/ProfileEdit.jsx';
 import Chat from './pages/Chat.jsx';
 import ChatsList from './pages/ChatsList.jsx';
 import MyPosts from './pages/MyPosts.jsx';
+import UserPublicProfile from './pages/UserPublicProfile.jsx';
 import NotFound from './pages/NotFound.jsx';
 
 // admin:
@@ -71,6 +72,7 @@ const router = createBrowserRouter([
       { path: '/profile', element: <Profile />, loader: requireAuthLoader },
       { path: '/profile/edit', element: <ProfileEdit />, loader: requireAuthLoader },
       { path: '/profile/:id', element: <Profile />, loader: requireAuthLoader },
+      { path: '/users/:id', element: <UserPublicProfile /> },
 
       // Seguidores / seguidos
       { path: '/users/:id/followers', element: <FollowersList />, loader: requireAuthLoader },

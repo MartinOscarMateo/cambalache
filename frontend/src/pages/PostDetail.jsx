@@ -1,6 +1,6 @@
 // frontend/src/pages/PostDetail.jsx
 import { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import { getPostById, getPostsByUser } from '../lib/api.js';
 
 function idOf(v) {
@@ -8,6 +8,19 @@ function idOf(v) {
   if (typeof v === 'string') return v;
   if (typeof v === 'object') return v._id || v.id || v.userId || '';
   return String(v);
+}
+
+function ownerProfileIdOf(p, o) {
+  return (
+    idOf(o?._id) ||
+    idOf(p?.ownerId) ||
+    idOf(p?.userId) ||
+    idOf(p?.authorId) ||
+    idOf(p?.owner) ||
+    idOf(p?.user) ||
+    idOf(p?.author) ||
+    ''
+  );
 }
 
 export default function PostDetail() {
@@ -78,17 +91,39 @@ export default function PostDetail() {
   useEffect(() => {
     const uid = idOf(owner?._id) || idOf(post?.ownerId);
     if (!uid || !post?._id) return;
-    getPostsByUser(uid, { page: 1, limit: 10 })
-      .then(res => {
+    (async () => {
+      try {
+        const res = await getPostsByUser(uid, { page: 1, limit: 10 });
         const items = Array.isArray(res) ? res : (res.items || []);
-        const filtered = items.filter(p => p._id !== post._id);
-        // solo muestra si el propietario tiene 3 o mas publicaciones activas
+        const filtered = items.filter(p => String(p._id) !== String(post._id));
         setMorePosts(filtered.length >= 3 ? filtered : []);
-      })
-      .catch(() => setMorePosts([]));
+      } catch {
+        try {
+          const API = import.meta.env.VITE_API_URL || 'http://localhost:4000';
+          const token = localStorage.getItem('token') || '';
+          const headers = token ? { Authorization: `Bearer ${token}` } : {};
+          const urls = [
+            `${API}/api/posts?author=${uid}`,
+            `${API}/api/posts?userId=${uid}`
+          ];
+          let items = [];
+          for (const url of urls) {
+            const r = await fetch(url, { headers });
+            if (!r.ok) continue;
+            const j = await r.json().catch(() => ({}));
+            items = Array.isArray(j) ? j : (j.items || j.posts || j.data || []);
+            if (Array.isArray(items)) break;
+          }
+          const filtered = (items || []).filter(p => String(p._id) !== String(post._id));
+          setMorePosts(filtered.length >= 3 ? filtered : []);
+        } catch {
+          setMorePosts([]);
+        }
+      }
+    })();
   }, [owner, post]);
 
-  // Cargar publicaciones propias para ofrecer
+  // Cargar publicaciones propias
   async function loadMyPosts() {
     const me = JSON.parse(localStorage.getItem('user') || '{}');
     if (!me?.id && !me?._id) return;
@@ -151,6 +186,8 @@ export default function PostDetail() {
   if (!post) return <main className="container p-6"><p>No encontrado</p></main>;
 
   const images = Array.isArray(post.images) ? post.images : [];
+  const ownerId = ownerProfileIdOf(post, owner);
+  const ownerProfilePath = ownerId ? (String(ownerId) === String(myId) ? '/profile' : `/users/${ownerId}`) : '';
 
   return (
     <main className="min-h-[85vh] flex justify-center p-4 md:p-10" style={{ background: '#f6f2ff' }}>
@@ -235,15 +272,27 @@ export default function PostDetail() {
             </div>
 
             {/* mini owner */}
-            <div className="shrink-0 flex items-center gap-2">
-              <div className="w-10 h-10 rounded-full bg-gray-200 overflow-hidden">
-                {owner?.avatar && <img src={owner.avatar} alt="avatar" className="w-full h-full object-cover" />}
+            {ownerProfilePath ? (
+              <Link to={ownerProfilePath} className="shrink-0 flex items-center gap-2 hover:opacity-90">
+                <div className="w-10 h-10 rounded-full bg-gray-200 overflow-hidden">
+                  {owner?.avatar && <img src={owner.avatar} alt="avatar" className="w-full h-full object-cover" />}
+                </div>
+                <div className="leading-tight">
+                  <p className="text-sm font-semibold" style={{ color: 'var(--c-text)' }}>{owner?.name || 'Usuario'}</p>
+                  <p className="text-xs text-gray-500">Propietario</p>
+                </div>
+              </Link>
+            ) : (
+              <div className="shrink-0 flex items-center gap-2">
+                <div className="w-10 h-10 rounded-full bg-gray-200 overflow-hidden">
+                  {owner?.avatar && <img src={owner.avatar} alt="avatar" className="w-full h-full object-cover" />}
+                </div>
+                <div className="leading-tight">
+                  <p className="text-sm font-semibold" style={{ color: 'var(--c-text)' }}>{owner?.name || 'Usuario'}</p>
+                  <p className="text-xs text-gray-500">Propietario</p>
+                </div>
               </div>
-              <div className="leading-tight">
-                <p className="text-sm font-semibold" style={{ color: 'var(--c-text)' }}>{owner?.name || 'Usuario'}</p>
-                <p className="text-xs text-gray-500">Propietario</p>
-              </div>
-            </div>
+            )}
           </header>
 
           {/* descripcion compacta */}
@@ -289,8 +338,9 @@ export default function PostDetail() {
                   Proponer trueque
                 </button>
                 <button
-                  className="px-4 py-2 rounded-xl border border-[color:var(--c-mid-blue)]/60 hover:bg-[color:var(--c-mid-blue)]/15 transition"
-                  onClick={() => navigate(`/users/${owner?._id}`)}
+                  className="px-4 py-2 rounded-xl border border-[color:var(--c-mid-blue)]/60 hover:bg-[color:var(--c-mid-blue)]/15 transition disabled:opacity-60"
+                  onClick={() => ownerProfilePath && navigate(ownerProfilePath)}
+                  disabled={!ownerProfilePath}
                 >
                   Ver perfil
                 </button>

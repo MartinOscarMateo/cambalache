@@ -80,7 +80,6 @@ export async function getFollowing(userId, limit = 20, cursor = '') {
   return res.json();
 }
 
-
 export async function createPost(data) {
   const API = import.meta.env.VITE_API_URL || 'http://localhost:4000';
   const token = localStorage.getItem('token') || '';
@@ -109,7 +108,6 @@ export async function createPost(data) {
   return json;
 }
 
-
 export async function uploadToCloudinary(file) {
   const cloud = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME;
   const preset = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET;
@@ -129,8 +127,6 @@ export async function uploadMany(files) {
   return urls;
 }
 
-
-
 export async function listTrades({ role = 'inbox', page = 1, limit = 10 } = {}) {
   const API = import.meta.env.VITE_API_URL || 'http://localhost:4000';
   const token = localStorage.getItem('token') || '';
@@ -144,7 +140,6 @@ export async function listTrades({ role = 'inbox', page = 1, limit = 10 } = {}) 
   return Array.isArray(json.items) ? json : { page: 1, limit: json.length || 0, total: json.length || 0, items: json };
 }
 
-
 export async function getPostById(id) {
   const token = localStorage.getItem('token') || '';
   const headers = token ? { Authorization: `Bearer ${token}` } : {};
@@ -154,23 +149,67 @@ export async function getPostById(id) {
   return json;
 }
 
-export async function getPostsByUser(userId, { page = 1, limit = 12 } = {}) {
-  const token = localStorage.getItem('token') || '';
-  const headers = token ? { Authorization: `Bearer ${token}` } : {};
-  const uid = typeof userId === 'object' ? (userId._id || userId.id || userId.userId) : String(userId);
-  if (!uid) throw new Error('userId inválido');
-
-  const url = new URL(`${API}/api/posts`);
-  url.searchParams.set('ownerId', uid);
-  url.searchParams.set('page', String(page));
-  url.searchParams.set('limit', String(limit));
-
-  const res = await fetch(url, { headers });
-  const json = await res.json().catch(() => ({}));
-  if (!res.ok) throw new Error(json?.error || json?.message || 'Error listando publicaciones');
-  return Array.isArray(json) ? { page: 1, limit: json.length || 0, total: json.length || 0, items: json } : json;
+// normaliza ids sueltos o objetos a string
+function toUid(userId) {
+  if (!userId) return '';
+  if (typeof userId === 'object') return userId._id || userId.id || userId.userId || '';
+  return String(userId);
 }
 
+// normaliza la respuesta
+function normalizePostsEnvelope(j, fallbackPage = 1, fallbackLimit = 0) {
+  // simple array
+  if (Array.isArray(j)) {
+    const items = j;
+    return { page: 1, limit: items.length || 0, total: items.length || 0, items };
+  }
+  // objetos comunes
+  const items = j?.items || j?.posts || j?.data || (Array.isArray(j?.results) ? j.results : []);
+  if (Array.isArray(items)) {
+    return {
+      page: Number(j.page || fallbackPage || 1),
+      limit: Number(j.limit || fallbackLimit || items.length || 0),
+      total: Number(j.total || items.length || 0),
+      items
+    };
+  }
+  return null;
+}
+
+// obtiene publis de usuario probando varios endpoints
+export async function fetchUserPosts(userId, { page = 1, limit = 12 } = {}) {
+  const token = localStorage.getItem('token') || '';
+  const headers = token ? { Authorization: `Bearer ${token}` } : {};
+  const uid = toUid(userId);
+  if (!uid) throw new Error('userId invalido');
+
+  // endpoints
+  const urls = [
+    `${API}/api/users/${uid}/posts?page=${page}&limit=${limit}`,
+    `${API}/api/posts?ownerId=${encodeURIComponent(uid)}&page=${page}&limit=${limit}`,
+    `${API}/api/posts?author=${encodeURIComponent(uid)}&page=${page}&limit=${limit}`,
+    `${API}/api/posts?userId=${encodeURIComponent(uid)}&page=${page}&limit=${limit}`
+  ];
+
+  for (const url of urls) {
+    try {
+      const res = await fetch(url, { headers });
+      const j = await res.json().catch(() => ({}));
+      if (!res.ok) continue;
+      const env = normalizePostsEnvelope(j, page, limit);
+      if (env) return env;
+    } catch {
+      // try next url
+    }
+  }
+
+  throw new Error('Error listando publicaciones del usuario');
+}
+
+export async function getPostsByUser(userId, { page = 1, limit = 12 } = {}) {
+  // delega en la funcion central con fallback
+  return fetchUserPosts(userId, { page, limit });
+}
 
 export async function updatePost(id, data) {
   const token = localStorage.getItem('token') || '';
@@ -198,8 +237,6 @@ export async function deletePost(id) {
   return json;
 }
 
-
-
 // chat automatico tras propuesta de trueque
 export async function createChatWithMessage(receiverId, text) {
   const API = import.meta.env.VITE_API_URL || 'http://localhost:4000';
@@ -222,7 +259,7 @@ export async function createChatWithMessage(receiverId, text) {
   const chatId = chatJson._id || chatJson.id;
   if (!chatId) throw new Error('Chat no válido');
 
-  // envía mensaje inicial (usa la ruta correcta)
+  // envia mensaje inicial
   if (text && text.trim()) {
     const msgRes = await fetch(`${API}/api/chats/messages`, {
       method: 'POST',

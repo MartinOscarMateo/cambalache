@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
-import { getMe } from '../lib/api.js';
+import { getMe, getPostsByUser } from '../lib/api.js';
 
 export default function Profile() {
   const params = useParams();
@@ -39,42 +39,26 @@ export default function Profile() {
     if (!user) return;
     const uid = String(user._id || user.id || '');
     if (!uid) return;
+
+    let active = true;
     (async () => {
       setPostsLoading(true);
       setPostsError('');
       try {
-        const token = localStorage.getItem('token') || '';
-        const headers = {
-          'Content-Type': 'application/json',
-          ...(token ? { Authorization: `Bearer ${token}` } : {})
-        };
-
-        const endpoints = [
-          `${API}/api/users/${uid}/posts`,
-          `${API}/api/posts?author=${uid}`,
-          `${API}/api/posts?userId=${uid}`
-        ];
-
-        let data = [];
-        for (const url of endpoints) {
-          try {
-            const r = await fetch(url, { headers });
-            if (!r.ok) continue;
-            const j = await r.json().catch(() => ({}));
-            data = Array.isArray(j) ? j : (j.items || j.posts || j.data || []);
-            if (Array.isArray(data)) break;
-          } catch {
-            // probar siguiente endpoint
-          }
-        }
-
-        setPosts(Array.isArray(data) ? data : []);
+        // usa la capa de api centralizada para implementar los fallbacks correctos xd
+        const env = await getPostsByUser(uid, { page: 1, limit: 18 });
+        if (!active) return;
+        setPosts(Array.isArray(env?.items) ? env.items : []);
       } catch (e) {
+        if (!active) return;
         setPostsError('No se pudieron cargar las publicaciones');
+        setPosts([]);
       } finally {
-        setPostsLoading(false);
+        if (active) setPostsLoading(false);
       }
     })();
+
+    return () => { active = false; };
   }, [user]);
 
   if (loading) {
@@ -150,7 +134,7 @@ export default function Profile() {
             </aside>
           )}
 
-          <section>
+          <section className={!viewingOwn ? 'md:col-span-2' : ''}>
             <div className="rounded-2xl bg-white border border-[color:var(--c-mid-blue)]/60 shadow-[0_20px_60px_rgba(0,0,0,.2)] p-6 md:p-8">
               <header className="flex flex-col sm:flex-row sm:items-center gap-6">
                 <div className="relative">
@@ -234,7 +218,7 @@ export default function Profile() {
                   </ul>
                 </section>
 
-                {/* Publicaciones del usuario */}
+                {/* Publicaciones del usuario */} 
                 <section className="rounded-xl border border-[color:var(--c-mid-blue)]/60 p-4">
                   <div className="flex items-center justify-between mb-3">
                     <h3
@@ -245,7 +229,7 @@ export default function Profile() {
                     </h3>
                     {viewingOwn && (
                       <button
-                        onClick={() => navigate('/posts/new')}
+                        onClick={() => navigate('/posts/create')}
                         className="text-sm rounded-lg px-3 py-1.5 bg-[color:var(--c-brand)]/90 text-white hover:opacity-90"
                       >
                         Nueva publicación
