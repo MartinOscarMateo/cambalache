@@ -102,7 +102,7 @@ export default function Profile() {
             <aside>
               <div className="rounded-2xl bg-white border border-[color:var(--c-mid-blue)]/60 shadow-[0_20px_60px_rgba(0,0,0,.2)] p-4">
                 <h2
-                  className="text-xl font-bold mb-3"
+                  className="text-xl font-bold mb-3 px-3"
                   style={{ color: 'var(--c-brand)', fontFamily: 'vag-rundschrift-d, sans-serif' }}
                 >
                   Acciones
@@ -123,7 +123,7 @@ export default function Profile() {
                     Gestionar publicaciones
                   </button>
                   <button
-                    onClick={() => navigate('/my-trades')}
+                    onClick={() => navigate('/trades')}
                     className="w-full text-left rounded-lg px-3 py-2 transition hover:bg-[color:var(--c-mid-cyan)]/35"
                     style={{ color: 'var(--c-text)' }}
                   >

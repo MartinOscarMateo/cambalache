@@ -23,21 +23,37 @@
 .home-guest__banner-box { position: relative; }
 .home-guest__banner img {
   width: 100%;
-  height: clamp(180px, 35vw, 420px);
+  height: clamp(142px, 35vw, 420px);
   object-fit: cover;
   border-radius: 16px;
 }
+@media (min-width: 640px) { 
+  .home-guest__banner img {
+    height: clamp(180px, 35vw, 420px);
+  }
+}
 .home-guest__banner-actions {
   position: absolute;
-  left: 16px;
-  bottom: 16px;
+  left: -11px;
+  bottom: -5px;
+  scale: calc(80%);
   display: inline-flex;
   gap: 12px;
   flex-wrap: wrap;
 }
 .home-guest__banner-actions .btn { box-shadow: 0 6px 18px rgba(0,0,0,.18); }
+@media (min-width: 680px) { 
+  .home-guest__banner-actions {
+    left: 10%;
+    bottom: 17%;
+    scale: calc(100%);
+  }
+}
 @media (min-width: 1024px) {
-  .home-guest__banner-actions { left: 24px; bottom: 24px; }
+  .home-guest__banner-actions { 
+    left: 10%;
+    bottom: 20%; 
+  }
 }
 
 /* Pasos */

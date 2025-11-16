@@ -191,7 +191,7 @@ export default function PostDetail() {
 
   return (
     <main className="min-h-[85vh] flex justify-center p-4 md:p-10" style={{ background: '#f6f2ff' }}>
-      <article className="w-full max-w-5xl h-[100%] grid md:grid-cols-[360px_minmax(0,1fr)] rounded-2xl overflow-hidden border border-[color:var(--c-mid-blue)]/60 shadow-[0_20px_60px_rgba(0,0,0,.15)] bg-white">
+      <article className="block w-full h-[100%] md:grid md:grid-cols-[360px_minmax(0,1fr)] rounded-2xl overflow-hidden border border-[color:var(--c-mid-blue)]/60 shadow-[0_20px_60px_rgba(0,0,0,.15)] bg-white">
         {/* left: gallery compacta */}
         <aside className="bg-white">
           <div className="relative">
@@ -238,61 +238,40 @@ export default function PostDetail() {
         </aside>
 
         {/* right: detalle y acciones */}
-        <section className="p-5 sm:p-6 md:p-7">
-          {/* header con titulo y pills */}
-          <header className="flex items-start justify-between gap-3">
+        <section className="p-5 sm:p-6 md:p-7 flex flex-col">
+          {/* header con titulo pills */}
+          <header className="flex flex-col gap-2">
             <div className="min-w-0">
               <h1
-                className="text-2xl font-bold truncate"
+                className="text-2xl font-bold"
                 style={{ color: 'var(--c-text)' }}
                 title={post.title}
               >
                 {post.title}
               </h1>
-              <div className="mt-2 flex flex-wrap gap-2">
-                {post.category && (
-                  <span className="px-3 py-1 rounded-full text-xs font-semibold bg-[color:var(--c-mid-pink)]/30 text-[color:var(--c-text)]">
-                    {post.category}
-                  </span>
-                )}
-                {post.condition && (
-                  <span className="px-3 py-1 rounded-full text-xs font-semibold bg-[color:var(--c-mid-cyan)]/30 text-[color:var(--c-text)]">
-                    Estado: {post.condition}
-                  </span>
-                )}
-                {post.location && (
-                  <span className="px-3 py-1 rounded-full text-xs font-semibold bg-[color:var(--c-accent)]/35 text-[color:var(--c-text)]">
-                    Zona: {post.location}
-                  </span>
-                )}
-                <span className="px-3 py-1 rounded-full text-xs font-semibold bg-[color:var(--c-info)]/25 text-[color:var(--c-text)]">
-                  {post.openToOffers ? 'Abierto a ofertas' : 'Intercambio especifico'}
-                </span>
-              </div>
             </div>
 
-            {/* mini owner */}
-            {ownerProfilePath ? (
-              <Link to={ownerProfilePath} className="shrink-0 flex items-center gap-2 hover:opacity-90">
-                <div className="w-10 h-10 rounded-full bg-gray-200 overflow-hidden">
-                  {owner?.avatar && <img src={owner.avatar} alt="avatar" className="w-full h-full object-cover" />}
-                </div>
-                <div className="leading-tight">
-                  <p className="text-sm font-semibold" style={{ color: 'var(--c-text)' }}>{owner?.name || 'Usuario'}</p>
-                  <p className="text-xs text-gray-500">Propietario</p>
-                </div>
-              </Link>
-            ) : (
-              <div className="shrink-0 flex items-center gap-2">
-                <div className="w-10 h-10 rounded-full bg-gray-200 overflow-hidden">
-                  {owner?.avatar && <img src={owner.avatar} alt="avatar" className="w-full h-full object-cover" />}
-                </div>
-                <div className="leading-tight">
-                  <p className="text-sm font-semibold" style={{ color: 'var(--c-text)' }}>{owner?.name || 'Usuario'}</p>
-                  <p className="text-xs text-gray-500">Propietario</p>
-                </div>
-              </div>
-            )}
+            {/* pills */}
+            <div className="flex flex-wrap gap-2">
+              {post.category && (
+                <span className="px-3 py-1 rounded-full text-xs font-semibold bg-[color:var(--c-mid-pink)]/30 text-[color:var(--c-text)]">
+                  {post.category}
+                </span>
+              )}
+              {post.condition && (
+                <span className="px-3 py-1 rounded-full text-xs font-semibold bg-[color:var(--c-mid-cyan)]/30 text-[color:var(--c-text)]">
+                  Estado: {post.condition}
+                </span>
+              )}
+              {post.location && (
+                <span className="px-3 py-1 rounded-full text-xs font-semibold bg-[color:var(--c-accent)]/35 text-[color:var(--c-text)]">
+                  Zona: {post.location}
+                </span>
+              )}
+              <span className="px-3 py-1 rounded-full text-xs font-semibold bg-[color:var(--c-info)]/25 text-[color:var(--c-text)]">
+                {post.openToOffers ? 'Abierto a ofertas' : 'Intercambio especifico'}
+              </span>
+            </div>
           </header>
 
           {/* descripcion compacta */}
@@ -305,7 +284,7 @@ export default function PostDetail() {
           )}
 
           {/* detalles opcionales */}
-          <div className="mt-4 grid gap-3">
+          <div className="mt-4 mb-4 grid gap-3">
             {post.hasDetails && post.detailsText && (
               <div className="rounded-xl bg-white border border-[color:var(--c-mid-pink)]/50 p-3">
                 <p className="text-sm" style={{ color: 'var(--c-text)' }}>
@@ -323,7 +302,7 @@ export default function PostDetail() {
           </div>
 
           {/* call to action */}
-          <div className="mt-5">
+          <div className="flex flex-col lg:flex-row md:justify-between gap-4 mt-auto">
             {isOwner ? (
               <p className="text-center text-sm text-gray-500">Sos el dueño de esta publicacion</p>
             ) : (
@@ -338,7 +317,7 @@ export default function PostDetail() {
                   Proponer trueque
                 </button>
                 <button
-                  className="px-4 py-2 rounded-xl border border-[color:var(--c-mid-blue)]/60 hover:bg-[color:var(--c-mid-blue)]/15 transition disabled:opacity-60"
+                  className="px-4 py-2 md:px-3 rounded-xl border border-[color:var(--c-mid-blue)]/60 hover:bg-[color:var(--c-mid-blue)]/15 transition disabled:opacity-60"
                   onClick={() => ownerProfilePath && navigate(ownerProfilePath)}
                   disabled={!ownerProfilePath}
                 >
@@ -349,6 +328,29 @@ export default function PostDetail() {
 
             {info && <p className="text-green-600 text-center mt-3 text-sm">{info}</p>}
             {error && <p className="text-red-600 text-center mt-3 text-sm">{error}</p>}
+
+            {/* mini owner */}
+              {ownerProfilePath ? (
+                <Link to={ownerProfilePath} className="shrink-0 flex items-center gap-2 hover:opacity-90">
+                  <div className="w-10 h-10 rounded-full bg-gray-200 overflow-hidden">
+                    {owner?.avatar && <img src={owner.avatar} alt="avatar" className="w-full h-full object-cover" />}
+                  </div>
+                  <div className="leading-tight">
+                    <p className="text-sm font-semibold" style={{ color: 'var(--c-text)' }}>{owner?.name || 'Usuario'}</p>
+                    <p className="text-xs text-gray-500">Propietario</p>
+                  </div>
+                </Link>
+              ) : (
+                <div className="shrink-0 flex items-center gap-2">
+                  <div className="w-10 h-10 rounded-full bg-gray-200 overflow-hidden">
+                    {owner?.avatar && <img src={owner.avatar} alt="avatar" className="w-full h-full object-cover" />}
+                  </div>
+                  <div className="leading-tight">
+                    <p className="text-sm font-semibold" style={{ color: 'var(--c-text)' }}>{owner?.name || 'Usuario'}</p>
+                    <p className="text-xs text-gray-500">Propietario</p>
+                  </div>
+                </div>
+              )}
           </div>
 
           {/* mas publicaciones del owner */}
@@ -414,7 +416,7 @@ export default function PostDetail() {
 
             {offerType === 'existing' && (
               <div className="space-y-3">
-                <h3 className="font-medium" style={{ color: 'var(--c-text)' }}>Selecciona una de tus publicaciones activas</h3>
+                <p className="text-center text-sm! sm:text-base! md:text-md! lg:text-xl! font-medium" style={{ color: 'var(--c-text)' }}>Selecciona una de tus publicaciones activas</p>
                 {myPosts.length === 0 ? (
                   <p className="text-gray-500 text-sm">No tenes publicaciones activas.</p>
                 ) : (

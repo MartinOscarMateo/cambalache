@@ -23,8 +23,7 @@ import UserPublicProfile from './pages/UserPublicProfile.jsx';
 import NotFound from './pages/NotFound.jsx';
 
 // admin:
-import AdminGuard from './components/AdminGuard.jsx';
-import AdminLayout from './layouts/AdminLayout.jsx';
+import AdminPanel from './pages/admin/AdminPanel.jsx';
 import AdminUsersList from './pages/admin/AdminUsersList.jsx';
 import AdminUserEdit from './pages/admin/AdminUserEdit.jsx';
 
@@ -81,18 +80,10 @@ const router = createBrowserRouter([
       { path: '/users/:id/following', element: <FollowingList />, loader: requireAuthLoader },
 
       // admin:
-      {
-        path: '/admin',
-        element: (
-          <AdminGuard>
-            <AdminLayout />
-          </AdminGuard>
-        ),
-        children: [
-          { path: 'users', element: <AdminUsersList /> },
-          { path: 'users/:id', element: <AdminUserEdit /> }
-        ]
-      },
+      
+      { path: '/admin', element: <AdminPanel /> },
+      { path: '/admin/users', element: <AdminUsersList /> },
+      { path: '/admin/users/:id', element: <AdminUserEdit /> },
 
       { path: '*', element: <NotFound /> }
     ]

@@ -9,7 +9,7 @@ export default function ForgotPassword() {
               <label className="text-sm font-medium">Email</label>
               <input type="email" placeholder="correo@ejemplo.com" className="w-full rounded-xl border px-4 py-3 border-slate-200 "/>
             </div>
-            <button type="submit" className="w-full rounded-xl bg-[color:var(--c-text)] px-4 py-3 font-semibold text-white transition hover:brightness-110 disabled:opacity-60">Enviar enlace (vista)</button>
+            <button type="submit" className="w-full rounded-xl bg-[color:var(--c-text)] px-4 py-3 font-semibold text-white transition hover:brightness-110 disabled:opacity-60">Enviar enlace</button>
           </form>
         </div>
       </section>

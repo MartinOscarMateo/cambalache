@@ -117,7 +117,33 @@ export default function PostCreate() {
             <section>
               <label className="text-sm font-medium" style={{ color: 'var(--c-text)' }}>Imágenes</label>
               <div className="mt-2 rounded-xl border-2 border-dashed border-[color:var(--c-mid-blue)]/70 p-4">
-                <input type="file" accept="image/*" multiple onChange={onFiles} disabled={loading} />
+                <input className='w-full hidden sm:block' type="file" accept="image/*" multiple onChange={onFiles} disabled={loading} />
+                <label className="block w-full cursor-pointer sm:hidden">
+                  <input
+                    id="images"
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    onChange={onFiles}
+                    disabled={loading}
+                    className="sr-only"
+                  />
+                  
+                  <div className="w-full rounded-md bg-white text-slate-700 border border-transparent">
+                    <div className="text-sm text-[var(--c-text)]">Hacé click para elegir archivos</div>
+                    <div className="mt-2 text-sm text-slate-700 whitespace-normal break-words max-h-20 overflow-auto">
+                      {files && files.length > 0 ? (
+                        files.map((f, i) => (
+                          <div key={i} className="mb-1">
+                            {f.name}
+                          </div>
+                        ))
+                      ) : (
+                        <span className="text-xs text-slate-500">Ningún archivo seleccionado</span>
+                      )}
+                    </div>
+                  </div>
+                </label>
                 <div className="mt-2 flex items-center justify-between text-xs text-slate-500">
                   <span>Máximo {LIMITS.imagesMax} imágenes.</span>
                   <span>{previews.length}/{LIMITS.imagesMax}</span>

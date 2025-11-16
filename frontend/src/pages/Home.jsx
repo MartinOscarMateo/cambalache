@@ -6,7 +6,7 @@ import '../styles/pages/home-guest.css'
 export default function Home() {
   return (
     <main className="min-h-[85vh] home-guest">
-      <section className="home-guest__banner" aria-labelledby="home-hero-title">
+      <section className="home-guest__banner mt-4" aria-labelledby="home-hero-title">
         <div className="container">
           <h1 id="home-hero-title" className="sr-only">Cambalache — trueque simple y local</h1>
           <div className="home-guest__banner-box">
