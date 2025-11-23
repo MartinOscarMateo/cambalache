@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
 import { listTrades } from '../lib/api.js';
+import TradeActions from '../components/TradeActions.jsx';
 
 export default function Trades() {
   const [role, setRole] = useState('inbox');
-  const [onlyUnread, setOnlyUnread] = useState(false);
   const [data, setData] = useState({ items: [], page: 1, limit: 10, total: 0 });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -52,14 +52,14 @@ export default function Trades() {
         </ul>
 
 
-        <ul className='bg-white rounded-2xl shadow-[0_10px_30px_rgba(0,0,0,.12)] list-none p-0 m-0 grid gap-12'>
+        <ul className='rounded-2xl list-none p-0 m-0 grid gap-6'>
           {data.items.map(t => {
             const id = t.id || t._id;
             const pr = t.postRequestedId?.title || 'Publicación';
             const po = t.postOfferedId?.title || (t.itemsText ? 'Propuesta textual' : 'Sin oferta');
             const who = role==='inbox' ? t.proposerId?.name || 'Usuario' : t.receiverId?.name || 'Usuario';
             return (
-              <li key={id} className='border border-[#e5e7eb] rounded-2xl p-5'>
+              <li key={id} className='bg-white shadow-[0_10px_30px_rgba(0,0,0,.12)] border border-[#e5e7eb] rounded-2xl p-5'>
                 <div className='flex flex-col md:flex-row md:justify-between gap-4'>
                   <div>
                     <div style={{fontWeight:600}}>{pr}</div>
@@ -71,6 +71,7 @@ export default function Trades() {
                     <div style={{fontSize:13,color:'#6b7280'}}>{new Date(t.createdAt).toLocaleString()}</div>
                   </div>
                 </div>
+                <TradeActions trade={t} />
               </li>
             );
           })}

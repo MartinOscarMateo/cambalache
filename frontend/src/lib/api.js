@@ -276,3 +276,21 @@ export async function createChatWithMessage(receiverId, text) {
 
   return chatJson;
 }
+
+export async function updateTradeStatus(id, action) {
+  const token = localStorage.getItem('token') || '';
+
+  const res = await fetch(`${API}/api/trades/${id}/status`, {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`,
+    },
+    body: JSON.stringify({ action }),
+  });
+
+  const json = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(json?.error || json?.message || 'Error actualizando estado del trueque');
+
+  return json;
+}

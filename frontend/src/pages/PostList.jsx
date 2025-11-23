@@ -11,6 +11,7 @@ export default function PostList() {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [q, setQ] = useState('');
 
   useEffect(() => {
     const API = import.meta.env.VITE_API_URL || 'http://localhost:4000';
@@ -44,6 +45,29 @@ export default function PostList() {
     );
   }
 
+  const filtered = items.filter(p => {
+    const title = String(p.title || "").toLowerCase();
+    const category = String(p.category || "").toLowerCase();
+    const location = String(p.location || "").toLowerCase();
+
+    const qlow = q.toLowerCase();
+
+    // Coincidencia por título, categoría o zona
+    return (
+      !q ||
+      title.includes(qlow) ||
+      category.includes(qlow) ||
+      location.includes(qlow)
+    );
+  });
+
+  // 📌 ordenar por fecha (si el backend lo manda)
+  const sorted = filtered.sort((a, b) => {
+    const da = new Date(a?.updatedAt || a?.createdAt || 0).getTime();
+    const db = new Date(b?.updatedAt || b?.createdAt || 0).getTime();
+    return db - da;
+  });
+
   // tarjeta
   function Card({ p }) {
     const img = Array.isArray(p.images) && p.images[0] ? p.images[0] : '';
@@ -67,7 +91,7 @@ export default function PostList() {
         {/* contenido */}
         <div className="p-4 flex-1 flex flex-col">
           <h3
-            className="font-semibold text-base line-clamp-2"
+            className="font-semibold lg:text-xl! line-clamp-2"
             style={{ color: 'var(--c-text)' }}
             title={title}
           >
@@ -75,7 +99,7 @@ export default function PostList() {
           </h3>
 
           {/* pastillas */}
-          <div className="mt-2 flex flex-wrap gap-2">
+          <div className="mt-2 mb-3 flex flex-wrap gap-2">
             {category && (
               <span className="px-3 py-1 rounded-full text-xs font-semibold bg-[color:var(--c-mid-pink)]/30 text-[color:var(--c-text)]">
                 {category}
@@ -97,7 +121,7 @@ export default function PostList() {
           </div>
 
           {/* accion */}
-          <div className="mt-4 flex items-center justify-between">
+          <div className="mt-auto flex items-center justify-between">
             <button
               onClick={() => navigate(`/posts/${pid(p)}`)}
               className="px-4 py-2 rounded-xl border border-[color:var(--c-mid-blue)]/60 hover:bg-[color:var(--c-mid-blue)]/15 transition text-sm font-medium"
@@ -113,21 +137,34 @@ export default function PostList() {
   return (
     <main className="min-h-[85vh] px-4 py-8" style={{ background: '#f6f2ff' }}>
       <div className="max-w-6xl mx-auto">
-        <header className="mb-6">
+        <header className="mb-4">
           <h1
-            className="text-2xl sm:text-3xl font-bold"
+            className="text-2xl sm:text-3xl font-bold text-center"
             style={{ color: 'var(--c-brand)', fontFamily: 'vag-rundschrift-d, sans-serif' }}
           >
             Publicaciones
           </h1>
-          <p className="mt-1 text-sm" style={{ color: 'var(--c-text)' }}>
+          <p className="mt-1 text-sm text-center" style={{ color: 'var(--c-text)' }}>
             Explora y propone intercambios.
           </p>
         </header>
 
+        <div className='mb-4'>
+          <div className="flex-1">
+            <label htmlFor="q" className="sr-only">Buscar</label>
+            <input
+              id="q"
+              value={q}
+              onChange={e => setQ(e.target.value)}
+              placeholder="Buscar por nombre, categoria o zona…"
+              className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 outline-none ring-2 ring-transparent focus:ring-[color:var(--c-info)]"
+            />
+          </div>
+        </div>
+
         {/* grilla adaptable */}
         <div className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-          {items.map(p => <Card key={pid(p)} p={p} />)}
+          {sorted.map(p => <Card key={pid(p)} p={p} />)}
         </div>
       </div>
     </main>

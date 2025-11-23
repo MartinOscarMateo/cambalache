@@ -1,8 +1,8 @@
 import mongoose from 'mongoose';
 const { Schema, Types } = mongoose;
 
-export const TRADE_STATUS = ['pending','countered','accepted','rejected','canceled'];
-export const TRADE_ACTION = ['created','countered','accepted','rejected','canceled'];
+export const TRADE_STATUS = ['pending','countered','accepted','rejected','cancelled','finished'];
+export const TRADE_ACTION = ['created','countered','accepted','rejected','cancelled','finished'];
 
 const HistorySchema = new Schema({
   at: { type: Date, default: Date.now },

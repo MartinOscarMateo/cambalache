@@ -6,7 +6,7 @@ import Chat from '../models/Chat.js'
 import Message from '../models/Message.js'
 
 const ALLOWED_STATUS = new Set(TRADE_STATUS);
-const TERMINAL = new Set(['accepted','rejected','canceled']);
+const TERMINAL = new Set(['rejected', 'cancelled', 'finished']);
 
 const viewId = v => String(v);
 const getOwnerId = (post) => post?.userId || post?.authorId || post?.ownerId;
@@ -26,12 +26,6 @@ async function mustValidPost(id) {
   return post;
 }
 
-function canTransition(current, action) {
-  if (TERMINAL.has(current)) return false;
-  if (!['pending','countered'].includes(current)) return false;
-  return ['accept','reject','cancel','counter'].includes(action);
-}
-
 function parsePageLimit(q) {
   const page = Math.max(1, Number(q.page || 1));
   let limit = Number(q.limit || 10);
@@ -49,19 +43,19 @@ export async function createTrade(req, res) {
     if (postOfferedId) {
       assert(String(postRequestedId) !== String(postOfferedId), 'SAME_POST', 'No podés pedir y ofrecer el mismo post');
     }
-
+    
     const postRequested = await mustValidPost(postRequestedId);
     const receiverId = viewId(getOwnerId(postRequested));
     assert(receiverId, 'REQ_POST_NO_OWNER', 'Publicación sin dueño');
     assert(receiverId !== userId, 'SELF_TRADE_FORBIDDEN', 'No podés ofertar sobre tu propia publicación');
-
+    
     if (postOfferedId) {
       const postOffered = await mustValidPost(postOfferedId);
       const offeredOwner = viewId(getOwnerId(postOffered));
       assert(offeredOwner === userId, 'OFFERED_NOT_OWNED', 'Debés ser dueño del post ofrecido');
     }
     assert(itemsText || postOfferedId, 'OFFER_REQUIRED', 'Ofrecé itemsText o postOfferedId');
-
+    
     const trade = await Trade.create({
       proposerId: userId,
       receiverId,
@@ -76,19 +70,19 @@ export async function createTrade(req, res) {
     if (!chat) {
       chat = await Chat.create({ participants: [userId, receiverId] })
     }
-
+    
     const autoText = `Hola! Te envié una solicitud de trueque por tu publicación "${postRequested.title}".`
     await Message.create({
       chatId: chat._id,
       sender: userId,
       text: autoText
     })
-
+    
     await Chat.findByIdAndUpdate(chat._id, {
       lastMessage: autoText,
       updatedAt: new Date()
     })
-
+    
     res.status(201).json(trade)
   } catch (err) {
     res.status(400).json({ code: err.code || 'TRADE_CREATE_ERROR', error: err.message });
@@ -101,19 +95,19 @@ export async function listTrades(req, res) {
     const { role = 'inbox', status } = req.query;
     assert(['inbox', 'sent'].includes(role), 'BAD_ROLE', 'role inválido');
     if (status) assert(ALLOWED_STATUS.has(status), 'BAD_STATUS', 'status inválido');
-
+    
     const { page, limit } = parsePageLimit(req.query);
     const q = role === 'inbox' ? { receiverId: userId } : { proposerId: userId };
     if (status) q.status = status;
-
+    
     const skip = (page - 1) * limit;
     const [items, total] = await Promise.all([
       Trade.find(q).sort({ createdAt: -1 }).skip(skip).limit(limit)
-        .populate('proposerId', 'name')
-        .populate('receiverId', 'name')
-        .populate('postRequestedId', 'title')
-        .populate('postOfferedId', 'title')
-        .lean(),
+      .populate('proposerId', 'name')
+      .populate('receiverId', 'name')
+      .populate('postRequestedId', 'title')
+      .populate('postOfferedId', 'title')
+      .lean(),
       Trade.countDocuments(q)
     ]);
 
@@ -128,11 +122,11 @@ export async function getTrade(req, res) {
     const userId = req.user.id;
     assert(mongoose.isValidObjectId(req.params.id), 'BAD_ID', 'ID inválido');
     const trade = await Trade.findById(req.params.id)
-      .populate('proposerId', 'name')
-      .populate('receiverId', 'name')
-      .populate('postRequestedId', 'title')
-      .populate('postOfferedId', 'title')
-      .lean();
+    .populate('proposerId', 'name')
+    .populate('receiverId', 'name')
+    .populate('postRequestedId', 'title')
+    .populate('postOfferedId', 'title')
+    .lean();
     assert(trade, 'NOT_FOUND', 'Trueque no encontrado');
     assert([viewId(trade.proposerId?._id), viewId(trade.receiverId?._id)].includes(userId), 'FORBIDDEN', 'No autorizado');
     res.json(trade);
@@ -141,24 +135,83 @@ export async function getTrade(req, res) {
   }
 }
 
+function canTransition(current, action) {
+  if (TERMINAL.has(current)) return false;
+
+  const allowed = {
+    pending:   ['accept', 'reject', 'cancel'],
+    countered: ['accept', 'reject', 'cancel'],
+    accepted:  ['finish', 'cancel'],
+    rejected:  [],
+    cancelled: [],
+    finished:  [],
+  };
+
+  return allowed[current]?.includes(action) ?? false;
+}
+
 export async function changeStatus(req, res) {
   try {
     const userId = req.user.id;
-    const { action } = req.body; // accept | reject | cancel
-    assert(['accept', 'reject', 'cancel'].includes(action), 'BAD_ACTION', 'Acción inválida');
-
+    const { action } = req.body;
+    assert(['accept', 'reject', 'cancel', 'finish'].includes(action), 'BAD_ACTION', 'Acción inválida');
+    
     const trade = await Trade.findById(req.params.id);
     assert(trade, 'NOT_FOUND', 'Trueque no encontrado');
+
     assert([viewId(trade.proposerId), viewId(trade.receiverId)].includes(userId), 'FORBIDDEN', 'No autorizado');
+    
+    //DEBUGGER
+
+    // console.log("DEBUG:", { status: trade.status, action });
+    // console.log("canTransition?", canTransition(trade.status, action));
+    
+    // console.log("---- DEBUG STATUS ----");
+    // console.log("trade.status:", JSON.stringify(trade.status));
+    // console.log("allowed keys:", Object.keys({
+    //   pending:1, countered:1, accepted:1, rejected:1, cancelled:1, finished:1
+    // }));
+    // console.log("TERMINAL.has(current):", ["accepted","rejected","cancelled","finished"].includes(trade.status));
+    // console.log("allowed[current]:", 
+    //   {
+    //     pending: ['accept','reject','cancel'],
+    //     countered: ['accept','reject','cancel'],
+    //     accepted: ['finish','cancel'],
+    //     rejected: [],
+    //     cancelled: [],
+    //     finished: []
+    //   }[trade.status]
+    // );
+
     assert(canTransition(trade.status, action), 'BAD_STATE', 'Estado no permite la acción');
 
     if (action === 'cancel') {
-      assert(viewId(trade.proposerId) === userId, 'ONLY_PROPOSER', 'Solo quien propuso puede cancelar');
+      if (trade.status === "pending") {
+        assert(
+          viewId(trade.proposerId) === userId,
+          "ONLY_PROPOSER",
+          "Solo quien propuso puede cancelar mientras está pendiente"
+        );
+      } else if (trade.status === "accepted") {
+        assert(
+          [viewId(trade.proposerId), viewId(trade.receiverId)].includes(userId),
+          "FORBIDDEN",
+          "No autorizado para cancelar"
+        );
+      }
+
       const from = trade.status;
-      trade.status = 'canceled';
-      trade.history.push({ by: userId, action: 'canceled', from, to: 'canceled' });
+      trade.status = 'cancelled';
+      trade.history.push({ by: userId, action: 'cancelled', from, to: 'cancelled' });
+    } else if (action === 'finish') {
+      assert(trade.status === 'accepted', 'BAD_STATE', 'Solo se finalizan trueques aceptados');
+
+      const from = trade.status;
+      trade.status = 'finished';
+      trade.history.push({ by: userId, action: 'finished', from, to: 'finished' });
     } else {
       assert(viewId(trade.receiverId) === userId, 'ONLY_RECEIVER', 'Solo el receptor puede aceptar o rechazar');
+
       const to = action === 'accept' ? 'accepted' : 'rejected';
       const from = trade.status;
       trade.status = to;
