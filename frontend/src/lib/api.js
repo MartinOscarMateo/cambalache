@@ -96,6 +96,7 @@ export async function createPost(data) {
       condition: data.condition,
       hasDetails: data.hasDetails,
       detailsText: data.detailsText,
+      barrio: data.barrio,
       location: data.location,
       openToOffers: data.openToOffers,
       interestsText: data.interestsText,
@@ -176,6 +177,27 @@ function normalizePostsEnvelope(j, fallbackPage = 1, fallbackLimit = 0) {
   return null;
 }
 
+// obtiene lista de publicaciones con filtros, incluyendo barrio
+export async function getPosts({ q = '', category = '', ownerId = '', status = '', sort = 'recent', page = 1, limit = 12, barrio = '' } = {}) {
+  const params = new URLSearchParams();
+  if (q) params.set('q', q);
+  if (category) params.set('category', category);
+  if (ownerId) params.set('ownerId', ownerId);
+  if (status) params.set('status', status);
+  if (sort) params.set('sort', sort);
+  if (page != null) params.set('page', String(page));
+  if (limit != null) params.set('limit', String(limit));
+  if (barrio) params.set('barrio', barrio);
+
+  const token = localStorage.getItem('token') || '';
+  const headers = token ? { Authorization: `Bearer ${token}` } : {};
+  const res = await fetch(`${API}/api/posts?${params.toString()}`, { headers });
+  const json = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(json?.error || json?.message || 'Error obteniendo publicaciones');
+  const env = normalizePostsEnvelope(json, page, limit) || { page: 1, limit: 0, total: 0, items: [] };
+  return env;
+}
+
 // obtiene publis de usuario probando varios endpoints
 export async function fetchUserPosts(userId, { page = 1, limit = 12 } = {}) {
   const token = localStorage.getItem('token') || '';
@@ -185,11 +207,11 @@ export async function fetchUserPosts(userId, { page = 1, limit = 12 } = {}) {
 
   // endpoints
   const urls = [
-    `${API}/api/users/${uid}/posts?page=${page}&limit=${limit}`,
     `${API}/api/posts?ownerId=${encodeURIComponent(uid)}&page=${page}&limit=${limit}`,
-    `${API}/api/posts?author=${encodeURIComponent(uid)}&page=${page}&limit=${limit}`,
+    // fallback por si se usa userId en vez de ownerId
     `${API}/api/posts?userId=${encodeURIComponent(uid)}&page=${page}&limit=${limit}`
   ];
+
 
   for (const url of urls) {
     try {
@@ -199,7 +221,7 @@ export async function fetchUserPosts(userId, { page = 1, limit = 12 } = {}) {
       const env = normalizePostsEnvelope(j, page, limit);
       if (env) return env;
     } catch {
-      // try next url
+
     }
   }
 
@@ -292,5 +314,19 @@ export async function updateTradeStatus(id, action) {
   const json = await res.json().catch(() => ({}));
   if (!res.ok) throw new Error(json?.error || json?.message || 'Error actualizando estado del trueque');
 
+  return json;
+}
+
+export async function getBarrios() {
+  const res = await fetch(`${API}/api/barrios`);
+  const json = await res.json().catch(() => ([]));
+  if (!res.ok) throw new Error(json?.message || 'Error obteniendo barrios');
+  return json;
+}
+
+export async function getBarriosGeojson() {
+  const res = await fetch(`${API}/api/barrios/geojson`);
+  const json = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(json?.message || 'Error obteniendo barrios (geojson)');
   return json;
 }

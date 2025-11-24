@@ -13,6 +13,7 @@ const PostSchema = new Schema(
     condition: { type: String, enum: ['nuevo', 'usado', 'no-funciona'], required: true },
     hasDetails: { type: Boolean, default: false },
     detailsText: { type: String, trim: true, maxlength: 1000 },
+    barrio: { type: String, required: true, trim: true, maxlength: 80, index: true },
     location: { type: String, trim: true, maxlength: 100 },
     openToOffers: { type: Boolean, default: true },
     interestsText: { type: String, trim: true, maxlength: 1000 }
