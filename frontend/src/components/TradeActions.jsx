@@ -8,7 +8,7 @@ export default function TradeActions({ trade }) {
   const [ratingLoading, setRatingLoading] = useState(false);
 
   const user = JSON.parse(localStorage.getItem("user"));
-  const userId = user._id;
+  const userId = user.id;
 
   const isProposer = trade.proposerId._id === userId;
   const isReceiver = trade.receiverId._id === userId;
