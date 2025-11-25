@@ -8,7 +8,7 @@ const router = express.Router()
 // obtiene publicaciones con filtros
 router.get('/', async (req, res) => {
   try {
-    const { q, category, ownerId, status, sort, page = '1', limit = '12' } = req.query
+    const { q, category, ownerId, status, sort, page = '1', limit = '12', barrio } = req.query
 
     const filter = {}
     if (q) filter.$text = { $search: q }
@@ -16,6 +16,7 @@ router.get('/', async (req, res) => {
     if (ownerId && mongoose.isValidObjectId(ownerId)) filter.ownerId = ownerId
     if (status) filter.status = status
     if (!status) filter.status = 'active'
+    if (barrio) filter.barrio = String(barrio).trim()
 
     const pageNum = Math.max(parseInt(page, 10) || 1, 1)
     const limitNum = Math.min(Math.max(parseInt(limit, 10) || 12, 1), 100)
@@ -96,7 +97,8 @@ router.post('/', auth, async (req, res) => {
       detailsText,
       location,
       openToOffers,
-      interestsText
+      interestsText,
+      barrio
     } = req.body
 
     const doc = new Post({
@@ -107,6 +109,7 @@ router.post('/', auth, async (req, res) => {
       condition: condition || 'usado',
       hasDetails: Boolean(hasDetails),
       detailsText: String(detailsText || '').trim(),
+      barrio: String(barrio || '').trim(),
       location: String(location || '').trim(),
       openToOffers: openToOffers !== false,
       interestsText: String(interestsText || '').trim(),
@@ -140,6 +143,7 @@ router.patch('/:id', auth, async (req, res) => {
     if (req.body.condition !== undefined) next.condition = req.body.condition
     if (req.body.hasDetails !== undefined) next.hasDetails = Boolean(req.body.hasDetails)
     if (req.body.detailsText !== undefined) next.detailsText = String(req.body.detailsText).trim()
+    if (req.body.barrio !== undefined) next.barrio = String(req.body.barrio).trim()
     if (req.body.location !== undefined) next.location = String(req.body.location).trim()
     if (req.body.openToOffers !== undefined) next.openToOffers = Boolean(req.body.openToOffers)
     if (req.body.interestsText !== undefined) next.interestsText = String(req.body.interestsText).trim()

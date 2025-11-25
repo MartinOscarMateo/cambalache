@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { createPost } from '../lib/api.js';
+import { createPost, getBarrios } from '../lib/api.js';
 import { uploadMany } from '../lib/upload.js';
 
 export default function PostCreate() {
@@ -11,12 +11,14 @@ export default function PostCreate() {
     condition: '',
     hasDetails: 'no',
     detailsText: '',
-    location: '',
+    barrio: '',
     openToOffers: 'yes',
     interestsText: ''
   });
   const [files, setFiles] = useState([]);
   const [previews, setPreviews] = useState([]);
+  const [barrios, setBarrios] = useState([]);
+  const [barriosLoading, setBarriosLoading] = useState(true);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const navigate = useNavigate();
@@ -28,11 +30,32 @@ export default function PostCreate() {
     descMax: 800,
     descMin: 10,
     catMax: 40,
-    locMax: 80,
     detailsMax: 300,
     interestsMax: 300,
     imagesMax: 6
   };
+
+  useEffect(() => {
+    let cancelled = false;
+    async function loadBarrios() {
+      try {
+        const list = await getBarrios();
+        if (!cancelled) {
+          setBarrios(Array.isArray(list) ? list : []);
+        }
+      } catch (err) {
+        if (!cancelled) {
+          setError(err.message || 'Error cargando barrios');
+        }
+      } finally {
+        if (!cancelled) {
+          setBarriosLoading(false);
+        }
+      }
+    }
+    loadBarrios();
+    return () => { cancelled = true; };
+  }, []);
 
   function onChange(e) {
     const { name, value } = e.target;
@@ -57,7 +80,7 @@ export default function PostCreate() {
     const description = form.description.trim();
     const category = form.category.trim().toLowerCase();
     const condition = form.condition;
-    const location = form.location.trim();
+    const barrio = form.barrio.trim();
     const hasDetails = form.hasDetails === 'yes';
     const detailsText = hasDetails ? form.detailsText.trim() : '';
     const openToOffers = form.openToOffers === 'yes';
@@ -67,6 +90,7 @@ export default function PostCreate() {
     if (description.length < LIMITS.descMin) return setError(`Descripción mínima ${LIMITS.descMin} caracteres`);
     if (!category) return setError('Categoría requerida');
     if (!condition) return setError('Seleccioná el estado del artículo');
+    if (!barrio) return setError('Seleccioná un barrio');
     if (!files.length) return setError('Subí al menos una imagen');
 
     setLoading(true);
@@ -79,7 +103,7 @@ export default function PostCreate() {
         condition,
         hasDetails,
         detailsText,
-        location,
+        barrio,
         openToOffers,
         interestsText,
         images
@@ -113,7 +137,7 @@ export default function PostCreate() {
           </header>
 
           <form onSubmit={onSubmit} className="space-y-5">
-            {/* Imágenes */}
+            {/* Imgensess */}
             <section>
               <label className="text-sm font-medium" style={{ color: 'var(--c-text)' }}>Imágenes</label>
               <div className="mt-2 rounded-xl border-2 border-dashed border-[color:var(--c-mid-blue)]/70 p-4">
@@ -285,22 +309,22 @@ export default function PostCreate() {
                 </>
               )}
 
-              <div className="grid gap-1">
-                <label htmlFor="location" className="text-sm font-medium" style={{ color: 'var(--c-text)' }}>Zona</label>
-                <input
-                  id="location"
-                  name="location"
-                  value={form.location}
-                  onChange={onChange}
-                  disabled={loading}
-                  maxLength={LIMITS.locMax}
-                  aria-describedby="loc-help"
-                  className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 outline-none ring-2 ring-transparent focus:ring-[color:var(--c-info)]"
-                  placeholder="Ej: Palermo, Buenos Aires"
-                />
-                <div id="loc-help" className="mt-1 flex items-center justify-between text-xs text-slate-500">
-                  <span>Máximo {LIMITS.locMax}.</span>
-                  <span>{form.location.length}/{LIMITS.locMax}</span>
+              <div className="grid gap-3">
+                <div className="grid gap-1">
+                  <label htmlFor="barrio" className="text-sm font-medium" style={{ color: 'var(--c-text)' }}>Barrio</label>
+                  <select
+                    id="barrio"
+                    name="barrio"
+                    value={form.barrio}
+                    onChange={onChange}
+                    disabled={loading || barriosLoading}
+                    className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 outline-none ring-2 ring-transparent focus:ring-[color:var(--c-info)]"
+                  >
+                    <option value="">{barriosLoading ? 'Cargando barrios…' : 'Seleccionar barrio…'}</option>
+                    {!barriosLoading && barrios.map((b, i) => (
+                      <option key={i} value={b}>{b}</option>
+                    ))}
+                  </select>
                 </div>
               </div>
             </section>
