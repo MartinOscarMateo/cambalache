@@ -1,13 +1,23 @@
 import { useState } from "react";
-import { updateTradeStatus } from "../lib/api";
+import { updateTradeStatus, rateTrade } from "../lib/api";
+import StarRating from "./StarRating";
 
 export default function TradeActions({ trade }) {
   const [loading, setLoading] = useState(null);
+  const [rating, setRating] = useState(0);
+  const [ratingLoading, setRatingLoading] = useState(false);
+
   const user = JSON.parse(localStorage.getItem("user"));
   const userId = user._id;
 
   const isProposer = trade.proposerId._id === userId;
   const isReceiver = trade.receiverId._id === userId;
+
+  const isRated = trade.ratings?.find(r => String(r.by) === String(userId));
+
+  const partner = isProposer ? trade.receiverId : trade.proposerId;
+  const who = partner?.username ?? "este usuario";
+
 
   async function doAction(action) {
     if (loading) return;
@@ -20,6 +30,20 @@ export default function TradeActions({ trade }) {
       alert(err.message);
     } finally {
       setLoading(null);
+    }
+  }
+
+  async function handleSubmitRating() {
+    if (!rating) return alert("Selecciona una valoracion de 1 a 5 estrellas.");
+
+    try {
+      setRatingLoading(true);
+      await rateTrade(trade._id, rating)
+      window.location.reload();
+    } catch (err) {
+      alert(err.message);
+    } finally {
+      setRatingLoading(false);
     }
   }
 
@@ -95,6 +119,34 @@ export default function TradeActions({ trade }) {
               </svg>
               {loading === "cancel" ? "Cancelando..." : "Cancelar Trueque"}
             </button>
+          </div>
+        </>
+      )}
+
+      {trade.status === "finished" && (
+        <>
+          <div>
+            {isRated ? (
+              // YA CALIFICÓ → mostrar la calificación fija
+              <div className="text-center">
+                <p>Ya calificaste a {who}</p>
+                <StarRating rating={isRated.value} onChange={() => {}} />
+              </div>
+            ) : (
+              // NO CALIFICÓ → permitir calificar
+              <div>
+                <p className="text-center">Calificar a {who}</p>
+                <StarRating rating={rating} onChange={setRating} />
+                <div className="flex justify-center mt-2">
+                  <button 
+                    onClick={handleSubmitRating}
+                    className="w-50 rounded-2xl py-2 bg-red-50"
+                  >
+                    {ratingLoading ? "Enviando..." : "Enviar calificación"}
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         </>
       )}

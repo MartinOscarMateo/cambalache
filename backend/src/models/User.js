@@ -13,6 +13,9 @@ const userSchema = new mongoose.Schema(
     followers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User', default: [] }],
     following: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User', default: [] }],
     role: {type: String, enum:['user', 'admin'], default: 'user', index: true},
+    ratingAverage: { type: Number, default: 0 },
+    ratingCount: { type: Number, default: 0 },
+    ratingTotal: { type: Number, default: 0 },
     active: {type: Boolean, default: true, index: true }
   },
   { timestamps: true }

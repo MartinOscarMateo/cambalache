@@ -13,6 +13,13 @@ const HistorySchema = new Schema({
   to: { type: String, enum: TRADE_STATUS }
 }, { _id: false });
 
+const RatingScchema = new Schema({
+  by: { type: Types.ObjectId, ref: 'User', required: true },
+  to: { type: Types.ObjectId, ref: 'User', required: true },
+  value: { type: Number, min: 1, max: 5, required: true },
+  at: { type: Date, default: Date.now }
+}, { _id: false });
+
 const TradeSchema = new Schema({
   proposerId: { type: Types.ObjectId, ref: 'User', required: true, index: true },
   receiverId: { type: Types.ObjectId, ref: 'User', required: true, index: true },
@@ -20,7 +27,8 @@ const TradeSchema = new Schema({
   postOfferedId: { type: Types.ObjectId, ref: 'Post' },
   itemsText: { type: String, trim: true, maxlength: 1000 },
   status: { type: String, enum: TRADE_STATUS, default: 'pending', index: true },
-  history: { type: [HistorySchema], default: [] }
+  history: { type: [HistorySchema], default: [] },
+  ratings: { type: [RatingScchema], default: [] }
 }, { timestamps: true });
 
 TradeSchema.index({ proposerId: 1, receiverId: 1, createdAt: -1 });

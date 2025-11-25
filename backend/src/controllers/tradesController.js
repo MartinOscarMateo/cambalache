@@ -1,6 +1,7 @@
 // backend/src/controllers/tradesController.js
 import mongoose from 'mongoose';
 import Trade, { TRADE_STATUS } from '../models/Trade.js';
+import User from "../models/User.js"
 import Post from '../models/Post.js';
 import Chat from '../models/Chat.js'
 import Message from '../models/Message.js'
@@ -253,5 +254,75 @@ export async function counterOffer(req, res) {
     res.json(trade.toJSON());
   } catch (err) {
     res.status(400).json({ code: err.code || 'TRADE_COUNTER_ERROR', error: err.message });
+  }
+}
+
+export async function rateTrade (req, res) {
+  try {
+    const tradeId = req.params.id;
+    const userId = req.user.id;
+    const { rating } = req.body;
+
+    if (!rating || rating < 1 || rating > 5) {
+      return res.status(400).json({ message: "Rating inválido (debe ser 1-5)" });
+    } 
+
+    const trade = await Trade.findById(tradeId);
+    if (!trade) {
+      return res.status(404).json({ message: "Trade no encontrado" });
+    }
+
+    if (trade.status !== "finished") {
+      return res.status(400).json({ message: "Solo podés calificar un trueque finalizado" });
+    }
+
+    // validamos que sea el usuario del trade
+    const isProposer = trade.proposerId.equals(userId);
+    const isReceiver = trade.receiverId.equals(userId);
+
+    if (!isProposer && !isReceiver) {
+      return res.status(403).json({ message: "No pertenecés a este trade" });
+    }
+
+    const to = isProposer ? trade.receiverId : trade.proposerId;
+
+    // evitar calificar 2 veces
+    const alreadyRated = trade.ratings?.some(r => r.by.equals(userId));
+    if (alreadyRated) {
+      return res.status(400).json({ message: "Ya calificaste este trueque" });
+    }
+
+    trade.ratings.push({
+      by: userId,
+      to,
+      value: rating,
+      at: new Date()
+    });
+
+    await trade.save();
+
+    // calculamos el promedio
+    const userRated = await User.findById(to);
+
+    userRated.ratingCount = userRated.ratingCount || 0;
+    userRated.ratingTotal = userRated.ratingTotal || 0;
+    userRated.ratingCount += 1;
+    userRated.ratingTotal += rating;
+    userRated.ratingAverage = Number((userRated.ratingTotal / userRated.ratingCount).toFixed(2));
+
+    await userRated.save();
+
+    return res.json({
+      message: "Rating enviado exitosamente",
+      rating: {
+        by: userId,
+        to,
+        value: rating
+      }
+    });
+
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: "Error al enviar rating" });
   }
 }

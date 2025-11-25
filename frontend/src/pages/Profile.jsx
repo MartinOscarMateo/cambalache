@@ -213,8 +213,26 @@ export default function Profile() {
                     Actividad
                   </h3>
                   <ul className="text-sm space-y-1" style={{ color: 'var(--c-text)' }}>
-                    <li>Publicaciones: {postsCount}</li>
-                    <li>Valoraciones: {user.ratingsCount ?? 0}</li>
+                    <li>
+                      <p>Publicaciones: {postsCount}</p>
+                    </li>
+                    <li className="mt-2">
+                      <p className='me-2'>Valoraciones: {user.ratingCount}</p>
+                    </li>
+                    <li className="flex items-center gap-1">
+                      <p className='me-2'>Calificación: {user.ratingAverage}</p>
+                      {[1, 2, 3, 4, 5].map((star) => (
+                        <span
+                          key={star}
+                          style={{
+                            fontSize: "20px",
+                            color: star <= Math.round(user.ratingAverage || 0) ? "#ffc107" : "#ccc"
+                          }}
+                        >
+                          ★
+                        </span>
+                      ))}
+                    </li>
                   </ul>
                 </section>
 

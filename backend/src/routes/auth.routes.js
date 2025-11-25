@@ -67,9 +67,40 @@ router.post('/login', validate(loginSchema), async (req, res) => {
 
 // Perfil del usuario autenticado
 router.get('/me', authRequired, async (req, res) => {
-  const user = await User.findById(req.user.id).select('name email avatar role active createdAt')
-  if (!user) return res.status(404).json({ message: 'No encontrado' })
-  res.json(user)
+  try {
+    const user = await User.findById(req.user.id).select('-password');
+    if (!user) return res.status(404).json({ message: "Usuario no encontrado" });
+
+    const followersCount = Array.isArray(user.followers) ? user.followers.length : 0;
+    const followingCount = Array.isArray(user.following) ? user.following.length : 0;
+
+    let tradesCount = 0;
+    try {
+      tradesCount = await Trade.countDocuments({ 
+        $or: [{ from: user._id }, { to: user._id }] 
+      });
+    } catch {}
+
+    res.json({
+      id: user._id,
+      name: user.name,
+      email: user.email,
+      avatar: user.avatar,
+      bio: user.bio,
+      role: user.role,
+
+      ratingAverage: user.ratingAverage,
+      ratingCount: user.ratingCount,
+      ratingTotal: user.ratingTotal,
+
+      followersCount,
+      followingCount,
+      tradesCount
+    });
+
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
 })
 
 export default router

@@ -37,6 +37,7 @@ export async function getUserById(req, res) {
 }
 
 // PUT actualizar perfil
+
 export async function updateUser(req, res) {
   try {
     const user = await User.findById(req.params.id)
@@ -47,6 +48,7 @@ export async function updateUser(req, res) {
     if (req.body.email) user.email = req.body.email
     if (req.body.password) user.password = req.body.password
     if (req.body.avatar) user.avatar = req.body.avatar
+    if (req.body.ratingAverage) user.ratingAverage = req.body.ratingAverage
 
     // guardamos y devolvemos el usuario actualizado :v
     const updatedUser = await user.save()

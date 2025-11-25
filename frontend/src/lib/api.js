@@ -294,3 +294,30 @@ export async function updateTradeStatus(id, action) {
 
   return json;
 }
+
+export async function rateTrade(tradeId, rating) {
+  const token = localStorage.getItem('token') || '';
+  
+  const res = await fetch(`${API}/api/trades/${tradeId}/rate`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`,
+    },
+    body: JSON.stringify({ rating }),  
+  });
+
+  let parsedJson = {};
+  try {
+    parsedJson = await res.json();
+  } catch (e) {
+    console.log(e, "No se pudo parsear el JSON");
+  }
+
+  console.log("STATUS:", res.status);
+  console.log("JSON:", parsedJson);
+
+  if (!res.ok) throw new Error(parsedJson?.error || parsedJson?.message || 'No se pudo enviar la calificación');
+
+  return parsedJson;
+}
