@@ -1,7 +1,8 @@
 // frontend/src/pages/PostDetail.jsx
+// frontend/src/pages/PostDetail.jsx
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { getPostById, getPostsByUser } from '../lib/api.js';
+import { getPostById, getPostsByUser, getMeetingPlaces } from '../lib/api.js';
 
 function idOf(v) {
   if (!v) return '';
@@ -38,10 +39,16 @@ export default function PostDetail() {
 
   // Modal
   const [showModal, setShowModal] = useState(false);
-  const [offerType, setOfferType] = useState('');
+  const [offerType, setOfferType] = useState('');        // '' | 'existing' | 'new'
   const [selectedPostId, setSelectedPostId] = useState('');
   const [offerText, setOfferText] = useState('');
   const [submitting, setSubmitting] = useState(false);
+
+  // Espacios públicos
+  const [meetingPlaces, setMeetingPlaces] = useState([]);
+  const [meetingPlacesLoading, setMeetingPlacesLoading] = useState(false);
+  const [selectedPlaceId, setSelectedPlaceId] = useState('');
+  const [meetingArea, setMeetingArea] = useState('');
 
   useEffect(() => {
     let active = true;
@@ -87,7 +94,7 @@ export default function PostDetail() {
     return () => { active = false; };
   }, [id]);
 
-  // Cargar mas publis del propietario
+  // Más posts del dueño
   useEffect(() => {
     const uid = idOf(owner?._id) || idOf(post?.ownerId);
     if (!uid || !post?._id) return;
@@ -123,7 +130,6 @@ export default function PostDetail() {
     })();
   }, [owner, post]);
 
-  // Cargar publicaciones propias
   async function loadMyPosts() {
     const me = JSON.parse(localStorage.getItem('user') || '{}');
     if (!me?.id && !me?._id) return;
@@ -137,7 +143,23 @@ export default function PostDetail() {
     }
   }
 
-  // Enviar propuesta
+  async function loadMeetingPlacesForPost() {
+    const barrio = post?.barrio || '';
+    if (!barrio) {
+      setMeetingPlaces([]);
+      return;
+    }
+    try {
+      setMeetingPlacesLoading(true);
+      const items = await getMeetingPlaces(barrio);
+      setMeetingPlaces(items);
+    } catch {
+      setMeetingPlaces([]);
+    } finally {
+      setMeetingPlacesLoading(false);
+    }
+  }
+
   async function submitTrade() {
     setSubmitting(true);
     setError('');
@@ -146,10 +168,16 @@ export default function PostDetail() {
       const API = import.meta.env.VITE_API_URL || 'http://localhost:4000';
       const token = localStorage.getItem('token') || '';
 
-      const body =
-        offerType === 'existing'
-          ? { postRequestedId: id, postOfferedId: selectedPostId }
-          : { postRequestedId: id, itemsText: offerText };
+      let body;
+      if (offerType === 'existing') {
+        body = { postRequestedId: id, postOfferedId: selectedPostId };
+      } else {
+        body = { postRequestedId: id, itemsText: offerText };
+      }
+
+      if (meetingArea) {
+        body.meetingArea = meetingArea;
+      }
 
       const res = await fetch(`${API}/api/trades`, {
         method: 'POST',
@@ -162,6 +190,11 @@ export default function PostDetail() {
 
       setInfo('Propuesta enviada');
       setShowModal(false);
+      setOfferType('');
+      setSelectedPostId('');
+      setOfferText('');
+      setSelectedPlaceId('');
+      setMeetingArea('');
       navigate(`/chat/${owner?._id}`);
     } catch (e) {
       setError(e.message || 'Error al enviar propuesta');
@@ -189,10 +222,15 @@ export default function PostDetail() {
   const ownerId = ownerProfileIdOf(post, owner);
   const ownerProfilePath = ownerId ? (String(ownerId) === String(myId) ? '/profile' : `/users/${ownerId}`) : '';
 
+  const canSend =
+    (offerType === 'existing' ? !!selectedPostId : !!offerText.trim()) &&
+    !!selectedPlaceId &&
+    !submitting;
+
   return (
     <main className="min-h-[85vh] flex justify-center p-4 md:p-10" style={{ background: '#f6f2ff' }}>
       <article className="block w-full h-[100%] md:grid md:grid-cols-[360px_minmax(0,1fr)] rounded-2xl overflow-hidden border border-[color:var(--c-mid-blue)]/60 shadow-[0_20px_60px_rgba(0,0,0,.15)] bg-white">
-        {/* left: gallery compacta */}
+        {/* left: gallery */}
         <aside className="bg-white">
           <div className="relative">
             {images.length > 0 && (
@@ -237,9 +275,8 @@ export default function PostDetail() {
           )}
         </aside>
 
-        {/* right: detalle y acciones */}
+        {/* right: detalle */}
         <section className="p-5 sm:p-6 md:p-7 flex flex-col">
-          {/* header con titulo pills */}
           <header className="flex flex-col gap-2">
             <div className="min-w-0">
               <h1
@@ -251,7 +288,6 @@ export default function PostDetail() {
               </h1>
             </div>
 
-            {/* pills */}
             <div className="flex flex-wrap gap-2">
               {post.category && (
                 <span className="px-3 py-1 rounded-full text-xs font-semibold bg-[color:var(--c-mid-pink)]/30 text-[color:var(--c-text)]">
@@ -274,7 +310,6 @@ export default function PostDetail() {
             </div>
           </header>
 
-          {/* descripcion compacta */}
           {post.description && (
             <div className="mt-4 rounded-xl border border-[color:var(--c-mid-blue)]/40 bg-[color:var(--c-mid-blue)]/10 p-3">
               <p className="text-sm leading-relaxed max-h-32 overflow-auto" style={{ color: 'var(--c-text)' }}>
@@ -283,7 +318,6 @@ export default function PostDetail() {
             </div>
           )}
 
-          {/* detalles opcionales */}
           <div className="mt-4 mb-4 grid gap-3">
             {post.hasDetails && post.detailsText && (
               <div className="rounded-xl bg-white border border-[color:var(--c-mid-pink)]/50 p-3">
@@ -301,7 +335,6 @@ export default function PostDetail() {
             )}
           </div>
 
-          {/* call to action */}
           <div className="flex flex-col lg:flex-row md:justify-between gap-4 mt-auto">
             {isOwner ? (
               <p className="text-center text-sm text-gray-500">Sos el dueño de esta publicacion</p>
@@ -310,7 +343,13 @@ export default function PostDetail() {
                 <button
                   onClick={() => {
                     setShowModal(true);
+                    setOfferType('');
+                    setSelectedPostId('');
+                    setOfferText('');
+                    setSelectedPlaceId('');
+                    setMeetingArea('');
                     loadMyPosts();
+                    loadMeetingPlacesForPost();
                   }}
                   className="px-5 py-2 rounded-xl font-semibold text-white bg-[color:var(--c-brand)] hover:brightness-110 transition"
                 >
@@ -329,31 +368,29 @@ export default function PostDetail() {
             {info && <p className="text-green-600 text-center mt-3 text-sm">{info}</p>}
             {error && <p className="text-red-600 text-center mt-3 text-sm">{error}</p>}
 
-            {/* mini owner */}
-              {ownerProfilePath ? (
-                <Link to={ownerProfilePath} className="shrink-0 flex items-center gap-2 hover:opacity-90">
-                  <div className="w-10 h-10 rounded-full bg-gray-200 overflow-hidden">
-                    {owner?.avatar && <img src={owner.avatar} alt="avatar" className="w-full h-full object-cover" />}
-                  </div>
-                  <div className="leading-tight">
-                    <p className="text-sm font-semibold" style={{ color: 'var(--c-text)' }}>{owner?.name || 'Usuario'}</p>
-                    <p className="text-xs text-gray-500">Propietario</p>
-                  </div>
-                </Link>
-              ) : (
-                <div className="shrink-0 flex items-center gap-2">
-                  <div className="w-10 h-10 rounded-full bg-gray-200 overflow-hidden">
-                    {owner?.avatar && <img src={owner.avatar} alt="avatar" className="w-full h-full object-cover" />}
-                  </div>
-                  <div className="leading-tight">
-                    <p className="text-sm font-semibold" style={{ color: 'var(--c-text)' }}>{owner?.name || 'Usuario'}</p>
-                    <p className="text-xs text-gray-500">Propietario</p>
-                  </div>
+            {ownerProfilePath ? (
+              <Link to={ownerProfilePath} className="shrink-0 flex items-center gap-2 hover:opacity-90">
+                <div className="w-10 h-10 rounded-full bg-gray-200 overflow-hidden">
+                  {owner?.avatar && <img src={owner.avatar} alt="avatar" className="w-full h-full object-cover" />}
                 </div>
-              )}
+                <div className="leading-tight">
+                  <p className="text-sm font-semibold" style={{ color: 'var(--c-text)' }}>{owner?.name || 'Usuario'}</p>
+                  <p className="text-xs text-gray-500">Propietario</p>
+                </div>
+              </Link>
+            ) : (
+              <div className="shrink-0 flex items-center gap-2">
+                <div className="w-10 h-10 rounded-full bg-gray-200 overflow-hidden">
+                  {owner?.avatar && <img src={owner.avatar} alt="avatar" className="w-full h-full object-cover" />}
+                </div>
+                <div className="leading-tight">
+                  <p className="text-sm font-semibold" style={{ color: 'var(--c-text)' }}>{owner?.name || 'Usuario'}</p>
+                  <p className="text-xs text-gray-500">Propietario</p>
+                </div>
+              </div>
+            )}
           </div>
 
-          {/* mas publicaciones del owner */}
           {morePosts.length >= 3 && (
             <div className="mt-6">
               <h2
@@ -382,7 +419,6 @@ export default function PostDetail() {
         </section>
       </article>
 
-      {/* modal de propuesta */}
       {showModal && (
         <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
           <div className="bg-white rounded-2xl shadow-lg w-[92%] max-w-md p-6 space-y-4 border border-[color:var(--c-mid-blue)]/50">
@@ -408,7 +444,17 @@ export default function PostDetail() {
                 >
                   Crear una nueva oferta
                 </button>
-                <button onClick={() => setShowModal(false)} className="text-gray-600 text-sm underline">
+                <button
+                  onClick={() => {
+                    setShowModal(false);
+                    setOfferType('');
+                    setSelectedPostId('');
+                    setOfferText('');
+                    setSelectedPlaceId('');
+                    setMeetingArea('');
+                  }}
+                  className="text-gray-600 text-sm underline"
+                >
                   Cancelar
                 </button>
               </div>
@@ -416,7 +462,9 @@ export default function PostDetail() {
 
             {offerType === 'existing' && (
               <div className="space-y-3">
-                <p className="text-center text-sm! sm:text-base! md:text-md! lg:text-xl! font-medium" style={{ color: 'var(--c-text)' }}>Selecciona una de tus publicaciones activas</p>
+                <p className="text-center text-sm! sm:text-base! md:text-md! lg:text-xl! font-medium" style={{ color: 'var(--c-text)' }}>
+                  Selecciona una de tus publicaciones activas
+                </p>
                 {myPosts.length === 0 ? (
                   <p className="text-gray-500 text-sm">No tenes publicaciones activas.</p>
                 ) : (
@@ -429,11 +477,56 @@ export default function PostDetail() {
                     {myPosts.map(p => <option key={p._id} value={p._id}>{p.title}</option>)}
                   </select>
                 )}
+
+                <div className="space-y-2 mt-3">
+                  {meetingPlacesLoading && (
+                    <p className="text-xs text-gray-500">Cargando espacios públicos cercanos...</p>
+                  )}
+                  {!meetingPlacesLoading && (
+                    <>
+                      <p className="text-sm font-medium" style={{ color: 'var(--c-text)' }}>
+                        Elegí un espacio público para encontrarse
+                      </p>
+                      {meetingPlaces.length === 0 ? (
+                        <p className="text-xs text-gray-500">
+                          No encontramos espacios públicos cargados para este barrio.
+                        </p>
+                      ) : (
+                        <select
+                          value={selectedPlaceId}
+                          onChange={e => {
+                            const val = e.target.value;
+                            setSelectedPlaceId(val);
+                            const place = meetingPlaces.find(mp => String(mp.id) === String(val));
+                            if (place) {
+                              const label = place.name + (place.barrio ? ` (${place.barrio})` : '');
+                              setMeetingArea(label);
+                            } else {
+                              setMeetingArea('');
+                            }
+                          }}
+                          className="w-full rounded-xl border border-slate-200 px-3 py-2"
+                        >
+                          <option value="">Seleccionar espacio público</option>
+                          {meetingPlaces.map(mp => (
+                            <option key={mp.id} value={mp.id}>
+                              {mp.name}{mp.barrio ? ` (${mp.barrio})` : ''}
+                            </option>
+                          ))}
+                        </select>
+                      )}
+                      {post?.barrio && (
+                        <p className="text-xs text-gray-500">Barrio de esta publicacion: {post.barrio}</p>
+                      )}
+                    </>
+                  )}
+                </div>
+
                 <div className="flex justify-between mt-4">
                   <button onClick={() => setOfferType('')} className="text-gray-600 underline">Volver</button>
                   <button
                     onClick={submitTrade}
-                    disabled={!selectedPostId || submitting}
+                    disabled={!canSend}
                     className="px-4 py-2 rounded-xl bg-[color:var(--c-brand)] text-white hover:brightness-110 transition disabled:opacity-60"
                   >
                     Enviar
@@ -451,11 +544,56 @@ export default function PostDetail() {
                   className="w-full rounded-xl border border-slate-200 px-3 py-2"
                   placeholder="Ej: Ofrezco una bici usada o clases de guitarra"
                 />
+
+                <div className="space-y-2 mt-2">
+                  {meetingPlacesLoading && (
+                    <p className="text-xs text-gray-500">Cargando espacios públicos cercanos...</p>
+                  )}
+                  {!meetingPlacesLoading && (
+                    <>
+                      <p className="text-sm font-medium" style={{ color: 'var(--c-text)' }}>
+                        Elegí un espacio público para encontrarse
+                      </p>
+                      {meetingPlaces.length === 0 ? (
+                        <p className="text-xs text-gray-500">
+                          No encontramos espacios públicos cargados para este barrio.
+                        </p>
+                      ) : (
+                        <select
+                          value={selectedPlaceId}
+                          onChange={e => {
+                            const val = e.target.value;
+                            setSelectedPlaceId(val);
+                            const place = meetingPlaces.find(mp => String(mp.id) === String(val));
+                            if (place) {
+                              const label = place.name + (place.barrio ? ` (${place.barrio})` : '');
+                              setMeetingArea(label);
+                            } else {
+                              setMeetingArea('');
+                            }
+                          }}
+                          className="w-full rounded-xl border border-slate-200 px-3 py-2"
+                        >
+                          <option value="">Seleccionar espacio público</option>
+                          {meetingPlaces.map(mp => (
+                            <option key={mp.id} value={mp.id}>
+                              {mp.name}{mp.barrio ? ` (${mp.barrio})` : ''}
+                            </option>
+                          ))}
+                        </select>
+                      )}
+                      {post?.barrio && (
+                        <p className="text-xs text-gray-500">Barrio de esta publicacion: {post.barrio}</p>
+                      )}
+                    </>
+                  )}
+                </div>
+
                 <div className="flex justify-between mt-4">
                   <button onClick={() => setOfferType('')} className="text-gray-600 underline">Volver</button>
                   <button
                     onClick={submitTrade}
-                    disabled={!offerText.trim() || submitting}
+                    disabled={!canSend}
                     className="px-4 py-2 rounded-xl bg-[color:var(--c-brand)] text-white hover:brightness-110 transition disabled:opacity-60"
                   >
                     Enviar

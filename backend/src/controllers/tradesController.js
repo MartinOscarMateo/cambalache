@@ -1,10 +1,10 @@
 // backend/src/controllers/tradesController.js
 import mongoose from 'mongoose';
 import Trade, { TRADE_STATUS } from '../models/Trade.js';
-import User from "../models/User.js"
+import User from "../models/User.js";
 import Post from '../models/Post.js';
-import Chat from '../models/Chat.js'
-import Message from '../models/Message.js'
+import Chat from '../models/Chat.js';
+import Message from '../models/Message.js';
 
 const ALLOWED_STATUS = new Set(TRADE_STATUS);
 const TERMINAL = new Set(['rejected', 'cancelled', 'finished']);
@@ -38,7 +38,7 @@ function parsePageLimit(q) {
 export async function createTrade(req, res) {
   try {
     const userId = req.user.id;
-    const { postRequestedId, postOfferedId, itemsText } = req.body;
+    const { postRequestedId, postOfferedId, itemsText, meetingArea } = req.body;
 
     assert(postRequestedId, 'REQ_POST_REQUIRED', 'Falta postRequestedId');
     if (postOfferedId) {
@@ -50,12 +50,34 @@ export async function createTrade(req, res) {
     assert(receiverId, 'REQ_POST_NO_OWNER', 'Publicación sin dueño');
     assert(receiverId !== userId, 'SELF_TRADE_FORBIDDEN', 'No podés ofertar sobre tu propia publicación');
     
+    let postOffered = null;
     if (postOfferedId) {
-      const postOffered = await mustValidPost(postOfferedId);
+      postOffered = await mustValidPost(postOfferedId);
       const offeredOwner = viewId(getOwnerId(postOffered));
       assert(offeredOwner === userId, 'OFFERED_NOT_OWNED', 'Debés ser dueño del post ofrecido');
     }
     assert(itemsText || postOfferedId, 'OFFER_REQUIRED', 'Ofrecé itemsText o postOfferedId');
+    
+    let finalMeetingArea = (meetingArea || '').trim();
+    const requestedBarrio = postRequested.barrio || '';
+    const offeredBarrio = postOffered?.barrio || '';
+
+    if (!finalMeetingArea) {
+      if (requestedBarrio && offeredBarrio) {
+        if (requestedBarrio === offeredBarrio) {
+          finalMeetingArea = requestedBarrio;
+        } else {
+          finalMeetingArea = offeredBarrio + ' ↔ ' + requestedBarrio;
+        }
+      } else {
+        finalMeetingArea = requestedBarrio || offeredBarrio || '';
+      }
+    }
+
+    let chat = await Chat.findOne({ participants: { $all: [userId, receiverId] } });
+    if (!chat) {
+      chat = await Chat.create({ participants: [userId, receiverId] });
+    }
     
     const trade = await Trade.create({
       proposerId: userId,
@@ -64,27 +86,35 @@ export async function createTrade(req, res) {
       postOfferedId: postOfferedId || undefined,
       itemsText: itemsText?.trim(),
       status: 'pending',
-      history: [{ by: userId, action: 'created' }]
+      history: [{ by: userId, action: 'created' }],
+      chatId: chat._id,
+      meetingArea: finalMeetingArea || undefined
     });
 
-    let chat = await Chat.findOne({ participants: { $all: [userId, receiverId] } })
-    if (!chat) {
-      chat = await Chat.create({ participants: [userId, receiverId] })
+    const parts = [];
+    parts.push(`Hola! Te envié una solicitud de trueque por tu publicación "${postRequested.title}".`);
+    if (postOffered) {
+      parts.push(`Te ofrezco: "${postOffered.title}".`);
+    } else if (itemsText && String(itemsText).trim()) {
+      parts.push(`Oferta: ${String(itemsText).trim()}.`);
     }
-    
-    const autoText = `Hola! Te envié una solicitud de trueque por tu publicación "${postRequested.title}".`
+    if (finalMeetingArea) {
+      parts.push(`Zona sugerida para encontrarnos: ${finalMeetingArea}.`);
+    }
+    const autoText = parts.join(' ');
+
     await Message.create({
       chatId: chat._id,
       sender: userId,
       text: autoText
-    })
+    });
     
     await Chat.findByIdAndUpdate(chat._id, {
       lastMessage: autoText,
       updatedAt: new Date()
-    })
+    });
     
-    res.status(201).json(trade)
+    res.status(201).json(trade);
   } catch (err) {
     res.status(400).json({ code: err.code || 'TRADE_CREATE_ERROR', error: err.message });
   }
@@ -106,8 +136,8 @@ export async function listTrades(req, res) {
       Trade.find(q).sort({ createdAt: -1 }).skip(skip).limit(limit)
       .populate('proposerId', 'name')
       .populate('receiverId', 'name')
-      .populate('postRequestedId', 'title')
-      .populate('postOfferedId', 'title')
+      .populate('postRequestedId', 'title barrio')
+      .populate('postOfferedId', 'title barrio')
       .lean(),
       Trade.countDocuments(q)
     ]);
@@ -125,8 +155,8 @@ export async function getTrade(req, res) {
     const trade = await Trade.findById(req.params.id)
     .populate('proposerId', 'name')
     .populate('receiverId', 'name')
-    .populate('postRequestedId', 'title')
-    .populate('postOfferedId', 'title')
+    .populate('postRequestedId', 'title barrio')
+    .populate('postOfferedId', 'title barrio')
     .lean();
     assert(trade, 'NOT_FOUND', 'Trueque no encontrado');
     assert([viewId(trade.proposerId?._id), viewId(trade.receiverId?._id)].includes(userId), 'FORBIDDEN', 'No autorizado');
@@ -162,28 +192,6 @@ export async function changeStatus(req, res) {
 
     assert([viewId(trade.proposerId), viewId(trade.receiverId)].includes(userId), 'FORBIDDEN', 'No autorizado');
     
-    //DEBUGGER
-
-    // console.log("DEBUG:", { status: trade.status, action });
-    // console.log("canTransition?", canTransition(trade.status, action));
-    
-    // console.log("---- DEBUG STATUS ----");
-    // console.log("trade.status:", JSON.stringify(trade.status));
-    // console.log("allowed keys:", Object.keys({
-    //   pending:1, countered:1, accepted:1, rejected:1, cancelled:1, finished:1
-    // }));
-    // console.log("TERMINAL.has(current):", ["accepted","rejected","cancelled","finished"].includes(trade.status));
-    // console.log("allowed[current]:", 
-    //   {
-    //     pending: ['accept','reject','cancel'],
-    //     countered: ['accept','reject','cancel'],
-    //     accepted: ['finish','cancel'],
-    //     rejected: [],
-    //     cancelled: [],
-    //     finished: []
-    //   }[trade.status]
-    // );
-
     assert(canTransition(trade.status, action), 'BAD_STATE', 'Estado no permite la acción');
 
     if (action === 'cancel') {
@@ -276,7 +284,6 @@ export async function rateTrade (req, res) {
       return res.status(400).json({ message: "Solo podés calificar un trueque finalizado" });
     }
 
-    // validamos que sea el usuario del trade
     const isProposer = trade.proposerId.equals(userId);
     const isReceiver = trade.receiverId.equals(userId);
 
@@ -286,7 +293,6 @@ export async function rateTrade (req, res) {
 
     const to = isProposer ? trade.receiverId : trade.proposerId;
 
-    // evitar calificar 2 veces
     const alreadyRated = trade.ratings?.some(r => r.by.equals(userId));
     if (alreadyRated) {
       return res.status(400).json({ message: "Ya calificaste este trueque" });
@@ -301,7 +307,6 @@ export async function rateTrade (req, res) {
 
     await trade.save();
 
-    // calculamos el promedio
     const userRated = await User.findById(to);
 
     userRated.ratingCount = userRated.ratingCount || 0;

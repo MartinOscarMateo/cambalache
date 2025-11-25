@@ -16,6 +16,7 @@ import userRoutes from './routes/userRoutes.js'
 import chatRoutes from './routes/chats.js'
 import adminUsersRouter from './routes/admin.users.js'
 import barriosRoutes from './routes/barrios.js'
+import meetingPlacesRoutes from './routes/meetingPlaces.js';
 
 const app = express()
 const server = createServer(app)
@@ -42,6 +43,7 @@ app.use('/api/users', userRoutes)
 app.use('/api/chats', chatRoutes)
 app.use('/api/admin/users', adminUsersRouter)
 app.use('/api/barrios', barriosRoutes)
+app.use('/api/meeting-places', meetingPlacesRoutes);
 
 // ruta healthcheck
 app.get('/health', (_req, res) => res.json({ ok: true }))
