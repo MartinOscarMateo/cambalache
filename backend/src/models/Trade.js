@@ -28,7 +28,9 @@ const TradeSchema = new Schema({
   itemsText: { type: String, trim: true, maxlength: 1000 },
   status: { type: String, enum: TRADE_STATUS, default: 'pending', index: true },
   history: { type: [HistorySchema], default: [] },
-  ratings: { type: [RatingScchema], default: [] }
+  ratings: { type: [RatingScchema], default: [] },
+  chatId: { type: Types.ObjectId, ref: 'Chat', index: true },
+  meetingArea: { type: String, trim: true, maxlength: 200 }
 }, { timestamps: true });
 
 TradeSchema.index({ proposerId: 1, receiverId: 1, createdAt: -1 });

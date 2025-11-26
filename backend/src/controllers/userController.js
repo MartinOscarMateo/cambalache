@@ -1,25 +1,23 @@
-import User from '../models/User.js'
-import Trade from '../models/Trade.js'
+import User from '../models/User.js';
+import Trade from '../models/Trade.js';
 
 // GET perfil
 export async function getUserById(req, res) {
   try {
-    const user = await User.findById(req.params.id).select('-password')
-    if (!user) return res.status(404).json({ message: 'Usuario no encontrado' })
+    const user = await User.findById(req.params.id).select('-password');
+    if (!user) return res.status(404).json({ message: 'Usuario no encontrado' });
 
-    // garantizamos que siempre existan los arrays para evitar errores
-    const followersArray = Array.isArray(user.followers) ? user.followers : []
-    const followingArray = Array.isArray(user.following) ? user.following : []
+    const followersArray = Array.isArray(user.followers) ? user.followers : [];
+    const followingArray = Array.isArray(user.following) ? user.following : [];
 
-    const followersCount = followersArray.length
-    const followingCount = followingArray.length
+    const followersCount = followersArray.length;
+    const followingCount = followingArray.length;
 
-    // si Trade no tiene documentos o el modelo no existe, devolvemos 0
-    let tradesCount = 0
+    let tradesCount = 0;
     try {
-      tradesCount = await Trade.countDocuments({ $or: [{ from: user._id }, { to: user._id }] })
+      tradesCount = await Trade.countDocuments({ $or: [{ proposerId: user._id }, { receiverId: user._id }] });
     } catch {
-      tradesCount = 0
+      tradesCount = 0;
     }
 
     res.json({
@@ -30,11 +28,12 @@ export async function getUserById(req, res) {
       followersCount,
       followingCount,
       tradesCount
-    })
+    });
   } catch (err) {
-    res.status(500).json({ message: err.message })
+    res.status(500).json({ message: err.message });
   }
 }
+
 
 // PUT actualizar perfil
 

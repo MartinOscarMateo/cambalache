@@ -1,3 +1,4 @@
+// frontend/src/lib/api.js
 const API = import.meta.env.VITE_API_URL || 'http://localhost:4000';
 
 export async function registerUser(payload) {
@@ -353,5 +354,14 @@ export async function getBarriosGeojson() {
   const res = await fetch(`${API}/api/barrios/geojson`);
   const json = await res.json().catch(() => ({}));
   if (!res.ok) throw new Error(json?.message || 'Error obteniendo barrios (geojson)');
+  return json;
+}
+
+export async function getMeetingPlaces(barrio = '') {
+  const params = new URLSearchParams();
+  if (barrio) params.set('barrio', barrio);
+  const res = await fetch(`${API}/api/meeting-places?${params.toString()}`);
+  const json = await res.json().catch(() => ([]));
+  if (!res.ok) throw new Error(json?.message || 'Error obteniendo espacios públicos');
   return json;
 }
