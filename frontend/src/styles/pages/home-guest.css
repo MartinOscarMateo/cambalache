@@ -6,7 +6,6 @@
   gap: 3rem;
 }
 
-/* utilitario accesible */
 .sr-only {
   position: absolute;
   width: 1px;
@@ -19,7 +18,7 @@
   border: 0;
 }
 
-/* Banner con botones superpuestos */
+/* Banner con boton */
 .home-guest__banner-box { position: relative; }
 .home-guest__banner img {
   width: 100%;
@@ -54,6 +53,72 @@
     left: 10%;
     bottom: 20%; 
   }
+}
+
+/* Texto abajo banner */
+.home-guest__banner-text {
+  margin-top: 12px;
+  max-width: 640px;
+  font-size: 0.95rem;
+  color: var(--c-text);
+}
+
+/* Intro */
+.home-guest__intro {
+  margin-top: 0.5rem;
+}
+.home-guest__intro h2 {
+  margin: 0 0 0.75rem;
+}
+.home-guest__intro-text {
+  margin: 0 0 0.25rem;
+  color: var(--c-text);
+}
+.home-guest__intro-sub {
+  margin: 0;
+  font-size: 0.9rem;
+  color: #6b7280;
+}
+
+/* Bullets */
+.home-guest__intro-list {
+  list-style: none;
+  padding: 0;
+  margin: 1.25rem 0 0;
+  display: grid;
+  gap: 12px;
+}
+@media (min-width: 768px) {
+  .home-guest__intro-list {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+.home-guest__intro-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: #ffffff;
+  border: 1px solid rgba(0,0,0,.05);
+}
+.home-guest__intro-dot {
+  flex-shrink: 0;
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  background: var(--c-brand);
+  margin-top: 5px;
+}
+.home-guest__intro-item h3 {
+  margin: 0 0 3px;
+  font-size: 0.95rem;
+  color: var(--c-text);
+}
+.home-guest__intro-item p {
+  margin: 0;
+  font-size: 0.88rem;
+  color: #4b5563;
 }
 
 /* Pasos */
@@ -93,3 +158,49 @@
   font-size: 1.25rem;
 }
 .home-guest__step p { margin: 0; }
+
+/* Acciones */
+.home-guest__cta {
+  padding-bottom: 2rem;
+}
+.home-guest__cta-grid {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: 1fr;
+}
+@media (min-width: 768px) {
+  .home-guest__cta-grid {
+    grid-template-columns: repeat(3, minmax(0,1fr));
+  }
+}
+.home-guest__cta-card {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 16px 18px;
+  color: var(--c-text);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  box-shadow: 0 10px 26px rgba(0,0,0,.06);
+  border: 1px solid rgba(0,0,0,.06);
+}
+.home-guest__cta-card h3 {
+  margin: 0;
+  font-size: 0.98rem;
+}
+.home-guest__cta-card p {
+  margin: 0;
+  font-size: 0.9rem;
+  color: #4b5563;
+}
+.home-guest__cta-link {
+  margin-top: 6px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-decoration: none;
+  color: var(--c-brand);
+}
+.home-guest__cta-link:hover {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}

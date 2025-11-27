@@ -1,5 +1,4 @@
 // frontend/src/pages/PostDetail.jsx
-// frontend/src/pages/PostDetail.jsx
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { getPostById, getPostsByUser, getMeetingPlaces } from '../lib/api.js';
@@ -39,7 +38,7 @@ export default function PostDetail() {
 
   // Modal
   const [showModal, setShowModal] = useState(false);
-  const [offerType, setOfferType] = useState('');        // '' | 'existing' | 'new'
+  const [offerType, setOfferType] = useState('');
   const [selectedPostId, setSelectedPostId] = useState('');
   const [offerText, setOfferText] = useState('');
   const [submitting, setSubmitting] = useState(false);
@@ -94,7 +93,7 @@ export default function PostDetail() {
     return () => { active = false; };
   }, [id]);
 
-  // Más posts del dueño
+  // + posts del dueño
   useEffect(() => {
     const uid = idOf(owner?._id) || idOf(post?.ownerId);
     if (!uid || !post?._id) return;
@@ -228,195 +227,272 @@ export default function PostDetail() {
     !submitting;
 
   return (
-    <main className="min-h-[85vh] flex justify-center p-4 md:p-10" style={{ background: '#f6f2ff' }}>
-      <article className="block w-full h-[100%] md:grid md:grid-cols-[360px_minmax(0,1fr)] rounded-2xl overflow-hidden border border-[color:var(--c-mid-blue)]/60 shadow-[0_20px_60px_rgba(0,0,0,.15)] bg-white">
-        {/* left: gallery */}
-        <aside className="bg-white">
-          <div className="relative">
-            {images.length > 0 && (
-              <img
-                src={images[idx]}
-                alt={post.title}
-                className="w-full h-72 object-cover"
-              />
-            )}
-            {images.length > 1 && (
-              <>
-                <button
-                  onClick={prev}
-                  className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/45 text-white px-2 py-1 rounded-full"
-                  aria-label="Anterior"
-                >
-                  ‹
-                </button>
-                <button
-                  onClick={next}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/45 text-white px-2 py-1 rounded-full"
-                  aria-label="Siguiente"
-                >
-                  ›
-                </button>
-              </>
-            )}
-          </div>
+    <main
+  className="min-h-[85vh] bg-[#f6f2ff] px-4 py-6 md:py-10 flex justify-center items-start">
 
-          {images.length > 1 && (
-            <div className="px-3 py-2 flex gap-2 overflow-x-auto bg-[color:var(--c-mid-blue)]/10 border-t border-[color:var(--c-mid-blue)]/40">
-              {images.map((u, i) => (
+      <article className="w-full max-w-6xl bg-white rounded-2xl border border-[color:var(--c-mid-blue)]/60 shadow-[0_18px_50px_rgba(0,0,0,.12)] overflow-hidden">
+        <div className="grid md:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)]">
+          {/* fotos de la izquierda */}
+          <aside className="bg-white border-b md:border-b-0 md:border-r border-[color:var(--c-mid-blue)]/30">
+            <div className="relative">
+              {images.length > 0 && (
                 <img
-                  key={i}
-                  src={u}
-                  onClick={() => setIdx(i)}
-                  className={`w-16 h-16 object-cover rounded-lg cursor-pointer border-2 ${i === idx ? 'border-[color:var(--c-brand)]' : 'border-transparent opacity-70 hover:opacity-100'}`}
-                  alt={`thumb-${i}`}
+                  src={images[idx]}
+                  alt={post.title}
+                  className="w-full h-72 md:h-[420px] object-cover"
                 />
-              ))}
-            </div>
-          )}
-        </aside>
-
-        {/* right: detalle */}
-        <section className="p-5 sm:p-6 md:p-7 flex flex-col">
-          <header className="flex flex-col gap-2">
-            <div className="min-w-0">
-              <h1
-                className="text-2xl font-bold"
-                style={{ color: 'var(--c-text)' }}
-                title={post.title}
-              >
-                {post.title}
-              </h1>
-            </div>
-
-            <div className="flex flex-wrap gap-2">
-              {post.category && (
-                <span className="px-3 py-1 rounded-full text-xs font-semibold bg-[color:var(--c-mid-pink)]/30 text-[color:var(--c-text)]">
-                  {post.category}
-                </span>
               )}
-              {post.condition && (
-                <span className="px-3 py-1 rounded-full text-xs font-semibold bg-[color:var(--c-mid-cyan)]/30 text-[color:var(--c-text)]">
-                  Estado: {post.condition}
-                </span>
-              )}
-              {post.location && (
-                <span className="px-3 py-1 rounded-full text-xs font-semibold bg-[color:var(--c-accent)]/35 text-[color:var(--c-text)]">
-                  Zona: {post.location}
-                </span>
-              )}
-              <span className="px-3 py-1 rounded-full text-xs font-semibold bg-[color:var(--c-info)]/25 text-[color:var(--c-text)]">
-                {post.openToOffers ? 'Abierto a ofertas' : 'Intercambio especifico'}
-              </span>
-            </div>
-          </header>
-
-          {post.description && (
-            <div className="mt-4 rounded-xl border border-[color:var(--c-mid-blue)]/40 bg-[color:var(--c-mid-blue)]/10 p-3">
-              <p className="text-sm leading-relaxed max-h-32 overflow-auto" style={{ color: 'var(--c-text)' }}>
-                {post.description}
-              </p>
-            </div>
-          )}
-
-          <div className="mt-4 mb-4 grid gap-3">
-            {post.hasDetails && post.detailsText && (
-              <div className="rounded-xl bg-white border border-[color:var(--c-mid-pink)]/50 p-3">
-                <p className="text-sm" style={{ color: 'var(--c-text)' }}>
-                  <span className="font-semibold" style={{ color: 'var(--c-brand)' }}>Detalles:</span> {post.detailsText}
-                </p>
-              </div>
-            )}
-            {!post.openToOffers && post.interestsText && (
-              <div className="rounded-xl bg-white border border-[color:var(--c-accent)]/60 p-3">
-                <p className="text-sm" style={{ color: 'var(--c-text)' }}>
-                  <span className="font-semibold" style={{ color: 'var(--c-brand)' }}>Intereses:</span> {post.interestsText}
-                </p>
-              </div>
-            )}
-          </div>
-
-          <div className="flex flex-col lg:flex-row md:justify-between gap-4 mt-auto">
-            {isOwner ? (
-              <p className="text-center text-sm text-gray-500">Sos el dueño de esta publicacion</p>
-            ) : (
-              <div className="flex flex-wrap items-center gap-3">
-                <button
-                  onClick={() => {
-                    setShowModal(true);
-                    setOfferType('');
-                    setSelectedPostId('');
-                    setOfferText('');
-                    setSelectedPlaceId('');
-                    setMeetingArea('');
-                    loadMyPosts();
-                    loadMeetingPlacesForPost();
-                  }}
-                  className="px-5 py-2 rounded-xl font-semibold text-white bg-[color:var(--c-brand)] hover:brightness-110 transition"
-                >
-                  Proponer trueque
-                </button>
-                <button
-                  className="px-4 py-2 md:px-3 rounded-xl border border-[color:var(--c-mid-blue)]/60 hover:bg-[color:var(--c-mid-blue)]/15 transition disabled:opacity-60"
-                  onClick={() => ownerProfilePath && navigate(ownerProfilePath)}
-                  disabled={!ownerProfilePath}
-                >
-                  Ver perfil
-                </button>
-              </div>
-            )}
-
-            {info && <p className="text-green-600 text-center mt-3 text-sm">{info}</p>}
-            {error && <p className="text-red-600 text-center mt-3 text-sm">{error}</p>}
-
-            {ownerProfilePath ? (
-              <Link to={ownerProfilePath} className="shrink-0 flex items-center gap-2 hover:opacity-90">
-                <div className="w-10 h-10 rounded-full bg-gray-200 overflow-hidden">
-                  {owner?.avatar && <img src={owner.avatar} alt="avatar" className="w-full h-full object-cover" />}
-                </div>
-                <div className="leading-tight">
-                  <p className="text-sm font-semibold" style={{ color: 'var(--c-text)' }}>{owner?.name || 'Usuario'}</p>
-                  <p className="text-xs text-gray-500">Propietario</p>
-                </div>
-              </Link>
-            ) : (
-              <div className="shrink-0 flex items-center gap-2">
-                <div className="w-10 h-10 rounded-full bg-gray-200 overflow-hidden">
-                  {owner?.avatar && <img src={owner.avatar} alt="avatar" className="w-full h-full object-cover" />}
-                </div>
-                <div className="leading-tight">
-                  <p className="text-sm font-semibold" style={{ color: 'var(--c-text)' }}>{owner?.name || 'Usuario'}</p>
-                  <p className="text-xs text-gray-500">Propietario</p>
-                </div>
-              </div>
-            )}
-          </div>
-
-          {morePosts.length >= 3 && (
-            <div className="mt-6">
-              <h2
-                className="text-lg font-semibold mb-3"
-                style={{ color: 'var(--c-brand)', fontFamily: 'vag-rundschrift-d, sans-serif' }}
-              >
-                Mas publicaciones de este usuario
-              </h2>
-              <div className="flex gap-3 overflow-x-auto pb-1">
-                {morePosts.map(p => (
-                  <div
-                    key={p._id}
-                    className="min-w-[200px] max-w-[200px] cursor-pointer rounded-xl overflow-hidden border border-[color:var(--c-mid-blue)]/50 bg-white shadow-sm hover:shadow-md transition"
-                    onClick={() => navigate(`/posts/${p._id}`)}
+              {images.length > 1 && (
+                <>
+                  <button
+                    onClick={prev}
+                    className="absolute left-3 top-1/2 -translate-y-1/2 bg-black/45 text-white px-2.5 py-1.5 rounded-full"
+                    aria-label="Anterior"
                   >
-                    {p.images?.[0] && (<img src={p.images[0]} alt={p.title} className="w-full h-28 object-cover" />)}
-                    <div className="p-3">
-                      <h3 className="text-sm font-semibold line-clamp-2" style={{ color: 'var(--c-text)' }}>{p.title}</h3>
-                      {p.category && <p className="text-xs mt-1 text-gray-500">{p.category}</p>}
-                    </div>
-                  </div>
+                    ‹
+                  </button>
+                  <button
+                    onClick={next}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 bg-black/45 text-white px-2.5 py-1.5 rounded-full"
+                    aria-label="Siguiente"
+                  >
+                    ›
+                  </button>
+                </>
+              )}
+            </div>
+
+            {images.length > 1 && (
+              <div className="px-3 py-3 flex gap-2 overflow-x-auto bg-[color:var(--c-mid-blue)]/8">
+                {images.map((u, i) => (
+                  <img
+                    key={i}
+                    src={u}
+                    onClick={() => setIdx(i)}
+                    className={`w-16 h-16 object-cover rounded-lg cursor-pointer border-2 ${
+                      i === idx
+                        ? 'border-[color:var(--c-brand)]'
+                        : 'border-transparent opacity-70 hover:opacity-100'
+                    }`}
+                    alt={`thumb-${i}`}
+                  />
                 ))}
               </div>
+            )}
+          </aside>
+
+          {/* Detalle que esta a la derecha */}
+          <section className="p-5 sm:p-6 md:p-7 flex flex-col gap-5">
+            {/* Encabezado :3 */}
+            <header className="flex flex-col gap-3">
+              <div className="flex items-start justify-between gap-4 flex-wrap">
+                <div className="min-w-0 flex-1">
+                  <h1
+                    className="text-2xl md:text-3xl font-bold leading-tight"
+                    style={{ color: 'var(--c-text)' }}
+                    title={post.title}
+                  >
+                    {post.title}
+                  </h1>
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    {post.category && (
+                      <span className="px-3 py-1 rounded-full text-xs font-semibold bg-[color:var(--c-mid-pink)]/30 text-[color:var(--c-text)]">
+                        {post.category}
+                      </span>
+                    )}
+                    {post.condition && (
+                      <span className="px-3 py-1 rounded-full text-xs font-semibold bg-[color:var(--c-mid-cyan)]/30 text-[color:var(--c-text)]">
+                        Estado: {post.condition}
+                      </span>
+                    )}
+                    {post.location && (
+                      <span className="px-3 py-1 rounded-full text-xs font-semibold bg-[color:var(--c-accent)]/35 text-[color:var(--c-text)]">
+                        Zona: {post.location}
+                      </span>
+                    )}
+                    <span className="px-3 py-1 rounded-full text-xs font-semibold bg-[color:var(--c-info)]/25 text-[color:var(--c-text)]">
+                      {post.openToOffers ? 'Abierto a ofertas' : 'Intercambio específico'}
+                    </span>
+                  </div>
+                </div>
+
+                {owner && (
+                  ownerProfilePath ? (
+                    <Link
+                      to={ownerProfilePath}
+                      className="shrink-0 flex items-center gap-2 rounded-full px-2.5 py-1.5 bg-[color:var(--c-mid-blue)]/10 hover:bg-[color:var(--c-mid-blue)]/15 transition"
+                    >
+                      <div className="w-10 h-10 rounded-full bg-gray-200 overflow-hidden">
+                        {owner.avatar && (
+                          <img
+                            src={owner.avatar}
+                            alt="avatar"
+                            className="w-full h-full object-cover"
+                          />
+                        )}
+                      </div>
+                      <div className="leading-tight">
+                        <p className="text-sm font-semibold" style={{ color: 'var(--c-text)' }}>
+                          {owner.name || 'Usuario'}
+                        </p>
+                        <p className="text-xs text-gray-500">Propietario</p>
+                      </div>
+                    </Link>
+                  ) : (
+                    <div className="shrink-0 flex items-center gap-2">
+                      <div className="w-10 h-10 rounded-full bg-gray-200 overflow-hidden">
+                        {owner.avatar && (
+                          <img
+                            src={owner.avatar}
+                            alt="avatar"
+                            className="w-full h-full object-cover"
+                          />
+                        )}
+                      </div>
+                      <div className="leading-tight">
+                        <p className="text-sm font-semibold" style={{ color: 'var(--c-text)' }}>
+                          {owner.name || 'Usuario'}
+                        </p>
+                        <p className="text-xs text-gray-500">Propietario</p>
+                      </div>
+                    </div>
+                  )
+                )}
+              </div>
+            </header>
+
+            {/* bloquecito principall */}
+            <div className="rounded-xl border border-[color:var(--c-mid-blue)]/30 bg-[color:var(--c-mid-blue)]/8 p-4 space-y-3">
+              {post.description && (
+                <div>
+                  <h2
+                    className="text-sm font-semibold mb-1.5"
+                    style={{ color: 'var(--c-brand)' }}
+                  >
+                    Sobre esta publicación
+                  </h2>
+                  <p
+                    className="text-sm leading-relaxed max-h-32 md:max-h-40 overflow-auto"
+                    style={{ color: 'var(--c-text)' }}
+                  >
+                    {post.description}
+                  </p>
+                </div>
+              )}
+
+              {(post.hasDetails && post.detailsText) && (
+                <div>
+                  <h3
+                    className="text-xs font-semibold mb-0.5 uppercase tracking-wide"
+                    style={{ color: 'var(--c-brand)' }}
+                  >
+                    Detalles
+                  </h3>
+                  <p className="text-sm" style={{ color: 'var(--c-text)' }}>
+                    {post.detailsText}
+                  </p>
+                </div>
+              )}
+
+              {!post.openToOffers && post.interestsText && (
+                <div>
+                  <h3
+                    className="text-xs font-semibold mb-0.5 uppercase tracking-wide"
+                    style={{ color: 'var(--c-brand)' }}
+                  >
+                    Lo que busca a cambio
+                  </h3>
+                  <p className="text-sm" style={{ color: 'var(--c-text)' }}>
+                    {post.interestsText}
+                  </p>
+                </div>
+              )}
             </div>
-          )}
-        </section>
+
+            {/* Acciones */}
+            <div className="mt-2 flex flex-col gap-3">
+              {isOwner ? (
+                <p className="text-center text-sm text-gray-500">
+                  Sos el dueño de esta publicación.
+                </p>
+              ) : (
+                <div className="flex flex-wrap items-center gap-3">
+                  <button
+                    onClick={() => {
+                      setShowModal(true);
+                      setOfferType('');
+                      setSelectedPostId('');
+                      setOfferText('');
+                      setSelectedPlaceId('');
+                      setMeetingArea('');
+                      loadMyPosts();
+                      loadMeetingPlacesForPost();
+                    }}
+                    className="px-5 py-2 rounded-xl font-semibold text-white bg-[color:var(--c-brand)] hover:brightness-110 transition"
+                  >
+                    Proponer trueque
+                  </button>
+                  <button
+                    className="px-4 py-2 md:px-3 rounded-xl border border-[color:var(--c-mid-blue)]/60 hover:bg-[color:var(--c-mid-blue)]/15 transition disabled:opacity-60"
+                    onClick={() => ownerProfilePath && navigate(ownerProfilePath)}
+                    disabled={!ownerProfilePath}
+                  >
+                    Ver perfil
+                  </button>
+                </div>
+              )}
+
+              {(info || error) && (
+                <div className="text-center text-sm">
+                  {info && <p className="text-green-600">{info}</p>}
+                  {error && <p className="text-red-600">{error}</p>}
+                </div>
+              )}
+            </div>
+          </section>
+        </div>
+
+        {/* Mas publis del mismo userr */}
+        {morePosts.length >= 3 && (
+          <div className="border-t border-[color:var(--c-mid-blue)]/30 bg-[color:var(--c-mid-blue)]/5 px-5 py-4 md:px-6 md:py-5">
+            <h2
+              className="text-lg font-semibold mb-3"
+              style={{ color: 'var(--c-brand)', fontFamily: 'vag-rundschrift-d, sans-serif' }}
+            >
+              Más publicaciones de este usuario
+            </h2>
+            <div className="flex gap-3 overflow-x-auto pb-1">
+              {morePosts.map(p => (
+                <div
+                  key={p._id}
+                  className="min-w-[200px] max-w-[220px] cursor-pointer rounded-xl overflow-hidden border border-[color:var(--c-mid-blue)]/50 bg-white shadow-sm hover:shadow-md transition"
+                  onClick={() => navigate(`/posts/${p._id}`)}
+                >
+                  {p.images?.[0] && (
+                    <img
+                      src={p.images[0]}
+                      alt={p.title}
+                      className="w-full h-28 object-cover"
+                    />
+                  )}
+                  <div className="p-3">
+                    <h3
+                      className="text-sm font-semibold line-clamp-2"
+                      style={{ color: 'var(--c-text)' }}
+                    >
+                      {p.title}
+                    </h3>
+                    {p.category && (
+                      <p className="text-xs mt-1 text-gray-500">
+                        {p.category}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </article>
 
       {showModal && (
@@ -435,7 +511,7 @@ export default function PostDetail() {
                   onClick={() => setOfferType('existing')}
                   className="w-full py-2 rounded-xl bg-[color:var(--c-info)] text-white hover:brightness-110 transition"
                 >
-                  Ofrecer una publicacion existente
+                  Ofrecer una publicación existente
                 </button>
                 <button
                   onClick={() => setOfferType('new')}
@@ -463,17 +539,17 @@ export default function PostDetail() {
             {offerType === 'existing' && (
               <div className="space-y-3">
                 <p className="text-center text-sm! sm:text-base! md:text-md! lg:text-xl! font-medium" style={{ color: 'var(--c-text)' }}>
-                  Selecciona una de tus publicaciones activas
+                  Seleccioná una de tus publicaciones activas
                 </p>
                 {myPosts.length === 0 ? (
-                  <p className="text-gray-500 text-sm">No tenes publicaciones activas.</p>
+                  <p className="text-gray-500 text-sm">No tenés publicaciones activas.</p>
                 ) : (
                   <select
                     value={selectedPostId}
                     onChange={e => setSelectedPostId(e.target.value)}
                     className="w-full rounded-xl border border-slate-200 px-3 py-2"
                   >
-                    <option value="">Seleccionar publicacion</option>
+                    <option value="">Seleccionar publicación</option>
                     {myPosts.map(p => <option key={p._id} value={p._id}>{p.title}</option>)}
                   </select>
                 )}
@@ -516,7 +592,7 @@ export default function PostDetail() {
                         </select>
                       )}
                       {post?.barrio && (
-                        <p className="text-xs text-gray-500">Barrio de esta publicacion: {post.barrio}</p>
+                        <p className="text-xs text-gray-500">Barrio de esta publicación: {post.barrio}</p>
                       )}
                     </>
                   )}
@@ -537,7 +613,7 @@ export default function PostDetail() {
 
             {offerType === 'new' && (
               <div className="space-y-3">
-                <h3 className="font-medium" style={{ color: 'var(--c-text)' }}>Describi tu oferta</h3>
+                <h3 className="font-medium" style={{ color: 'var(--c-text)' }}>Describí tu oferta</h3>
                 <textarea
                   value={offerText}
                   onChange={e => setOfferText(e.target.value)}
@@ -583,7 +659,7 @@ export default function PostDetail() {
                         </select>
                       )}
                       {post?.barrio && (
-                        <p className="text-xs text-gray-500">Barrio de esta publicacion: {post.barrio}</p>
+                        <p className="text-xs text-gray-500">Barrio de esta publicación: {post.barrio}</p>
                       )}
                     </>
                   )}
