@@ -1,17 +1,20 @@
 // frontend/src/pages/ProfileEdit.jsx
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { uploadToCloudinary } from '../lib/api.js'
 
 export default function ProfileEdit() {
   const navigate = useNavigate()
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
+  const [preview, setPreview] = useState('')
   const [form, setForm] = useState({
     name: '',
     email: '',
     password: '',
     confirm: '',
-    avatar: ''
+    avatar: '',
+    avatarFile: null
   })
 
   useEffect(() => {
@@ -21,8 +24,12 @@ export default function ProfileEdit() {
         ...prev,
         name: u.name || '',
         email: u.email || '',
-        avatar: u.avatar || ''
+        avatar: u.avatar || '',
+        avatarFile: null
       }))
+      if (u.avatar) {
+        setPreview(u.avatar)
+      }
     }
   }, [])
 
@@ -36,8 +43,9 @@ export default function ProfileEdit() {
   function onFileChange(e) {
     const file = e.target.files[0]
     if (file) {
-      const preview = URL.createObjectURL(file)
-      setForm(prev => ({ ...prev, avatar: preview, avatarFile: file }))
+      const url = URL.createObjectURL(file)
+      setPreview(url)
+      setForm(prev => ({ ...prev, avatarFile: file }))
     }
   }
 
@@ -47,12 +55,30 @@ export default function ProfileEdit() {
     const API = import.meta.env.VITE_API_URL || 'http://localhost:4000'
     const token = localStorage.getItem('token')
 
-    // solo actualizamos campos modificados
-    const updated = { ...current }
+    const updated = {}
+
     if (form.name && form.name !== current.name) updated.name = form.name
     if (form.email && form.email !== current.email) updated.email = form.email
     if (form.password && form.password === form.confirm) updated.password = form.password
-    if (form.avatar && form.avatar !== current.avatar) updated.avatar = form.avatar
+
+    // si hay archivo nuevo, lo subimos a Cloudinary y usamos la URL real
+    if (form.avatarFile) {
+      try {
+        const url = await uploadToCloudinary(form.avatarFile)
+        updated.avatar = url
+      } catch (err) {
+        alert(err.message || 'Error subiendo imagen de perfil')
+        return
+      }
+    } else if (form.avatar && form.avatar !== current.avatar) {
+      // por si en algun flujo futuro se cambia avatar como URL directa
+      updated.avatar = form.avatar
+    }
+
+    if (!Object.keys(updated).length) {
+      navigate('/profile')
+      return
+    }
 
     try {
       const userId = current._id || current.id
@@ -121,8 +147,8 @@ export default function ProfileEdit() {
         <div className="flex items-center gap-4 sm:gap-6 mb-6">
           <div className="relative">
             <div className="w-24 h-24 rounded-full overflow-hidden ring-4" style={{ ringColor: 'var(--c-brand)' }}>
-              {form.avatar ? (
-                <img src={form.avatar} alt="avatar" className="w-full h-full object-cover" />
+              {preview ? (
+                <img src={preview} alt="avatar" className="w-full h-full object-cover" />
               ) : (
                 <div
                   className="w-full h-full grid place-items-center text-sm font-bold"

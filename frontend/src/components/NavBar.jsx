@@ -62,6 +62,14 @@ export default function NavBar() {
     return location.pathname === path;
   }
 
+  const avatarSrc =
+    me?.avatar &&
+    typeof me.avatar === 'string' &&
+    !me.avatar.startsWith('blob:') &&
+    !me.avatar.startsWith('data:')
+      ? me.avatar
+      : 'https://i.pravatar.cc/40';
+
   return (
     <header className="bg-[#2727d1] font-['lato']">
       {open && (
@@ -161,7 +169,7 @@ export default function NavBar() {
                     className="flex items-center"
                   >
                     <img
-                      src={me?.avatar || 'https://i.pravatar.cc/40'}
+                      src={avatarSrc}
                       alt="avatar"
                       className="h-8 w-8 rounded-full ring-1 ring-white/30"
                     />

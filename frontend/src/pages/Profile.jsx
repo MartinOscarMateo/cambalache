@@ -94,6 +94,15 @@ export default function Profile() {
 
   const postsCount = (typeof user.postsCount === 'number' ? user.postsCount : posts.length) || 0;
 
+  // avatar blob = se ignora y se usa fallback xddd me dio altos errores eso jajaja
+  const safeAvatar =
+    typeof user.avatar === 'string' &&
+    user.avatar &&
+    !user.avatar.startsWith('blob:') &&
+    !user.avatar.startsWith('data:')
+      ? user.avatar
+      : '';
+
   return (
     <main className="min-h-screen" style={{ background: 'var(--c-text)' }}>
       <div className="mx-auto max-w-5xl px-4 py-10">
@@ -139,8 +148,8 @@ export default function Profile() {
               <header className="flex flex-col sm:flex-row sm:items-center gap-6">
                 <div className="relative">
                   <div className="w-28 h-28 rounded-full overflow-hidden ring-4 ring-[color:var(--c-brand)]">
-                    {user.avatar ? (
-                      <img src={user.avatar} alt="avatar" className="w-full h-full object-cover" />
+                    {safeAvatar ? (
+                      <img src={safeAvatar} alt="avatar" className="w-full h-full object-cover" />
                     ) : (
                       <div
                         className="w-full h-full grid place-items-center"

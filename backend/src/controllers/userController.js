@@ -46,7 +46,14 @@ export async function updateUser(req, res) {
     if (req.body.name) user.name = req.body.name
     if (req.body.email) user.email = req.body.email
     if (req.body.password) user.password = req.body.password
-    if (req.body.avatar) user.avatar = req.body.avatar
+
+    if (typeof req.body.avatar === 'string') {
+      const avatar = req.body.avatar.trim()
+      if (avatar && !avatar.startsWith('blob:') && !avatar.startsWith('data:')) {
+        user.avatar = avatar
+      }
+    }
+
     if (req.body.ratingAverage) user.ratingAverage = req.body.ratingAverage
 
     // guardamos y devolvemos el usuario actualizado :v
