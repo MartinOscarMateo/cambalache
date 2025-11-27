@@ -120,272 +120,417 @@ export default function PostCreate() {
   return (
     <main
       className="min-h-screen flex items-center justify-center px-4 py-10"
-      style={{ background: 'var(--c-text)' }}
+      style={{
+        background: 'linear-gradient(180deg, var(--c-text) 0%, #15158f 55%, #05004c 100%)'
+      }}
     >
-      <section className="w-full max-w-2xl">
-        <div className="rounded-2xl bg-white p-6 sm:p-7 shadow-[0_20px_60px_rgba(0,0,0,.25)] border border-[color:var(--c-mid-blue)]/60">
-          <header className="mb-4">
-            <h1
-              className="text-2xl font-bold tracking-tight"
-              style={{ color: 'var(--c-brand)', fontFamily: 'vag-rundschrift-d, sans-serif' }}
-            >
-              Crear publicación
-            </h1>
-            <p className="mt-1 text-sm" style={{ color: 'var(--c-text)' }}>
-              Mostrá qué ofrecés y qué te interesa recibir a cambio.
-            </p>
-          </header>
+      <section className="w-full max-w-5xl">
+        <div className="rounded-3xl bg-white/95 backdrop-blur-sm p-6 sm:p-8 shadow-[0_24px_80px_rgba(5,0,76,.55)] border border-[color:var(--c-mid-blue)]/60">
+          <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <p className="text-xs uppercase tracking-[0.18em] text-[color:var(--c-info)]/90">
+                Publicaciones · Nuevo aviso
+              </p>
+              <h1
+                className="mt-1 text-2xl sm:text-3xl font-bold tracking-tight"
+                style={{ color: 'var(--c-brand)', fontFamily: 'vag-rundschrift-d, sans-serif' }}
+              >
+                Crear publicación
+              </h1>
+            </div>
+            <div className="flex flex-col items-end text-xs sm:text-sm text-[color:var(--c-text)]">
+              <span className="inline-flex items-center gap-2 rounded-full bg-white/70 border border-[color:var(--c-info)]/60 px-3 py-1">
+                <span className="h-2 w-2 rounded-full bg-[color:var(--c-info)]" />
+                Paso único · Completar publicación
+              </span>
+              <span className="mt-1 hidden sm:block text-[11px] text-slate-500">
+                Podés editarla luego desde “Mis publicaciones”.
+              </span>
+            </div>
+          </div>
 
-          <form onSubmit={onSubmit} className="space-y-5">
-            {/* Imgensess */}
-            <section>
-              <label className="text-sm font-medium" style={{ color: 'var(--c-text)' }}>Imágenes</label>
-              <div className="mt-2 rounded-xl border-2 border-dashed border-[color:var(--c-mid-blue)]/70 p-4">
-                <input className='w-full hidden sm:block' type="file" accept="image/*" multiple onChange={onFiles} disabled={loading} />
-                <label className="block w-full cursor-pointer sm:hidden">
-                  <input
-                    id="images"
-                    type="file"
-                    accept="image/*"
-                    multiple
-                    onChange={onFiles}
-                    disabled={loading}
-                    className="sr-only"
-                  />
-                  
-                  <div className="w-full rounded-md bg-white text-slate-700 border border-transparent">
-                    <div className="text-sm text-[var(--c-text)]">Hacé click para elegir archivos</div>
-                    <div className="mt-2 text-sm text-slate-700 whitespace-normal break-words max-h-20 overflow-auto">
-                      {files && files.length > 0 ? (
-                        files.map((f, i) => (
-                          <div key={i} className="mb-1">
-                            {f.name}
-                          </div>
-                        ))
-                      ) : (
-                        <span className="text-xs text-slate-500">Ningún archivo seleccionado</span>
-                      )}
-                    </div>
+          <div className="grid gap-6 lg:grid-cols-[minmax(0,2.1fr)_minmax(260px,1fr)] lg:items-start">
+            {/* Columna principal: formulario */}
+            <form onSubmit={onSubmit} className="space-y-6">
+              {/* Imágenes */}
+              <section
+                className="rounded-2xl border border-dashed p-4 sm:p-5 bg-white/95"
+                style={{
+                  borderColor: 'rgba(0,175,231,0.45)'
+                }}
+              >
+                <div className="flex items-center justify-between gap-3">
+                  <div>
+                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[color:var(--c-info)]">
+                      Paso 1 · Imágenes
+                    </p>
+                    <label className="block text-sm font-medium mt-1" style={{ color: 'var(--c-text)' }}>
+                      Fotos del artículo
+                    </label>
+                    <p className="mt-1 text-xs text-slate-500 max-w-md">
+                      Sumá entre 3 y 6 fotos en buena luz. La primera se usa como portada en el listado.
+                    </p>
                   </div>
-                </label>
-                <div className="mt-2 flex items-center justify-between text-xs text-slate-500">
-                  <span>Máximo {LIMITS.imagesMax} imágenes.</span>
-                  <span>{previews.length}/{LIMITS.imagesMax}</span>
+                  <div className="hidden sm:flex h-10 w-10 items-center justify-center rounded-full bg-white shadow-sm border border-[color:var(--c-info)]/60 text-[color:var(--c-text)] text-lg">
+                    📷
+                  </div>
                 </div>
+
+                <div className="mt-4 rounded-xl bg-white/90 px-4 py-3 border border-dashed border-[color:var(--c-info)]/60">
+                  <div className="hidden sm:block">
+                    <input
+                      className="w-full cursor-pointer"
+                      type="file"
+                      accept="image/*"
+                      multiple
+                      onChange={onFiles}
+                      disabled={loading}
+                    />
+                  </div>
+
+                  <label className="block w-full cursor-pointer sm:hidden">
+                    <input
+                      id="images"
+                      type="file"
+                      accept="image/*"
+                      multiple
+                      onChange={onFiles}
+                      disabled={loading}
+                      className="sr-only"
+                    />
+
+                    <div className="w-full rounded-lg bg-white/90 text-slate-700 border border-[color:var(--c-info)]/60 px-3 py-2">
+                      <div className="text-sm text-[var(--c-text)] font-medium">
+                        Tocá para elegir archivos
+                      </div>
+                      <div className="mt-2 text-xs text-slate-700 whitespace-normal break-words max-h-24 overflow-auto">
+                        {files && files.length > 0 ? (
+                          files.map((f, i) => (
+                            <div key={i} className="mb-1">
+                              {f.name}
+                            </div>
+                          ))
+                        ) : (
+                          <span className="text-xs text-slate-500">Ningún archivo seleccionado</span>
+                        )}
+                      </div>
+                    </div>
+                  </label>
+
+                  <div className="mt-2 flex items-center justify-between text-[11px] text-slate-500">
+                    <span>Máximo {LIMITS.imagesMax} imágenes.</span>
+                    <span>{previews.length}/{LIMITS.imagesMax}</span>
+                  </div>
+                </div>
+
                 {!!previews.length && (
-                  <div className="mt-3 grid grid-cols-3 sm:grid-cols-4 gap-2">
+                  <div className="mt-4 grid grid-cols-3 sm:grid-cols-4 gap-2">
                     {previews.map((src, i) => (
-                      <img
+                      <div
                         key={i}
-                        src={src}
-                        alt={`p${i}`}
-                        className="w-full h-24 object-cover rounded-lg"
-                      />
+                        className={`relative overflow-hidden rounded-xl border ${
+                          i === 0
+                            ? 'border-[color:var(--c-brand)] ring-2 ring-[color:var(--c-brand)]/60'
+                            : 'border-slate-200'
+                        }`}
+                      >
+                        <img
+                          src={src}
+                          alt={`p${i}`}
+                          className="w-full h-24 object-cover"
+                        />
+                        {i === 0 && (
+                          <span className="absolute left-1.5 top-1.5 rounded-full bg-[color:var(--c-brand)] text-[10px] font-semibold uppercase tracking-[0.16em] text-white px-2 py-0.5">
+                            Portada
+                          </span>
+                        )}
+                      </div>
                     ))}
                   </div>
                 )}
-              </div>
-            </section>
+              </section>
 
-            {/* Datos principales */}
-            <section className="grid gap-4">
-              <div className="grid gap-1">
-                <label htmlFor="title" className="text-sm font-medium" style={{ color: 'var(--c-text)' }}>Título</label>
-                <input
-                  id="title"
-                  name="title"
-                  value={form.title}
-                  onChange={onChange}
-                  disabled={loading}
-                  maxLength={LIMITS.titleMax}
-                  aria-describedby="title-help"
-                  className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 outline-none ring-2 ring-transparent focus:ring-[color:var(--c-info)]"
-                  placeholder="Ej: Bicicleta urbana rodado 28"
-                />
-                <div id="title-help" className="mt-1 flex items-center justify-between text-xs text-slate-500">
-                  <span>Mínimo {LIMITS.titleMin}, máximo {LIMITS.titleMax}.</span>
-                  <span>{form.title.length}/{LIMITS.titleMax}</span>
-                </div>
-              </div>
+              {/* Datos principales */}
+              <section className="grid gap-4 rounded-2xl bg-slate-50/70 border border-slate-200 p-4 sm:p-5">
+                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[color:var(--c-brand)] mb-1">
+                  Paso 2 · Información básica
+                </p>
 
-              <div className="grid gap-1">
-                <label htmlFor="description" className="text-sm font-medium" style={{ color: 'var(--c-text)' }}>Descripción</label>
-                <textarea
-                  id="description"
-                  name="description"
-                  value={form.description}
-                  onChange={onChange}
-                  disabled={loading}
-                  maxLength={LIMITS.descMax}
-                  aria-describedby="desc-help"
-                  className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 outline-none ring-2 ring-transparent focus:ring-[color:var(--c-info)]"
-                  rows={4}
-                  placeholder="Contá el estado y qué incluye…"
-                />
-                <div id="desc-help" className="mt-1 flex items-center justify-between text-xs text-slate-500">
-                  <span>Mínimo {LIMITS.descMin}, máximo {LIMITS.descMax}.</span>
-                  <span>{form.description.length}/{LIMITS.descMax}</span>
-                </div>
-              </div>
-
-              <div className="grid sm:grid-cols-2 gap-4">
                 <div className="grid gap-1">
-                  <label htmlFor="category" className="text-sm font-medium h-[20px]" style={{ color: 'var(--c-text)' }}>Categoría</label>
+                  <label htmlFor="title" className="text-sm font-medium" style={{ color: 'var(--c-text)' }}>Título</label>
                   <input
-                    id="category"
-                    name="category"
-                    value={form.category}
+                    id="title"
+                    name="title"
+                    value={form.title}
                     onChange={onChange}
                     disabled={loading}
-                    maxLength={LIMITS.catMax}
-                    aria-describedby="cat-help"
-                    className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 outline-none ring-2 ring-transparent focus:ring-[color:var(--c-info)]"
-                    placeholder="Ej: bicicletas"
+                    maxLength={LIMITS.titleMax}
+                    aria-describedby="title-help"
+                    className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 outline-none ring-2 ring-transparent focus:ring-[color:var(--c-info)] focus:border-[color:var(--c-info)] text-sm"
+                    placeholder="Ej: Bicicleta urbana rodado 28"
                   />
-                  <div id="cat-help" className="mt-1 flex items-center justify-between text-xs text-slate-500">
-                    <span>Máximo {LIMITS.catMax}.</span>
-                    <span>{form.category.length}/{LIMITS.catMax}</span>
+                  <div id="title-help" className="mt-1 flex items-center justify-between text-xs text-slate-500">
+                    <span>Mínimo {LIMITS.titleMin}, máximo {LIMITS.titleMax}.</span>
+                    <span>{form.title.length}/{LIMITS.titleMax}</span>
                   </div>
                 </div>
 
-                <div className="grid grid-rows-[20px_1fr] gap-1 sm:grid-rows-[20px_1fr_20px]">
-                  <label htmlFor="condition" className="text-sm font-medium h-[20px]" style={{ color: 'var(--c-text)' }}>Estado</label>
-                  <select
-                    id="condition"
-                    name="condition"
-                    value={form.condition}
-                    onChange={onChange}
-                    disabled={loading}
-                    className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 outline-none ring-2 ring-transparent focus:ring-[color:var(--c-info)]"
-                  >
-                    <option value="">Seleccionar…</option>
-                    <option value="nuevo">Nuevo</option>
-                    <option value="usado">Usado</option>
-                    <option value="no-funciona">No funciona</option>
-                  </select>
-                </div>
-              </div>
-            </section>
-
-            {/* Detalles */}
-            <section className="grid gap-3 rounded-xl bg-[color:var(--c-mid-blue)]/10 border border-[color:var(--c-mid-blue)]/40 p-4">
-              <h2
-                className="text-base font-semibold"
-                style={{ color: 'var(--c-brand)', fontFamily: 'vag-rundschrift-d, sans-serif' }}
-              >
-                Detalles del artículo
-              </h2>
-
-              <div>
-                <span className="text-sm font-medium" style={{ color: 'var(--c-text)' }}>¿Tiene detalles?</span>
-                <div className="mt-1 flex gap-4 text-sm" style={{ color: 'var(--c-text)' }}>
-                  <label className="inline-flex items-center gap-2">
-                    <input type="radio" name="hasDetails" value="yes" checked={form.hasDetails === 'yes'} onChange={onChange} />
-                    Sí
-                  </label>
-                  <label className="inline-flex items-center gap-2">
-                    <input type="radio" name="hasDetails" value="no" checked={form.hasDetails === 'no'} onChange={onChange} />
-                    No
-                  </label>
-                </div>
-              </div>
-
-              {form.hasDetails === 'yes' && (
-                <>
-                  <textarea
-                    name="detailsText"
-                    value={form.detailsText}
-                    onChange={onChange}
-                    disabled={loading}
-                    maxLength={LIMITS.detailsMax}
-                    aria-describedby="details-help"
-                    className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 outline-none ring-2 ring-transparent focus:ring-[color:var(--c-info)]"
-                    placeholder="Describí rayas, golpes o faltantes…"
-                  />
-                  <div id="details-help" className="mt-1 flex items-center justify-between text-xs text-slate-500">
-                    <span>Máximo {LIMITS.detailsMax}.</span>
-                    <span>{form.detailsText.length}/{LIMITS.detailsMax}</span>
-                  </div>
-                </>
-              )}
-
-              <div className="grid gap-3">
                 <div className="grid gap-1">
-                  <label htmlFor="barrio" className="text-sm font-medium" style={{ color: 'var(--c-text)' }}>Barrio</label>
-                  <select
-                    id="barrio"
-                    name="barrio"
-                    value={form.barrio}
-                    onChange={onChange}
-                    disabled={loading || barriosLoading}
-                    className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 outline-none ring-2 ring-transparent focus:ring-[color:var(--c-info)]"
-                  >
-                    <option value="">{barriosLoading ? 'Cargando barrios…' : 'Seleccionar barrio…'}</option>
-                    {!barriosLoading && barrios.map((b, i) => (
-                      <option key={i} value={b}>{b}</option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-            </section>
-
-            {/* Preferencias de intercambio */}
-            <section className="grid gap-3 rounded-xl bg-[color:var(--c-mid-cyan)]/10 border border-[color:var(--c-mid-cyan)]/40 p-4">
-              <h2
-                className="text-base font-semibold"
-                style={{ color: 'var(--c-brand)', fontFamily: 'vag-rundschrift-d, sans-serif' }}
-              >
-                Preferencias de intercambio
-              </h2>
-
-              <div>
-                <span className="text-sm font-medium" style={{ color: 'var(--c-text)' }}>¿Abierto a ofertas?</span>
-                <div className="mt-1 flex gap-4 text-sm" style={{ color: 'var(--c-text)' }}>
-                  <label className="inline-flex items-center gap-2">
-                    <input type="radio" name="openToOffers" value="yes" checked={form.openToOffers === 'yes'} onChange={onChange} />
-                    Sí
-                  </label>
-                  <label className="inline-flex items-center gap-2">
-                    <input type="radio" name="openToOffers" value="no" checked={form.openToOffers === 'no'} onChange={onChange} />
-                    No
-                  </label>
-                </div>
-              </div>
-
-              {form.openToOffers === 'no' && (
-                <>
+                  <label htmlFor="description" className="text-sm font-medium" style={{ color: 'var(--c-text)' }}>Descripción</label>
                   <textarea
-                    name="interestsText"
-                    value={form.interestsText}
+                    id="description"
+                    name="description"
+                    value={form.description}
                     onChange={onChange}
                     disabled={loading}
-                    maxLength={LIMITS.interestsMax}
-                    aria-describedby="interests-help"
-                    className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 outline-none ring-2 ring-transparent focus:ring-[color:var(--c-info)]"
-                    placeholder="Indicá qué buscás a cambio…"
+                    maxLength={LIMITS.descMax}
+                    aria-describedby="desc-help"
+                    className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 outline-none ring-2 ring-transparent focus:ring-[color:var(--c-info)] focus:border-[color:var(--c-info)] text-sm"
+                    rows={4}
+                    placeholder="Contá el estado, usos, qué incluye y si tiene algo para revisar…"
                   />
-                  <div id="interests-help" className="mt-1 flex items-center justify-between text-xs text-slate-500">
-                    <span>Máximo {LIMITS.interestsMax}.</span>
-                    <span>{form.interestsText.length}/{LIMITS.interestsMax}</span>
+                  <div id="desc-help" className="mt-1 flex items-center justify-between text-xs text-slate-500">
+                    <span>Mínimo {LIMITS.descMin}, máximo {LIMITS.descMax}.</span>
+                    <span>{form.description.length}/{LIMITS.descMax}</span>
                   </div>
-                </>
+                </div>
+
+                <div className="grid sm:grid-cols-2 gap-4">
+                  <div className="grid gap-1">
+                    <label htmlFor="category" className="text-sm font-medium" style={{ color: 'var(--c-text)' }}>Categoría</label>
+                    <input
+                      id="category"
+                      name="category"
+                      value={form.category}
+                      onChange={onChange}
+                      disabled={loading}
+                      maxLength={LIMITS.catMax}
+                      aria-describedby="cat-help"
+                      className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 outline-none ring-2 ring-transparent focus:ring-[color:var(--c-info)] focus:border-[color:var(--c-info)] text-sm"
+                      placeholder="Ej: bicicletas"
+                    />
+                    <div id="cat-help" className="mt-1 flex items-center justify-between text-xs text-slate-500">
+                      <span>Máximo {LIMITS.catMax}.</span>
+                      <span>{form.category.length}/{LIMITS.catMax}</span>
+                    </div>
+                  </div>
+
+                  <div className="grid gap-1">
+                    <label htmlFor="condition" className="text-sm font-medium" style={{ color: 'var(--c-text)' }}>Estado</label>
+                    <select
+                      id="condition"
+                      name="condition"
+                      value={form.condition}
+                      onChange={onChange}
+                      disabled={loading}
+                      className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 outline-none ring-2 ring-transparent focus:ring-[color:var(--c-info)] focus:border-[color:var(--c-info)] text-sm"
+                    >
+                      <option value="">Seleccionar…</option>
+                      <option value="nuevo">Nuevo</option>
+                      <option value="usado">Usado</option>
+                      <option value="no-funciona">No funciona</option>
+                    </select>
+                  </div>
+                </div>
+              </section>
+
+              {/* Detalles */}
+              <section
+                className="grid gap-4 rounded-2xl border p-4 sm:p-5"
+                style={{
+                  background: 'rgba(39,39,209,0.04)',
+                  borderColor: 'rgba(39,39,209,0.22)'
+                }}
+              >
+                <div className="flex items-center justify-between gap-3">
+                  <h2
+                    className="text-base font-semibold"
+                    style={{ color: 'var(--c-brand)', fontFamily: 'vag-rundschrift-d, sans-serif' }}
+                  >
+                    Detalles del artículo
+                  </h2>
+                  <span className="text-[11px] uppercase tracking-[0.18em] text-[color:var(--c-text)]/70">
+                    Paso 3 · Estado real
+                  </span>
+                </div>
+
+                <div>
+                  <span className="text-sm font-medium" style={{ color: 'var(--c-text)' }}>¿Tiene detalles?</span>
+                  <div className="mt-1 flex gap-4 text-sm" style={{ color: 'var(--c-text)' }}>
+                    <label className="inline-flex items-center gap-2">
+                      <input type="radio" name="hasDetails" value="yes" checked={form.hasDetails === 'yes'} onChange={onChange} />
+                      Sí, tiene marcas / fallas
+                    </label>
+                    <label className="inline-flex items-center gap-2">
+                      <input type="radio" name="hasDetails" value="no" checked={form.hasDetails === 'no'} onChange={onChange} />
+                      No, está en buen estado
+                    </label>
+                  </div>
+                </div>
+
+                {form.hasDetails === 'yes' && (
+                  <>
+                    <textarea
+                      name="detailsText"
+                      value={form.detailsText}
+                      onChange={onChange}
+                      disabled={loading}
+                      maxLength={LIMITS.detailsMax}
+                      aria-describedby="details-help"
+                      className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 outline-none ring-2 ring-transparent focus:ring-[color:var(--c-info)] focus:border-[color:var(--c-info)] text-sm"
+                      placeholder="Describí rayas, golpes, piezas faltantes o cualquier cosa que te gustaría saber si fueras vos quien la recibe…"
+                    />
+                    <div id="details-help" className="mt-1 flex items-center justify-between text-xs text-slate-500">
+                      <span>Máximo {LIMITS.detailsMax}.</span>
+                      <span>{form.detailsText.length}/{LIMITS.detailsMax}</span>
+                    </div>
+                  </>
+                )}
+
+                <div className="grid gap-3">
+                  <div className="grid gap-1">
+                    <label htmlFor="barrio" className="text-sm font-medium" style={{ color: 'var(--c-text)' }}>Barrio</label>
+                    <select
+                      id="barrio"
+                      name="barrio"
+                      value={form.barrio}
+                      onChange={onChange}
+                      disabled={loading || barriosLoading}
+                      className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 outline-none ring-2 ring-transparent focus:ring-[color:var(--c-info)] focus:border-[color:var(--c-info)] text-sm"
+                    >
+                      <option value="">{barriosLoading ? 'Cargando barrios…' : 'Seleccionar barrio…'}</option>
+                      {!barriosLoading && barrios.map((b, i) => (
+                        <option key={i} value={b}>{b}</option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+              </section>
+
+              {/* Preferencias de intercambio */}
+              <section
+                className="grid gap-4 rounded-2xl border p-4 sm:p-5"
+                style={{
+                  background: 'rgba(0,175,231,0.04)',
+                  borderColor: 'rgba(0,175,231,0.24)'
+                }}
+              >
+                <div className="flex items-center justify-between gap-3">
+                  <h2
+                    className="text-base font-semibold"
+                    style={{ color: 'var(--c-brand)', fontFamily: 'vag-rundschrift-d, sans-serif' }}
+                  >
+                    Preferencias de intercambio
+                  </h2>
+                  <span className="text-[11px] uppercase tracking-[0.18em] text-[color:var(--c-info)]/90">
+                    Paso 4 · Qué esperás a cambio
+                  </span>
+                </div>
+
+                <div>
+                  <span className="text-sm font-medium" style={{ color: 'var(--c-text)' }}>¿Abierto a ofertas?</span>
+                  <div className="mt-1 flex flex-wrap gap-4 text-sm" style={{ color: 'var(--c-text)' }}>
+                    <label className="inline-flex items-center gap-2">
+                      <input type="radio" name="openToOffers" value="yes" checked={form.openToOffers === 'yes'} onChange={onChange} />
+                      Sí, escucho propuestas
+                    </label>
+                    <label className="inline-flex items-center gap-2">
+                      <input type="radio" name="openToOffers" value="no" checked={form.openToOffers === 'no'} onChange={onChange} />
+                      No, busco algo específico
+                    </label>
+                  </div>
+                </div>
+
+                {form.openToOffers === 'no' && (
+                  <>
+                    <textarea
+                      name="interestsText"
+                      value={form.interestsText}
+                      onChange={onChange}
+                      disabled={loading}
+                      maxLength={LIMITS.interestsMax}
+                      aria-describedby="interests-help"
+                      className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 outline-none ring-2 ring-transparent focus:ring-[color:var(--c-info)] focus:border-[color:var(--c-info)] text-sm"
+                      placeholder="Indicá qué buscás a cambio (ej: otra bici urbana, notebook, clases de guitarra, etc.)"
+                    />
+                    <div id="interests-help" className="mt-1 flex items-center justify-between text-xs text-slate-500">
+                      <span>Máximo {LIMITS.interestsMax}.</span>
+                      <span>{form.interestsText.length}/{LIMITS.interestsMax}</span>
+                    </div>
+                  </>
+                )}
+              </section>
+
+              {error && (
+                <p className="rounded-lg bg-red-50 border border-red-200 text-red-700 px-3 py-2 text-sm">
+                  {error}
+                </p>
               )}
-            </section>
 
-            {error && (
-              <p className="rounded-lg bg-red-50 border border-red-200 text-red-700 px-3 py-2 text-sm">
-                {error}
-              </p>
-            )}
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <p className="text-xs text-slate-500 sm:max-w-xs">
+                  Al publicar aceptás las reglas de convivencia de Cambalache y nuestro código de buenas prácticas de intercambio.
+                </p>
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="inline-flex justify-center items-center rounded-xl bg-[color:var(--c-text)] px-6 py-3 font-semibold text-white text-sm shadow-sm shadow-[rgba(0,0,0,.25)] transition hover:brightness-110 disabled:opacity-60"
+                >
+                  {loading ? 'Creando…' : 'Publicar'}
+                </button>
+              </div>
+            </form>
 
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full rounded-xl bg-[color:var(--c-text)] px-4 py-3 font-semibold text-white transition hover:brightness-110 disabled:opacity-60"
-            >
-              {loading ? 'Creando…' : 'Publicar'}
-            </button>
-          </form>
+            {/* Columna lateral: resumen / tips */}
+            <aside className="mt-6 lg:mt-0 lg:pl-4">
+              <div className="sticky top-4 space-y-4">
+                <div className="rounded-2xl bg-[color:var(--c-text)] text-white px-4 py-4 sm:px-5 sm:py-5 shadow-[0_18px_50px_rgba(0,0,0,.45)]">
+                  <p className="text-xs uppercase tracking-[0.18em] text-[color:var(--c-info)]/80">
+                    Vista rápida
+                  </p>
+                  <h3 className="mt-1 text-sm font-semibold">
+                    Así se va a ver tu publicación
+                  </h3>
+                  <div className="mt-3 rounded-xl bg-white/5 p-3 border border-white/15">
+                    <div className="h-32 w-full rounded-lg bg-gradient-to-tr from-[color:var(--c-brand)]/75 to-[color:var(--c-info)]/75 flex items-center justify-center text-4xl">
+                      {previews[0] ? (
+                        <img
+                          src={previews[0]}
+                          alt="preview"
+                          className="h-full w-full object-cover rounded-lg"
+                        />
+                      ) : (
+                        <span className="opacity-80">📸</span>
+                      )}
+                    </div>
+                    <div className="mt-3 space-y-1">
+                      <p className="text-[13px] font-semibold truncate">
+                        {form.title || 'Título de tu artículo'}
+                      </p>
+                      <p className="text-[11px] text-[color:var(--c-info)]/90">
+                        {form.barrio || 'Barrio de encuentro'} · {form.condition || 'Estado a definir'}
+                      </p>
+                      <p className="text-[11px] text-slate-200 line-clamp-2">
+                        {form.description || 'Escribí una descripción clara, honesta y concreta para generar confianza en el trueque.'}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="rounded-2xl bg-white/90 border border-[color:var(--c-brand)]/40 px-4 py-4 sm:px-5 sm:py-5">
+                  <h4 className="text-sm font-semibold text-[color:var(--c-text)]">
+                    Tip rápido para un buen trueque
+                  </h4>
+                  <ul className="mt-2 space-y-1.5 text-xs text-slate-600">
+                    <li>• Mostrá bien el estado real: fotos claras y sin filtros raros.</li>
+                    <li>• Contá si tiene detalles antes: evita malos entendidos después.</li>
+                    <li>• Sé flexible con el barrio de encuentro si podés.</li>
+                    <li>• Cuanto más claro el texto, más chances de match.</li>
+                  </ul>
+                </div>
+              </div>
+            </aside>
+          </div>
         </div>
       </section>
     </main>
