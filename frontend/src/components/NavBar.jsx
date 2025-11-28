@@ -149,15 +149,14 @@ export default function NavBar() {
                 </Link>
 
                 {/* notificaciones */}
-                <button
-                  type="button"
+                <Link
+                  to="/notifications"
                   aria-label="notificaciones"
                   title="notificaciones"
-                  aria-disabled="true"
                   className="relative nav-icon text-[#ffdb3e] cursor-default opacity-90"
                 >
                   <ion-icon name="notifications" className="text-2xl align-middle"></ion-icon>
-                </button>
+                </Link>
 
                 {/* avatar y menu */}
                 <div className="relative" ref={menuRef}>

@@ -89,7 +89,8 @@ export default function PostList() {
     const title = p.title || 'Sin título';
     const category = p.category || '';
     const condition = p.condition || '';
-    const location = p.location || '';
+    //const location = p.location || '';
+    const barrio = p.barrio || '';
     const openToOffers = !!p.openToOffers;
 
     return (
@@ -125,9 +126,9 @@ export default function PostList() {
                 Estado: {condition}
               </span>
             )}
-            {location && (
+            {barrio && (
               <span className="px-3 py-1 rounded-full text-[11px] font-semibold bg-[color:var(--c-accent)]/35 text-[color:var(--c-text)]">
-                Zona: {location}
+                Barrio: {barrio}
               </span>
             )}
             <span className="px-3 py-1 rounded-full text-[11px] font-semibold bg-[color:var(--c-info)]/25 text-[color:var(--c-text)]">

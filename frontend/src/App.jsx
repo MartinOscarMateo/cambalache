@@ -17,7 +17,7 @@ import Trades from './pages/Trades.jsx';
 import ProfileEdit from './pages/ProfileEdit.jsx';
 import Chat from './pages/Chat.jsx';
 import ChatsList from './pages/ChatsList.jsx';
-// import Noticications from './pages/Notifications.jsx';
+import Noticications from './pages/Notifications.jsx';
 import MyPosts from './pages/MyPosts.jsx';
 import UserPublicProfile from './pages/UserPublicProfile.jsx';
 import NotFound from './pages/NotFound.jsx';
@@ -63,7 +63,7 @@ const router = createBrowserRouter([
       { path: '/forgot-password', element: <ForgotPassword /> },
       { path: '/reset-password', element: <ResetPassword /> },
       { path: '/chat', element: <Chat />, loader: requireAuthLoader },
- //     { path: '/notifications', element: <Noticications /> },
+      { path: '/notifications', element: <Noticications /> },
 
       // Chat
       { path: '/chats', element: <ChatsList />, loader: requireAuthLoader }, // lista de chats

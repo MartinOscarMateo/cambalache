@@ -5,6 +5,7 @@ import User from "../models/User.js";
 import Post from '../models/Post.js';
 import Chat from '../models/Chat.js';
 import Message from '../models/Message.js';
+import Notification from '../models/Notification.js';
 
 const ALLOWED_STATUS = new Set(TRADE_STATUS);
 const TERMINAL = new Set(['rejected', 'cancelled', 'finished']);
@@ -38,6 +39,7 @@ function parsePageLimit(q) {
 export async function createTrade(req, res) {
   try {
     const userId = req.user.id;
+    const sender = await User.findById(userId).select("name");
     const { postRequestedId, postOfferedId, itemsText, meetingArea } = req.body;
 
     assert(postRequestedId, 'REQ_POST_REQUIRED', 'Falta postRequestedId');
@@ -113,9 +115,20 @@ export async function createTrade(req, res) {
       lastMessage: autoText,
       updatedAt: new Date()
     });
-    
+
+    await Notification.create({
+      user: trade.receiverId,
+      type: "TRADE_REQUEST",
+      title: "Nueva propuesta de trueque",
+      message: `${sender.name} te envió una propuesta de trueque.`,
+      link: `/chat/${userId}`
+    });
+
+    console.log("Creating notification for:", trade.receiverId);
+
     res.status(201).json(trade);
   } catch (err) {
+    console.error("ERROR CREANDO NOTIFICACION:", err);
     res.status(400).json({ code: err.code || 'TRADE_CREATE_ERROR', error: err.message });
   }
 }
@@ -208,7 +221,6 @@ export async function changeStatus(req, res) {
           "No autorizado para cancelar"
         );
       }
-
       const from = trade.status;
       trade.status = 'cancelled';
       trade.history.push({ by: userId, action: 'cancelled', from, to: 'cancelled' });
@@ -226,6 +238,16 @@ export async function changeStatus(req, res) {
       trade.status = to;
       trade.history.push({ by: userId, action: action + 'ed', from, to });
     }
+
+    const notifyUser = trade.from.toString() === req.user._id ? trade.to : trade.from;
+
+    await Notification.create({
+        user: notifyUser,
+        type: "TRADE_UPDATE",
+        title: "Actualización en un trueque",
+        message: `El trueque cambió su estado a: ${trade.status}.`,
+        link: `/trueques/${trade._id}`
+    });
 
     await trade.save();
     res.json(trade.toJSON());

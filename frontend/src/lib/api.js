@@ -365,3 +365,28 @@ export async function getMeetingPlaces(barrio = '') {
   if (!res.ok) throw new Error(json?.message || 'Error obteniendo espacios públicos');
   return json;
 }
+
+export async function getNotifications() {
+  const token = localStorage.getItem("token") || "";
+  const res = await fetch(`${API}/api/notifications`, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+
+  const json = await res.json().catch(() => ([]));
+  if (!res.ok) throw new Error(json?.message || "Error obteniendo notificaciones");
+
+  return json;
+}
+
+export async function markNotificationAsRead(id) {
+  const token = localStorage.getItem("token") || "";
+  const res = await fetch(`${API}/api/notifications/${id}/read`, {
+    method: "PATCH",
+    headers: { Authorization: `Bearer ${token}` }
+  });
+
+  const json = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(json?.message || "No se pudo marcar como leída");
+
+  return json;
+}
