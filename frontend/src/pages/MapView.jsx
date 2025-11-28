@@ -131,10 +131,95 @@ export default function MapView() {
     ? posts.filter(p => (p.barrio || '').toString().trim().toUpperCase() === selectedBarrio)
     : posts;
 
+  const totalPosts = posts.length;
+  const totalFiltrados = postsFiltrados.length;
+
   return (
-    <div className="flex h-screen w-full">
-      {/* Mapita a la izquiedra uwu*/}
-      <div className="flex-1 h-full">
+    <div className="flex h-screen w-full bg-slate-50">
+      {/* Columna de publis a la izquierda */}
+      <aside
+        className="w-full sm:w-80 md:w-96 h-full border-r border-slate-200 bg-white flex flex-col shadow-lg"
+        style={{ maxWidth: '420px' }}
+      >
+        <header className="px-4 py-3 border-b border-slate-200 bg-white/90 backdrop-blur sticky top-0 z-10">
+          <h2
+            className="text-sm font-semibold tracking-tight"
+            style={{ color: 'var(--c-text)', fontFamily: 'vag-rundschrift-d, sans-serif' }}
+          >
+            Mapa de publicaciones
+          </h2>
+          <p className="mt-1 text-xs text-slate-500">
+            {selectedBarrio
+              ? `Ofertas activas en ${selectedBarrio}`
+              : 'Explora ofertas activas dentro de CABA'}
+          </p>
+          <div className="mt-2 flex items-center justify-between text-[11px] text-slate-500">
+            <span className="inline-flex items-center gap-1 rounded-full bg-slate-100 px-2 py-0.5">
+              <span className="h-2 w-2 rounded-full bg-[#2727d1]" />
+              {selectedBarrio ? `Barrio seleccionado: ${selectedBarrio}` : 'Sin filtro de barrio'}
+            </span>
+            <span className="ml-2 whitespace-nowrap">
+              {totalFiltrados} / {totalPosts || totalFiltrados} avisos
+            </span>
+          </div>
+        </header>
+
+        {error && (
+          <div className="m-3 rounded-lg bg-red-50 border border-red-200 px-3 py-2 text-xs text-red-700">
+            {error}
+          </div>
+        )}
+
+        <div className="flex-1 overflow-y-auto px-3 py-3 space-y-3">
+          {loadingPosts && (
+            <p className="text-xs text-slate-500">Cargando publicaciones…</p>
+          )}
+
+          {!loadingPosts && !postsFiltrados.length && !error && (
+            <p className="text-xs text-slate-500 leading-relaxed">
+              {selectedBarrio
+                ? 'No hay publicaciones activas en este barrio por ahora. Probá limpiando el filtro para ver toda CABA.'
+                : 'No hay publicaciones activas en este momento. Volvé a revisar mas tarde.'}
+            </p>
+          )}
+
+          {!loadingPosts && postsFiltrados.map((post) => {
+            const id = post._id || post.id;
+            return (
+              <article
+                key={id}
+                className="rounded-xl border border-slate-200 bg-white px-3.5 py-3 text-xs shadow-sm hover:shadow-md hover:border-[#2727d1]/70 transition-all duration-150 cursor-pointer"
+              >
+                <h3 className="font-semibold text-[var(--c-text)] text-[13px] line-clamp-2">
+                  {post.title}
+                </h3>
+                <p className="mt-1 text-[11px] text-slate-500 uppercase tracking-wide">
+                  {post.category} · {post.barrio || 'Barrio no especificado'}
+                </p>
+                {post.description && (
+                  <p className="mt-2 text-[11px] text-slate-600 line-clamp-3">
+                    {post.description}
+                  </p>
+                )}
+              </article>
+            );
+          })}
+        </div>
+      </aside>
+
+      {/* Mapa a la derecha owo */}
+      <div className="relative flex-1 h-full">
+        <div className="pointer-events-none absolute left-4 top-4 z-[400]">
+          <div className="rounded-xl bg-white/90 px-3 py-2 shadow-md text-[11px] text-slate-700 space-y-1">
+            <p className="font-semibold text-[12px]" style={{ fontFamily: 'vag-rundschrift-d, sans-serif' }}>
+              Vista de barrios CABA
+            </p>
+            <p>Azul: barrios con publicaciones activas</p>
+            <p>Gris: barrios sin publicaciones activas</p>
+            <p>Hace click en un barrio para filtrar la lista</p>
+          </div>
+        </div>
+
         <MapContainer
           center={CABA_CENTER}
           zoom={13}
@@ -157,68 +242,6 @@ export default function MapView() {
           )}
         </MapContainer>
       </div>
-
-      {/* Columna de publis*/}
-      <aside
-        className="w-full sm:w-80 md:w-96 h-full border-l border-slate-200 bg-white flex flex-col"
-        style={{ maxWidth: '400px' }}
-      >
-        <header className="px-4 py-3 border-b border-slate-200">
-          <h2
-            className="text-sm font-semibold tracking-tight"
-            style={{ color: 'var(--c-text)', fontFamily: 'vag-rundschrift-d, sans-serif' }}
-          >
-            Publicaciones disponibles
-          </h2>
-          <p className="mt-1 text-xs text-slate-500">
-            {selectedBarrio
-              ? `Mostrando publicaciones activas en ${selectedBarrio}.`
-              : 'Mostrando publicaciones activas dentro de CABA.'}
-          </p>
-        </header>
-
-        {error && (
-          <div className="m-3 rounded-lg bg-red-50 border border-red-200 px-3 py-2 text-xs text-red-700">
-            {error}
-          </div>
-        )}
-
-        <div className="flex-1 overflow-y-auto px-3 py-2 space-y-2">
-          {loadingPosts && (
-            <p className="text-xs text-slate-500">Cargando publicaciones…</p>
-          )}
-
-          {!loadingPosts && !postsFiltrados.length && !error && (
-            <p className="text-xs text-slate-500">
-              {selectedBarrio
-                ? 'No hay publicaciones activas en este barrio.'
-                : 'No hay publicaciones activas en este momento.'}
-            </p>
-          )}
-
-          {!loadingPosts && postsFiltrados.map((post) => {
-            const id = post._id || post.id;
-            return (
-              <article
-                key={id}
-                className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs shadow-sm"
-              >
-                <h3 className="font-semibold text-[var(--c-text)] line-clamp-2">
-                  {post.title}
-                </h3>
-                <p className="mt-0.5 text-[11px] text-slate-500 uppercase tracking-wide">
-                  {post.category} · {post.barrio || 'Barrio no especificado'}
-                </p>
-                {post.description && (
-                  <p className="mt-1 text-[11px] text-slate-600 line-clamp-3">
-                    {post.description}
-                  </p>
-                )}
-              </article>
-            );
-          })}
-        </div>
-      </aside>
     </div>
   );
 }
