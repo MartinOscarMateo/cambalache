@@ -198,15 +198,20 @@ export async function changeStatus(req, res) {
   try {
     const userId = req.user.id;
     const { action } = req.body;
+
     assert(['accept', 'reject', 'cancel', 'finish'].includes(action), 'BAD_ACTION', 'Acción inválida');
-    
+
     const trade = await Trade.findById(req.params.id);
     assert(trade, 'NOT_FOUND', 'Trueque no encontrado');
 
     assert([viewId(trade.proposerId), viewId(trade.receiverId)].includes(userId), 'FORBIDDEN', 'No autorizado');
-    
+
     assert(canTransition(trade.status, action), 'BAD_STATE', 'Estado no permite la acción');
 
+    const from = trade.status;
+    let to;
+
+    // --- Cambios de estado ---
     if (action === 'cancel') {
       if (trade.status === "pending") {
         assert(
@@ -214,43 +219,42 @@ export async function changeStatus(req, res) {
           "ONLY_PROPOSER",
           "Solo quien propuso puede cancelar mientras está pendiente"
         );
-      } else if (trade.status === "accepted") {
-        assert(
-          [viewId(trade.proposerId), viewId(trade.receiverId)].includes(userId),
-          "FORBIDDEN",
-          "No autorizado para cancelar"
-        );
       }
-      const from = trade.status;
-      trade.status = 'cancelled';
-      trade.history.push({ by: userId, action: 'cancelled', from, to: 'cancelled' });
-    } else if (action === 'finish') {
-      assert(trade.status === 'accepted', 'BAD_STATE', 'Solo se finalizan trueques aceptados');
-
-      const from = trade.status;
-      trade.status = 'finished';
-      trade.history.push({ by: userId, action: 'finished', from, to: 'finished' });
-    } else {
+      to = "cancelled";
+    } 
+    else if (action === "finish") {
+      assert(trade.status === "accepted", 'BAD_STATE', 'Solo se finalizan trueques aceptados');
+      to = "finished";
+    } 
+    else {
       assert(viewId(trade.receiverId) === userId, 'ONLY_RECEIVER', 'Solo el receptor puede aceptar o rechazar');
-
-      const to = action === 'accept' ? 'accepted' : 'rejected';
-      const from = trade.status;
-      trade.status = to;
-      trade.history.push({ by: userId, action: action + 'ed', from, to });
+      to = action === "accept" ? "accepted" : "rejected";
     }
 
-    const notifyUser = trade.from.toString() === req.user._id ? trade.to : trade.from;
+    trade.status = to;
+    trade.history.push({ by: userId, action: action + "ed", from, to });
+
+    // --- Mensajes personalizados ---
+    const statusMessages = {
+      accepted: "El receptor aceptó tu propuesta de trueque.",
+      rejected: "Tu propuesta de trueque fue rechazada.",
+      cancelled: "El trueque fue cancelado.",
+      finished: "El trueque finalizó exitosamente.",
+    };
+
+    const message = statusMessages[to] || `El trueque cambió su estado a: ${to}.`;
 
     await Notification.create({
-        user: notifyUser,
-        type: "TRADE_UPDATE",
-        title: "Actualización en un trueque",
-        message: `El trueque cambió su estado a: ${trade.status}.`,
-        link: `/trueques/${trade._id}`
+      user: trade.proposerId,
+      type: "TRADE_UPDATE",
+      title: "Actualización en un trueque",
+      message,
+      link: `/chat/${userId}`
     });
 
     await trade.save();
     res.json(trade.toJSON());
+
   } catch (err) {
     res.status(400).json({ code: err.code || 'TRADE_STATUS_ERROR', error: err.message });
   }
