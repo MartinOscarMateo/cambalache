@@ -31,7 +31,7 @@ export default function Noticications () {
     }
 
     return (
-        <main className="h-[85vh] bg-[#f6f2ff] px-4 py-8">
+        <main className="min-h-[85vh] bg-[#f6f2ff] px-4 py-8">
             <div className="max-w-3xl mx-auto">
                 <header className="mb-3">
                     <h1 className="text-center">Notificaciones</h1>

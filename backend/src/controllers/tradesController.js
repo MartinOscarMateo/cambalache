@@ -116,8 +116,10 @@ export async function createTrade(req, res) {
       updatedAt: new Date()
     });
 
+    const notifyUser = String(trade.proposerId) === String(userId) ? trade.receiverId : trade.proposerId;
+
     await Notification.create({
-      user: trade.receiverId,
+      user: notifyUser,
       type: "TRADE_REQUEST",
       title: "Nueva propuesta de trueque",
       message: `${sender.name} te envió una propuesta de trueque.`,
@@ -231,8 +233,15 @@ export async function changeStatus(req, res) {
       to = action === "accept" ? "accepted" : "rejected";
     }
 
+    const actionNames = {
+      accept: "accepted",
+      reject: "rejected",
+      cancel: "cancelled",
+      finish: "finished"
+    };
+
     trade.status = to;
-    trade.history.push({ by: userId, action: action + "ed", from, to });
+    trade.history.push({ by: userId, action: actionNames[action], from, to });
 
     // --- Mensajes personalizados ---
     const statusMessages = {
@@ -244,8 +253,10 @@ export async function changeStatus(req, res) {
 
     const message = statusMessages[to] || `El trueque cambió su estado a: ${to}.`;
 
+    const notifyUser = String(trade.proposerId) === String(userId) ? trade.receiverId : trade.proposerId;
+
     await Notification.create({
-      user: trade.proposerId,
+      user: notifyUser,
       type: "TRADE_UPDATE",
       title: "Actualización en un trueque",
       message,
