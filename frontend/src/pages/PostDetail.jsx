@@ -1,7 +1,7 @@
 // frontend/src/pages/PostDetail.jsx
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { getPostById, getPostsByUser, getMeetingPlaces } from '../lib/api.js';
+import { getPostById, getPostsByUser, createTrade } from '../lib/api.js';
 
 function idOf(v) {
   if (!v) return '';
@@ -42,12 +42,6 @@ export default function PostDetail() {
   const [selectedPostId, setSelectedPostId] = useState('');
   const [offerText, setOfferText] = useState('');
   const [submitting, setSubmitting] = useState(false);
-
-  // Espacios públicos
-  const [meetingPlaces, setMeetingPlaces] = useState([]);
-  const [meetingPlacesLoading, setMeetingPlacesLoading] = useState(false);
-  const [selectedPlaceId, setSelectedPlaceId] = useState('');
-  const [meetingArea, setMeetingArea] = useState('');
 
   useEffect(() => {
     let active = true;
@@ -142,58 +136,20 @@ export default function PostDetail() {
     }
   }
 
-  async function loadMeetingPlacesForPost() {
-    const barrio = post?.barrio || '';
-    if (!barrio) {
-      setMeetingPlaces([]);
-      return;
-    }
-    try {
-      setMeetingPlacesLoading(true);
-      const items = await getMeetingPlaces(barrio);
-      setMeetingPlaces(items);
-    } catch {
-      setMeetingPlaces([]);
-    } finally {
-      setMeetingPlacesLoading(false);
-    }
-  }
-
   async function submitTrade() {
     setSubmitting(true);
     setError('');
     setInfo('');
     try {
-      const API = import.meta.env.VITE_API_URL || 'http://localhost:4000';
-      const token = localStorage.getItem('token') || '';
-
-      let body;
-      if (offerType === 'existing') {
-        body = { postRequestedId: id, postOfferedId: selectedPostId };
-      } else {
-        body = { postRequestedId: id, itemsText: offerText };
-      }
-
-      if (meetingArea) {
-        body.meetingArea = meetingArea;
-      }
-
-      const res = await fetch(`${API}/api/trades`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-        body: JSON.stringify(body)
-      });
-
-      const json = await res.json();
-      if (!res.ok) throw new Error(json?.error || 'Error al proponer trueque');
+      // solo usamos publicaciones existentes en este flujo
+      const payload = { postRequestedId: id, postOfferedId: selectedPostId };
+      await createTrade(payload);
 
       setInfo('Propuesta enviada');
       setShowModal(false);
       setOfferType('');
       setSelectedPostId('');
       setOfferText('');
-      setSelectedPlaceId('');
-      setMeetingArea('');
       navigate(`/chat/${owner?._id}`);
     } catch (e) {
       setError(e.message || 'Error al enviar propuesta');
@@ -221,14 +177,11 @@ export default function PostDetail() {
   const ownerId = ownerProfileIdOf(post, owner);
   const ownerProfilePath = ownerId ? (String(ownerId) === String(myId) ? '/profile' : `/users/${ownerId}`) : '';
 
-  const canSend =
-    (offerType === 'existing' ? !!selectedPostId : !!offerText.trim()) &&
-    !!selectedPlaceId &&
-    !submitting;
+  const canSend = !!selectedPostId && !submitting;
 
   return (
     <main
-  className="min-h-[85vh] bg-[#f6f2ff] px-4 py-6 md:py-10 flex justify-center items-start">
+      className="min-h-[85vh] bg-[#f6f2ff] px-4 py-6 md:py-10 flex justify-center items-start">
 
       <article className="w-full max-w-6xl bg-white rounded-2xl border border-[color:var(--c-mid-blue)]/60 shadow-[0_18px_50px_rgba(0,0,0,.12)] overflow-hidden">
         <div className="grid md:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)]">
@@ -423,10 +376,7 @@ export default function PostDetail() {
                       setOfferType('');
                       setSelectedPostId('');
                       setOfferText('');
-                      setSelectedPlaceId('');
-                      setMeetingArea('');
                       loadMyPosts();
-                      loadMeetingPlacesForPost();
                     }}
                     className="px-5 py-2 rounded-xl font-semibold text-white bg-[color:var(--c-brand)] hover:brightness-110 transition"
                   >
@@ -526,8 +476,6 @@ export default function PostDetail() {
                     setOfferType('');
                     setSelectedPostId('');
                     setOfferText('');
-                    setSelectedPlaceId('');
-                    setMeetingArea('');
                   }}
                   className="text-gray-600 text-sm underline"
                 >
@@ -554,50 +502,6 @@ export default function PostDetail() {
                   </select>
                 )}
 
-                <div className="space-y-2 mt-3">
-                  {meetingPlacesLoading && (
-                    <p className="text-xs text-gray-500">Cargando espacios públicos cercanos...</p>
-                  )}
-                  {!meetingPlacesLoading && (
-                    <>
-                      <p className="text-sm font-medium" style={{ color: 'var(--c-text)' }}>
-                        Elegí un espacio público para encontrarse
-                      </p>
-                      {meetingPlaces.length === 0 ? (
-                        <p className="text-xs text-gray-500">
-                          No encontramos espacios públicos cargados para este barrio.
-                        </p>
-                      ) : (
-                        <select
-                          value={selectedPlaceId}
-                          onChange={e => {
-                            const val = e.target.value;
-                            setSelectedPlaceId(val);
-                            const place = meetingPlaces.find(mp => String(mp.id) === String(val));
-                            if (place) {
-                              const label = place.name + (place.barrio ? ` (${place.barrio})` : '');
-                              setMeetingArea(label);
-                            } else {
-                              setMeetingArea('');
-                            }
-                          }}
-                          className="w-full rounded-xl border border-slate-200 px-3 py-2"
-                        >
-                          <option value="">Seleccionar espacio público</option>
-                          {meetingPlaces.map(mp => (
-                            <option key={mp.id} value={mp.id}>
-                              {mp.name}{mp.barrio ? ` (${mp.barrio})` : ''}
-                            </option>
-                          ))}
-                        </select>
-                      )}
-                      {post?.barrio && (
-                        <p className="text-xs text-gray-500">Barrio de esta publicación: {post.barrio}</p>
-                      )}
-                    </>
-                  )}
-                </div>
-
                 <div className="flex justify-between mt-4">
                   <button onClick={() => setOfferType('')} className="text-gray-600 underline">Volver</button>
                   <button
@@ -612,67 +516,29 @@ export default function PostDetail() {
             )}
 
             {offerType === 'new' && (
-              <div className="space-y-3">
-                <h3 className="font-medium" style={{ color: 'var(--c-text)' }}>Describí tu oferta</h3>
-                <textarea
-                  value={offerText}
-                  onChange={e => setOfferText(e.target.value)}
-                  className="w-full rounded-xl border border-slate-200 px-3 py-2"
-                  placeholder="Ej: Ofrezco una bici usada o clases de guitarra"
-                />
+              <div className="space-y-4">
+                <p className="text-sm" style={{ color: 'var(--c-text)' }}>
+                  Vas a crear una nueva publicación con lo que querés ofrecer y la vamos a usar como base para la propuesta de trueque.
+                </p>
 
-                <div className="space-y-2 mt-2">
-                  {meetingPlacesLoading && (
-                    <p className="text-xs text-gray-500">Cargando espacios públicos cercanos...</p>
-                  )}
-                  {!meetingPlacesLoading && (
-                    <>
-                      <p className="text-sm font-medium" style={{ color: 'var(--c-text)' }}>
-                        Elegí un espacio público para encontrarse
-                      </p>
-                      {meetingPlaces.length === 0 ? (
-                        <p className="text-xs text-gray-500">
-                          No encontramos espacios públicos cargados para este barrio.
-                        </p>
-                      ) : (
-                        <select
-                          value={selectedPlaceId}
-                          onChange={e => {
-                            const val = e.target.value;
-                            setSelectedPlaceId(val);
-                            const place = meetingPlaces.find(mp => String(mp.id) === String(val));
-                            if (place) {
-                              const label = place.name + (place.barrio ? ` (${place.barrio})` : '');
-                              setMeetingArea(label);
-                            } else {
-                              setMeetingArea('');
-                            }
-                          }}
-                          className="w-full rounded-xl border border-slate-200 px-3 py-2"
-                        >
-                          <option value="">Seleccionar espacio público</option>
-                          {meetingPlaces.map(mp => (
-                            <option key={mp.id} value={mp.id}>
-                              {mp.name}{mp.barrio ? ` (${mp.barrio})` : ''}
-                            </option>
-                          ))}
-                        </select>
-                      )}
-                      {post?.barrio && (
-                        <p className="text-xs text-gray-500">Barrio de esta publicación: {post.barrio}</p>
-                      )}
-                    </>
-                  )}
-                </div>
-
-                <div className="flex justify-between mt-4">
-                  <button onClick={() => setOfferType('')} className="text-gray-600 underline">Volver</button>
+                <div className="flex justify-between mt-2">
                   <button
-                    onClick={submitTrade}
-                    disabled={!canSend}
-                    className="px-4 py-2 rounded-xl bg-[color:var(--c-brand)] text-white hover:brightness-110 transition disabled:opacity-60"
+                    onClick={() => setOfferType('')}
+                    className="text-gray-600 underline"
                   >
-                    Enviar
+                    Volver
+                  </button>
+                  <button
+                    onClick={() => {
+                      setShowModal(false);
+                      setOfferType('');
+                      setSelectedPostId('');
+                      setOfferText('');
+                      navigate('/posts/create', { state: { offerForPostId: id } });
+                    }}
+                    className="px-4 py-2 rounded-xl bg-[color:var(--c-brand)] text-white hover:brightness-110 transition"
+                  >
+                    Ir a crear publicación
                   </button>
                 </div>
               </div>

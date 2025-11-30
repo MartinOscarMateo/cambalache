@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { createPost, getBarrios } from '../lib/api.js';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { createPost, getBarrios, createTrade } from '../lib/api.js';
 import { uploadMany } from '../lib/upload.js';
 
 export default function PostCreate() {
@@ -22,8 +22,11 @@ export default function PostCreate() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const navigate = useNavigate();
+  const location = useLocation();
+  const offerForPostId = location.state?.offerForPostId || '';
+  const isTradeOfferMode = !!offerForPostId;
 
-  // límites
+  // limites
   const LIMITS = {
     titleMax: 80,
     titleMin: 5,
@@ -108,8 +111,24 @@ export default function PostCreate() {
         interestsText,
         images
       });
-      const id = post.id || post._id;
-      navigate(`/posts/${id}`);
+      const newPostId = post.id || post._id;
+
+      if (!newPostId) {
+        throw new Error('Publicación creada pero sin id válido');
+      }
+      if (isTradeOfferMode && offerForPostId) {
+        try {
+          await createTrade({
+            postRequestedId: offerForPostId,
+            postOfferedId: newPostId
+          });
+          navigate(`/posts/${offerForPostId}`);
+        } catch (tradeErr) {
+          setError(tradeErr.message || 'La publicación se creó, pero hubo un problema al proponer el trueque.');
+        }
+      } else {
+        navigate(`/posts/${newPostId}`);
+      }
     } catch (err) {
       setError(err.message || 'Error al crear la publicación');
     } finally {
@@ -125,6 +144,16 @@ export default function PostCreate() {
       }}
     >
       <section className="w-full max-w-5xl">
+        {isTradeOfferMode && (
+          <div className="mb-3 rounded-2xl bg-[color:var(--c-info)]/10 border border-[color:var(--c-info)]/50 px-4 py-3 text-sm text-[color:var(--c-text)]">
+            <p className="font-semibold text-[color:var(--c-info)]">
+              Estás creando una publicación para ofrecerla en un trueque.
+            </p>
+            <p className="mt-1 text-xs text-slate-600">
+              Al publicar, vamos a enviar esta publicación como oferta para otra publicación.
+            </p>
+          </div>
+        )}
         <div className="rounded-3xl bg-white/95 backdrop-blur-sm p-6 sm:p-8 shadow-[0_24px_80px_rgba(5,0,76,.55)] border border-[color:var(--c-mid-blue)]/60">
           <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
             <div>
@@ -150,9 +179,9 @@ export default function PostCreate() {
           </div>
 
           <div className="grid gap-6 lg:grid-cols-[minmax(0,2.1fr)_minmax(260px,1fr)] lg:items-start">
-            {/* Columna principal: formulario */}
+            {/* Columna formulario */}
             <form onSubmit={onSubmit} className="space-y-6">
-              {/* Imágenes */}
+              {/* Imagenes xd */}
               <section
                 className="rounded-2xl border border-dashed p-4 sm:p-5 bg-white/95"
                 style={{
@@ -481,7 +510,7 @@ export default function PostCreate() {
               </div>
             </form>
 
-            {/* Columna lateral: resumen / tips */}
+            {/* Columna lateral */}
             <aside className="mt-6 lg:mt-0 lg:pl-4">
               <div className="sticky top-4 space-y-4">
                 <div className="rounded-2xl bg-[color:var(--c-text)] text-white px-4 py-4 sm:px-5 sm:py-5 shadow-[0_18px_50px_rgba(0,0,0,.45)]">

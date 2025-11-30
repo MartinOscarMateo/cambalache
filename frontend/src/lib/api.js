@@ -142,6 +142,21 @@ export async function listTrades({ role = 'inbox', page = 1, limit = 10 } = {}) 
   return Array.isArray(json.items) ? json : { page: 1, limit: json.length || 0, total: json.length || 0, items: json };
 }
 
+export async function createTrade(payload) {
+  const token = localStorage.getItem('token') || '';
+  const res = await fetch(`${API}/api/trades`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    },
+    body: JSON.stringify(payload)
+  });
+  const json = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(json?.error || json?.message || 'Error al crear trueque');
+  return json;
+}
+
 export async function getPostById(id) {
   const token = localStorage.getItem('token') || '';
   const headers = token ? { Authorization: `Bearer ${token}` } : {};
