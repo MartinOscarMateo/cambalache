@@ -63,16 +63,26 @@ export default function Profile() {
 
   if (loading) {
     return (
-      <main className="min-h-screen flex items-center justify-center px-4 py-10" style={{ background: 'var(--c-text)' }}>
-        <p className="text-white">Cargando…</p>
+      <main
+        className="min-h-[85vh] flex items-center justify-center px-4 py-10"
+        style={{ background: 'linear-gradient(180deg, var(--c-text) 0%, #15158f 55%, #05004c 100%)' }}
+      >
+        <div className="rounded-2xl bg-white/95 px-6 py-4 shadow-[0_18px_50px_rgba(0,0,0,.45)] border border-[color:var(--c-mid-blue)]/50">
+          <p style={{ color: 'var(--c-text)' }}>Cargando…</p>
+        </div>
       </main>
     );
   }
 
   if (error) {
     return (
-      <main className="min-h-screen flex items-center justify-center px-4 py-10" style={{ background: 'var(--c-text)' }}>
-        <p className="rounded-lg bg-red-50 border border-red-200 text-red-700 px-4 py-2">{error}</p>
+      <main
+        className="min-h-[85vh] flex items-center justify-center px-4 py-10"
+        style={{ background: 'linear-gradient(180deg, var(--c-text) 0%, #15158f 55%, #05004c 100%)' }}
+      >
+        <div className="rounded-2xl bg-white/95 px-6 py-4 shadow-[0_18px_50px_rgba(0,0,0,.45)] border border-red-200">
+          <p className="rounded-lg bg-red-50 border border-red-200 text-red-700 px-4 py-2">{error}</p>
+        </div>
       </main>
     );
   }
@@ -104,217 +114,226 @@ export default function Profile() {
       : '';
 
   return (
-    <main className="min-h-screen" style={{ background: 'var(--c-text)' }}>
-      <div className="mx-auto max-w-5xl px-4 py-10">
-        <div className="grid gap-6 md:grid-cols-[220px_minmax(0,1fr)]">
-          {viewingOwn && (
-            <aside>
-              <div className="rounded-2xl bg-white border border-[color:var(--c-mid-blue)]/60 shadow-[0_20px_60px_rgba(0,0,0,.2)] p-4">
-                <h2
-                  className="text-xl font-bold mb-3 px-3"
-                  style={{ color: 'var(--c-brand)', fontFamily: 'vag-rundschrift-d, sans-serif' }}
-                >
-                  Acciones
-                </h2>
-                <nav className="flex flex-col gap-2">
-                  <button
-                    onClick={() => navigate('/profile/edit')}
-                    className="w-full text-left rounded-lg px-3 py-2 transition hover:bg-[color:var(--c-mid-pink)]/35"
-                    style={{ color: 'var(--c-text)' }}
-                  >
-                    Editar perfil
-                  </button>
-                  <button
-                    onClick={() => navigate('/posts/manage')}
-                    className="w-full text-left rounded-lg px-3 py-2 transition hover:bg-[color:var(--c-accent)]/35"
-                    style={{ color: 'var(--c-text)' }}
-                  >
-                    Gestionar publicaciones
-                  </button>
-                  <button
-                    onClick={() => navigate('/trades')}
-                    className="w-full text-left rounded-lg px-3 py-2 transition hover:bg-[color:var(--c-mid-cyan)]/35"
-                    style={{ color: 'var(--c-text)' }}
-                  >
-                    Gestionar trueques
-                  </button>
-                </nav>
-              </div>
-            </aside>
-          )}
-
-          <section className={!viewingOwn ? 'md:col-span-2' : ''}>
-            <div className="rounded-2xl bg-white border border-[color:var(--c-mid-blue)]/60 shadow-[0_20px_60px_rgba(0,0,0,.2)] p-6 md:p-8">
-              <header className="flex flex-col sm:flex-row sm:items-center gap-6">
-                <div className="relative">
-                  <div className="w-28 h-28 rounded-full overflow-hidden ring-4 ring-[color:var(--c-brand)]">
-                    {safeAvatar ? (
-                      <img src={safeAvatar} alt="avatar" className="w-full h-full object-cover" />
-                    ) : (
-                      <div
-                        className="w-full h-full grid place-items-center"
-                        style={{
-                          background:
-                            'radial-gradient(60% 60% at 30% 30%, var(--c-accent), transparent 70%), radial-gradient(60% 60% at 70% 70%, var(--c-info), transparent 70%), #f6f6ff'
-                        }}
-                      >
-                        <span className="text-2xl font-bold" style={{ color: 'var(--c-text)' }}>{initials()}</span>
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                <div className="flex-1">
-                  <h1 className="text-3xl font-bold leading-tight" style={{ color: 'var(--c-text)' }}>
-                    {user.name || user.email}
-                  </h1>
-                  <p className="mt-1 text-sm" style={{ color: 'var(--c-text)' }}>{user.email}</p>
-
-                  <div className="mt-4 grid grid-cols-3 gap-3 max-w-md">
-                    <button
-                      onClick={() => navigate(`/users/${params.id || myId}/followers`)}
-                      className="rounded-xl border border-[color:var(--c-mid-blue)]/60 px-3 py-2 text-center hover:bg-[color:var(--c-mid-blue)]/20"
-                    >
-                      <span className="block text-lg font-semibold text-[color:var(--c-brand)]">
-                        {user.followersCount ?? 0}
-                      </span>
-                      <span className="text-xs" style={{ color: 'var(--c-text)' }}>Seguidores</span>
-                    </button>
-
-                    <button
-                      onClick={() => navigate(`/users/${params.id || myId}/following`)}
-                      className="rounded-xl border border-[color:var(--c-mid-blue)]/60 px-3 py-2 text-center hover:bg-[color:var(--c-mid-blue)]/20"
-                    >
-                      <span className="block text-lg font-semibold text-[color:var(--c-brand)]">
-                        {user.followingCount ?? 0}
-                      </span>
-                      <span className="text-xs" style={{ color: 'var(--c-text)' }}>Seguidos</span>
-                    </button>
-
-                    <div className="rounded-xl border border-[color:var(--c-mid-blue)]/60 px-3 py-2 text-center">
-                      <span className="block text-lg font-semibold text-[color:var(--c-brand)]">
-                        {user.tradesCount ?? 0}
-                      </span>
-                      <span className="text-xs" style={{ color: 'var(--c-text)' }}>Trueques</span>
-                    </div>
-                  </div>
-                </div>
-              </header>
-
-              <div className="mt-8 grid gap-6">
-                <section className="rounded-xl bg-[color:var(--c-mid-pink)]/25 border border-[color:var(--c-mid-pink)]/60 p-4">
-                  <h3
-                    className="text-lg font-semibold mb-1"
+    <main
+      className="min-h-[85vh] px-4 py-8"
+      style={{ background: 'linear-gradient(180deg, var(--c-text) 0%, #15158f 55%, #05004c 100%)' }}
+    >
+      <section className="max-w-5xl mx-auto">
+        <div className="rounded-3xl bg-white/95 backdrop-blur-sm p-6 sm:p-8 shadow-[0_24px_80px_rgba(0,0,0,.55)] border border-[color:var(--c-mid-blue)]/60">
+          <div className="grid gap-6 md:grid-cols-[220px_minmax(0,1fr)]">
+            {viewingOwn && (
+              <aside>
+                <div className="rounded-2xl bg-white/95 border border-[color:var(--c-mid-blue)]/50 shadow-[0_18px_45px_rgba(0,0,0,.18)] p-4">
+                  <h2
+                    className="text-xl font-bold mb-3 px-3"
                     style={{ color: 'var(--c-brand)', fontFamily: 'vag-rundschrift-d, sans-serif' }}
                   >
-                    Acerca de
-                  </h3>
-                  <p className="text-sm" style={{ color: 'var(--c-text)' }}>
-                    {user.bio || 'Sin descripción aún.'}
-                  </p>
-                </section>
+                    Acciones
+                  </h2>
+                  <nav className="flex flex-col gap-2">
+                    <button
+                      onClick={() => navigate('/profile/edit')}
+                      className="w-full text-left rounded-lg px-3 py-2 transition hover:bg-[color:var(--c-mid-pink)]/35"
+                      style={{ color: 'var(--c-text)' }}
+                    >
+                      Editar perfil
+                    </button>
+                    <button
+                      onClick={() => navigate('/posts/manage')}
+                      className="w-full text-left rounded-lg px-3 py-2 transition hover:bg-[color:var(--c-accent)]/35"
+                      style={{ color: 'var(--c-text)' }}
+                    >
+                      Gestionar publicaciones
+                    </button>
+                    <button
+                      onClick={() => navigate('/trades')}
+                      className="w-full text-left rounded-lg px-3 py-2 transition hover:bg-[color:var(--c-mid-cyan)]/35"
+                      style={{ color: 'var(--c-text)' }}
+                    >
+                      Gestionar trueques
+                    </button>
+                  </nav>
+                </div>
+              </aside>
+            )}
 
-                <section className="rounded-xl bg-[color:var(--c-info)]/20 border border-[color:var(--c-info)]/50 p-4">
-                  <h3
-                    className="text-lg font-semibold mb-1"
-                    style={{ color: 'var(--c-brand)', fontFamily: 'vag-rundschrift-d, sans-serif' }}
-                  >
-                    Actividad
-                  </h3>
-                  <ul className="text-sm space-y-1" style={{ color: 'var(--c-text)' }}>
-                    <li>
-                      <p>Publicaciones: {postsCount}</p>
-                    </li>
-                    <li className="mt-2">
-                      <p className='me-2'>Valoraciones: {user.ratingCount}</p>
-                    </li>
-                    <li className="flex items-center gap-1">
-                      <p className='me-2'>Calificación: {user.ratingAverage}</p>
-                      {[1, 2, 3, 4, 5].map((star) => (
-                        <span
-                          key={star}
+            <section className={!viewingOwn ? 'md:col-span-2' : ''}>
+              <div className="rounded-2xl bg-white/95 border border-[color:var(--c-mid-blue)]/50 shadow-[0_18px_60px_rgba(0,0,0,.25)] p-6 md:p-8">
+                <header className="flex flex-col sm:flex-row sm:items-center gap-6">
+                  <div className="relative">
+                    <div className="w-28 h-28 rounded-full overflow-hidden ring-4 ring-[color:var(--c-brand)] bg-white">
+                      {safeAvatar ? (
+                        <img src={safeAvatar} alt="avatar" className="w-full h-full object-cover" />
+                      ) : (
+                        <div
+                          className="w-full h-full grid place-items-center"
                           style={{
-                            fontSize: "20px",
-                            color: star <= Math.round(user.ratingAverage || 0) ? "#ffc107" : "#ccc"
+                            background:
+                              'radial-gradient(60% 60% at 30% 30%, var(--c-accent), transparent 70%), radial-gradient(60% 60% at 70% 70%, var(--c-info), transparent 70%), #f6f6ff'
                           }}
                         >
-                          ★
-                        </span>
-                      ))}
-                    </li>
-                  </ul>
-                </section>
+                          <span className="text-2xl font-bold" style={{ color: 'var(--c-text)' }}>{initials()}</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
 
-                {/* Publicaciones del usuario */} 
-                <section className="rounded-xl border border-[color:var(--c-mid-blue)]/60 p-4">
-                  <div className="flex items-center justify-between mb-3">
+                  <div className="flex-1">
+                    <h1 className="text-3xl font-bold leading-tight" style={{ color: 'var(--c-text)' }}>
+                      {user.name || user.email}
+                    </h1>
+                    <p className="mt-1 text-sm" style={{ color: 'var(--c-text)' }}>{user.email}</p>
+
+                    <div className="mt-4 grid grid-cols-3 gap-3 max-w-md">
+                      <button
+                        onClick={() => navigate(`/users/${params.id || myId}/followers`)}
+                        className="rounded-xl border border-[color:var(--c-mid-blue)]/60 px-3 py-2 text-center hover:bg-[color:var(--c-mid-blue)]/10 transition"
+                      >
+                        <span className="block text-lg font-semibold text-[color:var(--c-brand)]">
+                          {user.followersCount ?? 0}
+                        </span>
+                        <span className="text-xs" style={{ color: 'var(--c-text)' }}>Seguidores</span>
+                      </button>
+
+                      <button
+                        onClick={() => navigate(`/users/${params.id || myId}/following`)}
+                        className="rounded-xl border border-[color:var(--c-mid-blue)]/60 px-3 py-2 text-center hover:bg-[color:var(--c-mid-blue)]/10 transition"
+                      >
+                        <span className="block text-lg font-semibold text-[color:var(--c-brand)]">
+                          {user.followingCount ?? 0}
+                        </span>
+                        <span className="text-xs" style={{ color: 'var(--c-text)' }}>Seguidos</span>
+                      </button>
+
+                      <div className="rounded-xl border border-[color:var(--c-mid-blue)]/60 px-3 py-2 text-center bg-white/80">
+                        <span className="block text-lg font-semibold text-[color:var(--c-brand)]">
+                          {user.tradesCount ?? 0}
+                        </span>
+                        <span className="text-xs" style={{ color: 'var(--c-text)' }}>Trueques</span>
+                      </div>
+                    </div>
+                  </div>
+                </header>
+
+                <div className="mt-8 grid gap-6">
+                  <section className="rounded-xl bg-[color:var(--c-mid-pink)]/25 border border-[color:var(--c-mid-pink)]/60 p-4">
                     <h3
-                      className="text-lg font-semibold"
+                      className="text-lg font-semibold mb-1"
                       style={{ color: 'var(--c-brand)', fontFamily: 'vag-rundschrift-d, sans-serif' }}
                     >
-                      Publicaciones
+                      Acerca de
                     </h3>
-                    {viewingOwn && (
-                      <button
-                        onClick={() => navigate('/posts/create')}
-                        className="text-sm rounded-lg px-3 py-1.5 bg-[color:var(--c-brand)]/90 text-white hover:opacity-90"
-                      >
-                        Nueva publicación
-                      </button>
-                    )}
-                  </div>
-
-                  {postsLoading && <p className="text-sm" style={{ color: 'var(--c-text)' }}>Cargando publicaciones…</p>}
-                  {postsError && <p className="text-sm text-red-700">{postsError}</p>}
-
-                  {!postsLoading && !postsError && posts.length === 0 && (
                     <p className="text-sm" style={{ color: 'var(--c-text)' }}>
-                      {viewingOwn ? 'Aún no creaste publicaciones.' : 'Este usuario aún no tiene publicaciones.'}
+                      {user.bio || 'Sin descripción aún.'}
                     </p>
-                  )}
+                  </section>
 
-                  <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                    {posts.map((p) => (
-                      <Link
-                        key={String(p._id || p.id)}
-                        to={`/posts/${String(p._id || p.id)}`}
-                        className="group rounded-xl overflow-hidden border border-[color:var(--c-mid-blue)]/60 hover:shadow-lg transition"
+                  <section className="rounded-xl bg-[color:var(--c-info)]/20 border border-[color:var(--c-info)]/50 p-4">
+                    <h3
+                      className="text-lg font-semibold mb-1"
+                      style={{ color: 'var(--c-brand)', fontFamily: 'vag-rundschrift-d, sans-serif' }}
+                    >
+                      Actividad
+                    </h3>
+                    <ul className="text-sm space-y-1" style={{ color: 'var(--c-text)' }}>
+                      <li>
+                        <p>Publicaciones: {postsCount}</p>
+                      </li>
+                      <li className="mt-2">
+                        <p className="me-2">Valoraciones: {user.ratingCount}</p>
+                      </li>
+                      <li className="flex items-center gap-1">
+                        <p className="me-2">Calificación: {user.ratingAverage}</p>
+                        {[1, 2, 3, 4, 5].map((star) => (
+                          <span
+                            key={star}
+                            style={{
+                              fontSize: '20px',
+                              color: star <= Math.round(user.ratingAverage || 0) ? '#ffc107' : '#ccc'
+                            }}
+                          >
+                            ★
+                          </span>
+                        ))}
+                      </li>
+                    </ul>
+                  </section>
+
+                  {/* Publicaciones del usuario */}
+                  <section className="rounded-xl border border-[color:var(--c-mid-blue)]/60 bg-white/90 p-4">
+                    <div className="flex items-center justify-between mb-3">
+                      <h3
+                        className="text-lg font-semibold"
+                        style={{ color: 'var(--c-brand)', fontFamily: 'vag-rundschrift-d, sans-serif' }}
                       >
-                        <div className="aspect-[4/3] bg-[color:var(--c-mid-blue)]/25">
-                          {p.images?.[0] ? (
-                            <img
-                              src={p.images[0]}
-                              alt={p.title || 'Publicación'}
-                              className="w-full h-full object-cover group-hover:scale-[1.02] transition"
-                            />
-                          ) : null}
-                        </div>
-                        <div className="p-3">
-                          <h4 className="text-sm font-semibold" style={{ color: 'var(--c-text)' }}>
-                            {p.title || 'Sin título'}
-                          </h4>
-                          <div className="mt-1 text-xs flex items-center gap-2">
-                            {p.status && (
-                              <span className="px-2 py-0.5 rounded-full bg-[color:var(--c-mid-cyan)]/40 border border-[color:var(--c-mid-cyan)]/60">
-                                {String(p.status)}
-                              </span>
-                            )}
-                            {Array.isArray(p.categories) && p.categories[0] && (
-                              <span className="px-2 py-0.5 rounded-full bg-[color:var(--c-mid-pink)]/40 border border-[color:var(--c-mid-pink)]/60">
-                                {p.categories[0]}
-                              </span>
+                        Publicaciones
+                      </h3>
+                      {viewingOwn && (
+                        <button
+                          onClick={() => navigate('/posts/create')}
+                          className="text-sm rounded-lg px-3 py-1.5 bg-[color:var(--c-brand)]/90 text-white hover:opacity-90"
+                        >
+                          Nueva publicación
+                        </button>
+                      )}
+                    </div>
+
+                    {postsLoading && <p className="text-sm" style={{ color: 'var(--c-text)' }}>Cargando publicaciones…</p>}
+                    {postsError && <p className="text-sm text-red-700">{postsError}</p>}
+
+                    {!postsLoading && !postsError && posts.length === 0 && (
+                      <p className="text-sm" style={{ color: 'var(--c-text)' }}>
+                        {viewingOwn ? 'Aún no creaste publicaciones.' : 'Este usuario aún no tiene publicaciones.'}
+                      </p>
+                    )}
+
+                    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                      {posts.map((p) => (
+                        <Link
+                          key={String(p._id || p.id)}
+                          to={`/posts/${String(p._id || p.id)}`}
+                          className="group rounded-2xl overflow-hidden border border-[color:var(--c-mid-blue)]/40 bg-white shadow-[0_14px_35px_rgba(0,0,0,.14)] hover:shadow-[0_18px_45px_rgba(0,0,0,.2)] transition"
+                        >
+                          <div className="aspect-[4/3] bg-[color:var(--c-mid-blue)]/10">
+                            {p.images?.[0] ? (
+                              <img
+                                src={p.images[0]}
+                                alt={p.title || 'Publicación'}
+                                className="w-full h-full object-cover group-hover:scale-[1.02] transition"
+                              />
+                            ) : (
+                              <div className="w-full h-full grid place-items-center">
+                                <span className="text-xs" style={{ color: 'var(--c-text)' }}>Sin imagen</span>
+                              </div>
                             )}
                           </div>
-                        </div>
-                      </Link>
-                    ))}
-                  </div>
-                </section>
+                          <div className="p-3">
+                            <h4 className="text-sm font-semibold line-clamp-2" style={{ color: 'var(--c-text)' }}>
+                              {p.title || 'Sin título'}
+                            </h4>
+                            <div className="mt-2 text-[11px] flex flex-wrap items-center gap-2">
+                              {p.status && (
+                                <span className="px-3 py-1 rounded-full bg-[color:var(--c-mid-cyan)]/30 border border-[color:var(--c-mid-cyan)]/60 text-[color:var(--c-text)]">
+                                  {String(p.status)}
+                                </span>
+                              )}
+                              {Array.isArray(p.categories) && p.categories[0] && (
+                                <span className="px-3 py-1 rounded-full bg-[color:var(--c-mid-pink)]/30 border border-[color:var(--c-mid-pink)]/60 text-[color:var(--c-text)]">
+                                  {p.categories[0]}
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        </Link>
+                      ))}
+                    </div>
+                  </section>
+                </div>
               </div>
-            </div>
-          </section>
+            </section>
+          </div>
         </div>
-      </div>
+      </section>
     </main>
   );
 }
