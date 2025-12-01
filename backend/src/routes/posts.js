@@ -14,9 +14,14 @@ router.get('/', async (req, res) => {
     if (q) filter.$text = { $search: q }
     if (category) filter.category = String(category).trim()
     if (ownerId && mongoose.isValidObjectId(ownerId)) filter.ownerId = ownerId
-    if (status) filter.status = status
-    if (!status) filter.status = 'active'
     if (barrio) filter.barrio = String(barrio).trim()
+
+    // manejo de status
+    if (status && status !== 'all') {
+      filter.status = status
+    } else if (!status && !ownerId) {
+      filter.status = 'active'
+    }
 
     const pageNum = Math.max(parseInt(page, 10) || 1, 1)
     const limitNum = Math.min(Math.max(parseInt(limit, 10) || 12, 1), 100)
@@ -29,7 +34,7 @@ router.get('/', async (req, res) => {
 
     const [items, total] = await Promise.all([
       Post.find(filter, projection)
-        .populate('ownerId', 'name avatar') // trae datos del propietario
+        .populate('ownerId', 'name avatar')
         .sort(sortSpec)
         .skip(skip)
         .limit(limitNum)
@@ -133,6 +138,11 @@ router.patch('/:id', auth, async (req, res) => {
     const post = await Post.findById(id)
     if (!post) return res.status(404).json({ error: 'NOT_FOUND' })
     if (String(post.ownerId) !== req.user.id) return res.status(403).json({ error: 'FORBIDDEN' })
+
+    // no permitir cambios si la publicacion ya fue intercambiada
+    if (post.status === 'traded') {
+      return res.status(409).json({ error: 'ALREADY_TRADED' })
+    }
 
     const next = {}
     if (req.body.title !== undefined) next.title = String(req.body.title).trim()

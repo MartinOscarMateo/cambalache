@@ -25,6 +25,8 @@ async function mustValidPost(id) {
   const post = await Post.findById(id).lean();
   assert(post, 'POST_NOT_FOUND', 'Publicación no encontrada');
   assert(!post.isDeleted && !post.deletedAt, 'POST_DELETED', 'Publicación eliminada');
+  assert(post.status === 'active', 'POST_NOT_ACTIVE', 'La publicación ya no está activa para trueques');
+  assert(post.openToOffers !== false, 'POST_CLOSED', 'La publicación ya no acepta nuevas ofertas');
   return post;
 }
 
@@ -196,16 +198,22 @@ export async function changeStatus(req, res) {
     const userId = req.user.id;
     const { action } = req.body;
     assert(['accept', 'reject', 'cancel', 'finish'].includes(action), 'BAD_ACTION', 'Acción inválida');
+
     const trade = await Trade.findById(req.params.id);
     assert(trade, 'NOT_FOUND', 'Trueque no encontrado');
+
     assert([viewId(trade.proposerId), viewId(trade.receiverId)].includes(userId), 'FORBIDDEN', 'No autorizado');
+
     assert(canTransition(trade.status, action), 'BAD_STATE', 'Estado no permite la acción');
+
     if (!Array.isArray(trade.finishedBy)) {
       trade.finishedBy = [];
     }
+
     const from = trade.status;
     let to;
     let message;
+
     if (action === 'cancel') {
       if (trade.status === "pending") {
         assert(
@@ -218,17 +226,32 @@ export async function changeStatus(req, res) {
       trade.finishedBy = [];
     } else if (action === "finish") {
       assert(trade.status === "accepted", 'BAD_STATE', 'Solo se finalizan trueques aceptados');
+
       const me = viewId(userId);
       const participants = [viewId(trade.proposerId), viewId(trade.receiverId)];
+
       const alreadyMarked = trade.finishedBy.some(id => viewId(id) === me);
       if (!alreadyMarked) {
         trade.finishedBy.push(userId);
       }
+
       const finishedSet = new Set(trade.finishedBy.map(id => viewId(id)));
       const bothFinished = participants.every(id => finishedSet.has(id));
+
       if (bothFinished) {
         to = "finished";
         message = "El trueque finalizó exitosamente.";
+
+        const postIds = [];
+        if (trade.postRequestedId) postIds.push(trade.postRequestedId);
+        if (trade.postOfferedId) postIds.push(trade.postOfferedId);
+
+        if (postIds.length) {
+          await Post.updateMany(
+            { _id: { $in: postIds } },
+            { $set: { status: "traded", openToOffers: false } }
+          );
+        }
       } else {
         to = from;
         message = "La otra persona marcó el trueque como realizado. Confirmalo cuando también hayas hecho el intercambio.";
@@ -240,22 +263,27 @@ export async function changeStatus(req, res) {
         trade.finishedBy = [];
       }
     }
+
     const actionNames = {
       accept: "accepted",
       reject: "rejected",
       cancel: "cancelled",
       finish: "finished"
     };
+
     const statusMessages = {
       accepted: "El receptor aceptó tu propuesta de trueque.",
       rejected: "Tu propuesta de trueque fue rechazada.",
       cancelled: "El trueque fue cancelado.",
       finished: "El trueque finalizó exitosamente."
     };
+
     trade.status = to;
+
     const historyNote = action === "finish" && to === from
       ? "El usuario marcó el trueque como realizado. Falta que la otra parte también lo marque."
       : undefined;
+
     trade.history.push({
       by: userId,
       action: actionNames[action],
@@ -263,10 +291,13 @@ export async function changeStatus(req, res) {
       to,
       ...(historyNote ? { note: historyNote } : {})
     });
+
     if (!message) {
       message = statusMessages[to] || `El trueque cambió su estado a: ${to}.`;
     }
+
     const notifyUser = String(trade.proposerId) === String(userId) ? trade.receiverId : trade.proposerId;
+
     await Notification.create({
       user: notifyUser,
       type: "TRADE_UPDATE",
@@ -274,14 +305,17 @@ export async function changeStatus(req, res) {
       message,
       link: `/chat/${userId}`
     });
+
     const chat = await ensureChatForTrade(trade);
     await postSystemMessage(chat._id, userId, message);
+
     await trade.save();
     res.json(trade.toJSON());
   } catch (err) {
     res.status(400).json({ code: err.code || 'TRADE_STATUS_ERROR', error: err.message });
   }
 }
+
 
 export async function counterOffer(req, res) {
   try {

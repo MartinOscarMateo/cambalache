@@ -216,17 +216,25 @@ export async function getPosts({ q = '', category = '', ownerId = '', status = '
 }
 
 // obtiene publis de usuario probando varios endpoints
-export async function fetchUserPosts(userId, { page = 1, limit = 12 } = {}) {
+export async function fetchUserPosts(userId, { page = 1, limit = 12, status = '' } = {}) {
   const token = localStorage.getItem('token') || '';
   const headers = token ? { Authorization: `Bearer ${token}` } : {};
   const uid = toUid(userId);
   if (!uid) throw new Error('userId invalido');
 
-  // endpoints
+  // armamos qs base
+  let qsOwner = `ownerId=${encodeURIComponent(uid)}&page=${encodeURIComponent(page)}&limit=${encodeURIComponent(limit)}`;
+  let qsUser = `userId=${encodeURIComponent(uid)}&page=${encodeURIComponent(page)}&limit=${encodeURIComponent(limit)}`;
+  if (status) {
+    const encStatus = encodeURIComponent(status);
+    qsOwner += `&status=${encStatus}`;
+    qsUser += `&status=${encStatus}`;
+  }
+
   const urls = [
-    `${API}/api/posts?ownerId=${encodeURIComponent(uid)}&page=${page}&limit=${limit}`,
+    `${API}/api/posts?${qsOwner}`,
     // fallback por si se usa userId en vez de ownerId
-    `${API}/api/posts?userId=${encodeURIComponent(uid)}&page=${page}&limit=${limit}`
+    `${API}/api/posts?${qsUser}`
   ];
 
   for (const url of urls) {
@@ -245,9 +253,9 @@ export async function fetchUserPosts(userId, { page = 1, limit = 12 } = {}) {
   throw new Error('Error listando publicaciones del usuario');
 }
 
-export async function getPostsByUser(userId, { page = 1, limit = 12 } = {}) {
+export async function getPostsByUser(userId, { page = 1, limit = 12, status = '' } = {}) {
   // delega en la funcion central con fallback
-  return fetchUserPosts(userId, { page, limit });
+  return fetchUserPosts(userId, { page, limit, status });
 }
 
 export async function updatePost(id, data) {
