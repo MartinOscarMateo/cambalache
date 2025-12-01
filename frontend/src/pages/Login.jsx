@@ -40,7 +40,7 @@ export default function Login() {
           <header className="text-center">
             <h2
               className="text-3xl font-bold tracking-tight"
-              style={{ color: 'var(--c-brand)', fontFamily: 'vag-rundschrift-d, sans-serif' }}
+              style={{ color: 'var(--c-brand)' }}
             >
               Iniciar sesión
             </h2>

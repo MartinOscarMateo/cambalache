@@ -466,7 +466,7 @@ export default function Chat() {
               </p>
               <h1
                 className="mt-1 text-2xl sm:text-3xl font-bold"
-                style={{ color: 'var(--c-brand)', fontFamily: 'vag-rundschrift-d, sans-serif' }}
+                style={{ color: 'var(--c-brand)' }}
               >
                 Chat
               </h1>
@@ -953,10 +953,11 @@ export default function Chat() {
             <div className="w-[92%] max-w-sm rounded-2xl bg-white p-6 border border-[color:var(--c-mid-blue)]/60 shadow-[0_20px_60px_rgba(0,0,0,.25)]">
               <h2
                 className="text-lg font-bold text-center"
-                style={{ color: 'var(--c-brand)', fontFamily: 'vag-rundschrift-d, sans-serif' }}
+                style={{ color: 'var(--c-brand)' }}
               >
                 Marcar trueque como realizado
               </h2>
+
               <p className="text-sm mt-3 text-center" style={{ color: 'var(--c-text)' }}>
                 Seguro que queres marcar este trueque como realizado?
               </p>

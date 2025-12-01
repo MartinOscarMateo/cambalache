@@ -134,7 +134,7 @@ export default function ProfileEdit() {
         <header className="mb-6">
           <h1
             className="text-2xl sm:text-3xl font-bold tracking-tight"
-            style={{ color: 'var(--c-brand)', fontFamily: 'vag-rundschrift-d, sans-serif' }}
+            style={{ color: 'var(--c-brand)' }}
           >
             Editar perfil
           </h1>

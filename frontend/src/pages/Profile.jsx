@@ -126,7 +126,7 @@ export default function Profile() {
                 <div className="rounded-2xl bg-white/95 border border-[color:var(--c-mid-blue)]/50 shadow-[0_18px_45px_rgba(0,0,0,.18)] p-4">
                   <h2
                     className="text-xl font-bold mb-3 px-3"
-                    style={{ color: 'var(--c-brand)', fontFamily: 'vag-rundschrift-d, sans-serif' }}
+                    style={{ color: 'var(--c-brand)' }}
                   >
                     Acciones
                   </h2>
@@ -219,7 +219,7 @@ export default function Profile() {
                   <section className="rounded-xl bg-[color:var(--c-mid-pink)]/25 border border-[color:var(--c-mid-pink)]/60 p-4">
                     <h3
                       className="text-lg font-semibold mb-1"
-                      style={{ color: 'var(--c-brand)', fontFamily: 'vag-rundschrift-d, sans-serif' }}
+                      style={{ color: 'var(--c-brand)' }}
                     >
                       Acerca de
                     </h3>
@@ -231,7 +231,7 @@ export default function Profile() {
                   <section className="rounded-xl bg-[color:var(--c-info)]/20 border border-[color:var(--c-info)]/50 p-4">
                     <h3
                       className="text-lg font-semibold mb-1"
-                      style={{ color: 'var(--c-brand)', fontFamily: 'vag-rundschrift-d, sans-serif' }}
+                      style={{ color: 'var(--c-brand)' }}
                     >
                       Actividad
                     </h3>
@@ -264,7 +264,7 @@ export default function Profile() {
                     <div className="flex items-center justify-between mb-3">
                       <h3
                         className="text-lg font-semibold"
-                        style={{ color: 'var(--c-brand)', fontFamily: 'vag-rundschrift-d, sans-serif' }}
+                        style={{ color: 'var(--c-brand)' }}
                       >
                         Publicaciones
                       </h3>

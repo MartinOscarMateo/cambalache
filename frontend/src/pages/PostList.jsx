@@ -164,7 +164,7 @@ export default function PostList() {
               </p>
               <h1
                 className="mt-1 text-2xl sm:text-3xl font-bold"
-                style={{ color: 'var(--c-brand)', fontFamily: 'vag-rundschrift-d, sans-serif' }}
+                style={{ color: 'var(--c-brand)' }}
               >
                 Publicaciones
               </h1>

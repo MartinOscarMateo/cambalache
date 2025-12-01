@@ -145,7 +145,7 @@ export default function PostEdit() {
           <header className='mb-4'>
             <h1
               className='text-2xl font-bold tracking-tight'
-              style={{ color: 'var(--c-brand)', fontFamily: 'vag-rundschrift-d, sans-serif' }}
+              style={{ color: 'var(--c-brand)' }}
             >
               Editar publicación
             </h1>
@@ -283,10 +283,11 @@ export default function PostEdit() {
             <section className='grid gap-3 rounded-xl bg-[color:var(--c-mid-blue)]/10 border border-[color:var(--c-mid-blue)]/40 p-4'>
               <h2
                 className='text-base font-semibold'
-                style={{ color: 'var(--c-brand)', fontFamily: 'vag-rundschrift-d, sans-serif' }}
+                style={{ color: 'var(--c-brand)' }}
               >
                 Detalles del artículo
               </h2>
+
 
               <div>
                 <span className='text-sm font-medium' style={{ color: 'var(--c-text)' }}>¿Tiene detalles?</span>
@@ -343,11 +344,10 @@ export default function PostEdit() {
             <section className='grid gap-3 rounded-xl bg-[color:var(--c-mid-cyan)]/10 border border-[color:var(--c-mid-cyan)]/40 p-4'>
               <h2
                 className='text-base font-semibold'
-                style={{ color: 'var(--c-brand)', fontFamily: 'vag-rundschrift-d, sans-serif' }}
+                style={{ color: 'var(--c-brand)' }}
               >
                 Preferencias de intercambio
               </h2>
-
               <div>
                 <span className='text-sm font-medium' style={{ color: 'var(--c-text)' }}>¿Abierto a ofertas?</span>
                 <div className='mt-1 flex gap-4 text-sm' style={{ color: 'var(--c-text)' }}>

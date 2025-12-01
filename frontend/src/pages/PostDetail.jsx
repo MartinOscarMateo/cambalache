@@ -407,7 +407,7 @@ export default function PostDetail() {
           <div className="border-t border-[color:var(--c-mid-blue)]/30 bg-[color:var(--c-mid-blue)]/5 px-5 py-4 md:px-6 md:py-5">
             <h2
               className="text-lg font-semibold mb-3"
-              style={{ color: 'var(--c-brand)', fontFamily: 'vag-rundschrift-d, sans-serif' }}
+              style={{ color: 'var(--c-brand)' }}
             >
               Más publicaciones de este usuario
             </h2>
@@ -450,11 +450,10 @@ export default function PostDetail() {
           <div className="bg-white rounded-2xl shadow-lg w-[92%] max-w-md p-6 space-y-4 border border-[color:var(--c-mid-blue)]/50">
             <h2
               className="text-xl font-bold text-center"
-              style={{ color: 'var(--c-brand)', fontFamily: 'vag-rundschrift-d, sans-serif' }}
+              style={{ color: 'var(--c-brand)' }}
             >
               Proponer trueque
             </h2>
-
             {!offerType && (
               <div className="space-y-3 text-center">
                 <button

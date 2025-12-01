@@ -162,10 +162,11 @@ export default function PostCreate() {
               </p>
               <h1
                 className="mt-1 text-2xl sm:text-3xl font-bold tracking-tight"
-                style={{ color: 'var(--c-brand)', fontFamily: 'vag-rundschrift-d, sans-serif' }}
+                style={{ color: 'var(--c-brand)' }}
               >
                 Crear publicación
               </h1>
+
             </div>
             <div className="flex flex-col items-end text-xs sm:text-sm text-[color:var(--c-text)]">
               <span className="inline-flex items-center gap-2 rounded-full bg-white/70 border border-[color:var(--c-info)]/60 px-3 py-1">
@@ -374,7 +375,7 @@ export default function PostCreate() {
                 <div className="flex items-center justify-between gap-3">
                   <h2
                     className="text-base font-semibold"
-                    style={{ color: 'var(--c-brand)', fontFamily: 'vag-rundschrift-d, sans-serif' }}
+                    style={{ color: 'var(--c-brand)' }}
                   >
                     Detalles del artículo
                   </h2>
@@ -447,7 +448,7 @@ export default function PostCreate() {
                 <div className="flex items-center justify-between gap-3">
                   <h2
                     className="text-base font-semibold"
-                    style={{ color: 'var(--c-brand)', fontFamily: 'vag-rundschrift-d, sans-serif' }}
+                    style={{ color: 'var(--c-brand)' }}
                   >
                     Preferencias de intercambio
                   </h2>

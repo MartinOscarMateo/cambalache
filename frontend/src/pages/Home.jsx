@@ -38,7 +38,7 @@ export default function Home() {
                 <h2
                   id="que-podes-hacer"
                   className="mt-1 text-2xl sm:text-3xl font-bold"
-                  style={{ color: 'var(--c-brand)', fontFamily: 'vag-rundschrift-d, sans-serif' }}
+                  style={{ color: 'var(--c-brand)' }}
                 >
                   Qué podés hacer en Cambalache
                 </h2>
@@ -111,7 +111,7 @@ export default function Home() {
               <h2
                 id="como-funciona"
                 className="text-2xl sm:text-3xl font-bold mb-4"
-                style={{ color: 'var(--c-brand)', fontFamily: 'vag-rundschrift-d, sans-serif' }}
+                style={{ color: 'var(--c-brand)' }}
               >
                 ¿Cómo funciona?
               </h2>
@@ -151,10 +151,11 @@ export default function Home() {
                 </p>
                 <h2
                   className="mt-1 text-2xl sm:text-3xl font-bold"
-                  style={{ color: 'var(--c-brand)', fontFamily: 'vag-rundschrift-d, sans-serif' }}
+                  style={{ color: 'var(--c-brand)' }}
                 >
                   Accesos rápidos
                 </h2>
+
               </div>
 
               <div className="home-guest__cta-grid grid gap-4 sm:grid-cols-3">

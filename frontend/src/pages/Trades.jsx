@@ -78,13 +78,16 @@ export default function Trades() {
   if (error) return <main className="container"><p style={{color:'crimson'}}>{error}</p></main>;
 
   return (
-    <main className="min-h-[85vh] px-4 py-8" style={{ background: 'linear-gradient(180deg,#0b0b5a 0%,#05004c 55%,#020217 100%)' }}>
+  <main
+  className="min-h-[85vh] px-4 py-8"
+  style={{ background: 'linear-gradient(180deg, var(--c-text) 0%, #15158f 55%, #05004c 100%)' }}
+>
       <div className="max-w-3xl mx-auto">
         <header className="mb-6 text-center">
           <p className="text-[11px] uppercase tracking-[0.18em]" style={{color:'var(--c-info)'}}>
             Resumen de intercambios
           </p>
-          <h1 className="text-2xl font-bold mt-1" style={{color:'var(--c-brand)',fontFamily:'vag-rundschrift-d,sans-serif'}}>
+          <h1 className="text-2xl font-bold mt-1" style={{ color: 'var(--c-brand)' }}>
             Trueques
           </h1>
           <p className="mt-1 text-sm" style={{color:'var(--c-bg-soft,#f6f2ff)'}}>

@@ -103,10 +103,11 @@ export default function MyPosts() {
         <header className="mb-6">
           <h1
             className="text-2xl sm:text-3xl font-bold tracking-tight"
-            style={{ color: 'var(--c-brand)', fontFamily: 'vag-rundschrift-d, sans-serif' }}
+            style={{ color: 'var(--c-brand)' }}
           >
             Mis publicaciones
           </h1>
+
           <p className="mt-1 text-sm" style={{ color: 'var(--c-text)' }}>
             Administra lo que ofreces y revisa el estado de tus trueques.
           </p>
@@ -252,7 +253,7 @@ export default function MyPosts() {
             <div className="w-[92%] max-w-sm rounded-2xl bg-white p-6 border border-[color:var(--c-mid-blue)]/60 shadow-[0_20px_60px_rgba(0,0,0,.25)]">
               <h2
                 className="text-lg font-bold text-center"
-                style={{ color: 'var(--c-brand)', fontFamily: 'vag-rundschrift-d, sans-serif' }}
+                style={{ color: 'var(--c-brand)' }}
               >
                 Eliminar publicacion
               </h2>

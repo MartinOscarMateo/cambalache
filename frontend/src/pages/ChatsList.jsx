@@ -94,10 +94,11 @@ export default function ChatsList() {
         <header className="mb-4">
           <h1
             className="text-2xl font-bold text-center"
-            style={{ color: 'var(--c-brand)', fontFamily: 'vag-rundschrift-d, sans-serif' }}
+            style={{ color: 'var(--c-brand)' }}
           >
             Mis chats
           </h1>
+
           <p className="text-sm text-center mt-1" style={{ color: 'var(--c-text)' }}>
             Conversaciones para coordinar tus trueques.
           </p>

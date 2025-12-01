@@ -1,4 +1,4 @@
-// frontend\src\pages\admin\AdminUsersList.jsx
+// frontend/src/pages/admin/AdminUsersList.jsx
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
@@ -11,6 +11,11 @@ export default function AdminUsersList() {
   const [limit, setLimit] = useState(10);
   const [data, setData] = useState({ items: [], total: 0 });
   const [loading, setLoading] = useState(false);
+
+  const latoHeading = {
+    fontFamily:
+      '"Lato", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
+  };
 
   async function load() {
     setLoading(true);
@@ -26,7 +31,7 @@ export default function AdminUsersList() {
       const json = await res.json().catch(() => ({}));
       if (!res.ok) {
         if (res.status === 401 || res.status === 403) {
-          alert('Sesión sin permisos de administrador.');
+          alert('Sesion sin permisos de administrador.');
           navigate('/login');
           return;
         }
@@ -38,7 +43,9 @@ export default function AdminUsersList() {
     }
   }
 
-  useEffect(() => { load(); }, [page, limit]);
+  useEffect(() => {
+    load();
+  }, [page, limit]);
 
   function onSearch(e) {
     e.preventDefault();
@@ -47,7 +54,7 @@ export default function AdminUsersList() {
   }
 
   async function handleDelete(id) {
-    const ok = window.confirm('confirmar baja logica del usuario?');
+    const ok = window.confirm('Confirmar baja logica del usuario?');
     if (!ok) return;
     const raw = localStorage.getItem('token') || '';
     if (!raw) {
@@ -57,7 +64,7 @@ export default function AdminUsersList() {
     const token = `Bearer ${raw}`;
     const res = await fetch(`${API}/api/admin/users/${id}`, {
       method: 'DELETE',
-      headers: { Authorization: token }
+      headers: { Authorization: token },
     });
     if (!res.ok) {
       if (res.status === 401 || res.status === 403) {
@@ -65,7 +72,7 @@ export default function AdminUsersList() {
         return;
       }
       const json = await res.json().catch(() => ({}));
-      alert(json?.error || 'error al eliminar');
+      alert(json?.error || 'Error al eliminar');
       return;
     }
     await load();
@@ -73,32 +80,44 @@ export default function AdminUsersList() {
 
   return (
     <main
-      className="min-h-screen px-4 py-8"
-      style={{ background: 'var(--c-text)' }}
+      className="min-h-[85vh] px-4 py-8"
+      style={{
+        background:
+          'linear-gradient(180deg, var(--c-text) 0%, #15158f 55%, #05004c 100%)',
+      }}
     >
-      <div className="max-w-6xl mx-auto">
-        <section className="rounded-2xl bg-white p-5 sm:p-6 border border-[color:var(--c-mid-blue)]/60 shadow-[0_20px_60px_rgba(0,0,0,.25)]">
+      <section className="max-w-6xl mx-auto">
+        <div className="rounded-3xl bg-white/95 backdrop-blur-sm p-6 sm:p-8 shadow-[0_24px_80px_rgba(0,0,0,.55)] border border-[color:var(--c-mid-blue)]/60">
           <header className="mb-5">
-            <h1
-              className="text-2xl font-bold"
-              style={{ color: 'var(--c-brand)', fontFamily: 'vag-rundschrift-d, sans-serif' }}
+            <p
+              className="text-[11px] uppercase tracking-[0.18em] text-[color:var(--c-info)]/90"
+              style={latoHeading}
             >
-              usuarios
+              Administracion
+            </p>
+            <h1
+              className="mt-1 text-2xl md:text-3xl font-bold"
+              style={{ color: 'var(--c-brand)', ...latoHeading }}
+            >
+              Usuarios
             </h1>
           </header>
 
-          <form onSubmit={onSearch} className="flex flex-col sm:flex-row gap-2 mb-4">
+          <form
+            onSubmit={onSearch}
+            className="flex flex-col sm:flex-row gap-2 mb-4"
+          >
             <input
               value={q}
               onChange={(e) => setQ(e.target.value)}
-              placeholder="buscar por nombre o email"
+              placeholder="Buscar por nombre o email"
               className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 outline-none ring-2 ring-transparent focus:ring-[color:var(--c-info)]"
             />
             <button
               type="submit"
               className="px-4 py-3 rounded-xl font-semibold text-white bg-[color:var(--c-info)] hover:brightness-110 transition"
             >
-              buscar
+              Buscar
             </button>
           </form>
 
@@ -106,23 +125,42 @@ export default function AdminUsersList() {
             <table className="min-w-full text-sm">
               <thead>
                 <tr className="bg-[color:var(--c-mid-blue)]/20 text-left">
-                  <th className="p-3" style={{ color: 'var(--c-text)' }}>name</th>
-                  <th className="p-3" style={{ color: 'var(--c-text)' }}>email</th>
-                  <th className="p-3" style={{ color: 'var(--c-text)' }}>role</th>
-                  <th className="p-3" style={{ color: 'var(--c-text)' }}>active</th>
-                  <th className="p-3" style={{ color: 'var(--c-text)' }}>createdAt</th>
-                  <th className="p-3" style={{ color: 'var(--c-text)' }}>acciones</th>
+                  <th className="p-3" style={{ color: 'var(--c-text)', ...latoHeading }}>
+                    Nombre
+                  </th>
+                  <th className="p-3" style={{ color: 'var(--c-text)', ...latoHeading }}>
+                    Email
+                  </th>
+                  <th className="p-3" style={{ color: 'var(--c-text)', ...latoHeading }}>
+                    Rol
+                  </th>
+                  <th className="p-3" style={{ color: 'var(--c-text)', ...latoHeading }}>
+                    Activo
+                  </th>
+                  <th className="p-3" style={{ color: 'var(--c-text)', ...latoHeading }}>
+                    Creado
+                  </th>
+                  <th className="p-3" style={{ color: 'var(--c-text)', ...latoHeading }}>
+                    Acciones
+                  </th>
                 </tr>
               </thead>
               <tbody>
-                {data.items.map(u => {
+                {data.items.map((u) => {
                   const id = u._id || u.id;
                   const isActive = !!u.active;
                   const role = String(u.role || '').toLowerCase();
                   return (
-                    <tr key={id} className="border-t hover:bg-[color:var(--c-mid-blue)]/10">
-                      <td className="p-3 text-[color:var(--c-text)]">{u.name}</td>
-                      <td className="p-3 text-[color:var(--c-text)]">{u.email}</td>
+                    <tr
+                      key={id}
+                      className="border-t hover:bg-[color:var(--c-mid-blue)]/10"
+                    >
+                      <td className="p-3 text-[color:var(--c-text)]">
+                        {u.name}
+                      </td>
+                      <td className="p-3 text-[color:var(--c-text)]">
+                        {u.email}
+                      </td>
                       <td className="p-3">
                         <span
                           className={`px-2 py-1 rounded-full text-xs font-semibold ${
@@ -146,7 +184,9 @@ export default function AdminUsersList() {
                         </span>
                       </td>
                       <td className="p-3 text-slate-600">
-                        {u.createdAt ? new Date(u.createdAt).toLocaleString() : '-'}
+                        {u.createdAt
+                          ? new Date(u.createdAt).toLocaleString()
+                          : '-'}
                       </td>
                       <td className="p-3">
                         <div className="flex flex-wrap gap-2 justify-start">
@@ -154,13 +194,13 @@ export default function AdminUsersList() {
                             to={`/admin/users/${id}`}
                             className="px-3 py-1.5 rounded-xl border border-[color:var(--c-mid-blue)]/60 hover:bg-[color:var(--c-mid-blue)]/15 transition text-[color:var(--c-text)]"
                           >
-                            modificar
+                            Modificar
                           </Link>
                           <button
                             onClick={() => handleDelete(id)}
                             className="px-3 py-1.5 rounded-xl bg-[color:var(--c-brand)] text-white hover:brightness-110 transition"
                           >
-                            eliminar
+                            Eliminar
                           </button>
                         </div>
                       </td>
@@ -169,8 +209,12 @@ export default function AdminUsersList() {
                 })}
                 {data.items.length === 0 && (
                   <tr>
-                    <td className="p-3" colSpan={6} style={{ color: 'var(--c-text)' }}>
-                      sin resultados
+                    <td
+                      className="p-3"
+                      colSpan={6}
+                      style={{ color: 'var(--c-text)' }}
+                    >
+                      Sin resultados
                     </td>
                   </tr>
                 )}
@@ -180,23 +224,26 @@ export default function AdminUsersList() {
 
           <div className="flex flex-wrap items-center gap-3 mt-4">
             <button
-              onClick={() => setPage(p => Math.max(1, p - 1))}
+              onClick={() => setPage((p) => Math.max(1, p - 1))}
               className="px-3 py-2 rounded-full border border-[color:var(--c-mid-blue)]/60 hover:bg-[color:var(--c-mid-blue)]/15 transition"
               disabled={loading}
               style={{ color: 'var(--c-text)' }}
             >
-              prev
+              Anterior
             </button>
-            <span className="px-3 py-2 rounded-full bg-[color:var(--c-accent)]/50 text-sm font-semibold" style={{ color: 'var(--c-text)' }}>
-              page {page}
+            <span
+              className="px-3 py-2 rounded-full bg-[color:var(--c-accent)]/50 text-sm font-semibold"
+              style={{ color: 'var(--c-text)' }}
+            >
+              Pagina {page}
             </span>
             <button
-              onClick={() => setPage(p => p + 1)}
+              onClick={() => setPage((p) => p + 1)}
               className="px-3 py-2 rounded-full border border-[color:var(--c-mid-blue)]/60 hover:bg-[color:var(--c-mid-blue)]/15 transition"
               disabled={loading}
               style={{ color: 'var(--c-text)' }}
             >
-              next
+              Siguiente
             </button>
             <select
               value={limit}
@@ -208,12 +255,15 @@ export default function AdminUsersList() {
               <option value={25}>25</option>
               <option value={50}>50</option>
             </select>
-            <span className="ml-auto text-sm" style={{ color: 'var(--c-text)' }}>
-              total {data.total}
+            <span
+              className="ml-auto text-sm"
+              style={{ color: 'var(--c-text)' }}
+            >
+              Total {data.total}
             </span>
           </div>
-        </section>
-      </div>
+        </div>
+      </section>
     </main>
   );
 }
