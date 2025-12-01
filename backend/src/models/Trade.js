@@ -50,6 +50,8 @@ const TradeSchema = new Schema({
   ratings: { type: [RatingScchema], default: [] },
   chatId: { type: Types.ObjectId, ref: 'Chat', index: true },
 
+  finishedBy: { type: [{ type: Types.ObjectId, ref: 'User' }], default: [] },
+
   meetingArea: { type: String, trim: true, maxlength: 200 },
   meeting: { type: MeetingSchema, default: () => ({ status: 'none' }) }
 }, { timestamps: true });
