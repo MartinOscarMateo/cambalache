@@ -2,7 +2,9 @@ import mongoose from 'mongoose';
 const { Schema, Types } = mongoose;
 
 export const TRADE_STATUS = ['pending','countered','accepted','rejected','cancelled','finished'];
-export const TRADE_ACTION = ['created','countered','accepted','rejected','cancelled','finished'];
+export const TRADE_ACTION = ['created','countered','accepted','rejected','cancelled','finished','meeting_suggested','meeting_accepted','meeting_rejected','meeting_cancelled'];
+
+export const MEETING_STATUS = ['none', 'proposed', 'confirmed'];
 
 const HistorySchema = new Schema({
   at: { type: Date, default: Date.now },
@@ -20,6 +22,23 @@ const RatingScchema = new Schema({
   at: { type: Date, default: Date.now }
 }, { _id: false });
 
+const MeetingSchema = new Schema({
+  status: { type: String, enum: MEETING_STATUS, default: 'none' },
+
+  placeId: { type: Types.ObjectId, ref: 'MeetingPlace' },
+  placeName: { type: String, trim: true, maxlength: 200 },
+  placeAddress: { type: String, trim: true, maxlength: 200 },
+  barrio: { type: String, trim: true, maxlength: 120 },
+  lat: { type: Number },
+  lng: { type: Number },
+
+  suggestedBy: { type: Types.ObjectId, ref: 'User' },
+  acceptedBy: [{ type: Types.ObjectId, ref: 'User' }],
+
+  suggestedAt: { type: Date },
+  confirmedAt: { type: Date }
+}, { _id: false });
+
 const TradeSchema = new Schema({
   proposerId: { type: Types.ObjectId, ref: 'User', required: true, index: true },
   receiverId: { type: Types.ObjectId, ref: 'User', required: true, index: true },
@@ -30,7 +49,9 @@ const TradeSchema = new Schema({
   history: { type: [HistorySchema], default: [] },
   ratings: { type: [RatingScchema], default: [] },
   chatId: { type: Types.ObjectId, ref: 'Chat', index: true },
-  meetingArea: { type: String, trim: true, maxlength: 200 }
+
+  meetingArea: { type: String, trim: true, maxlength: 200 },
+  meeting: { type: MeetingSchema, default: () => ({ status: 'none' }) }
 }, { timestamps: true });
 
 TradeSchema.index({ proposerId: 1, receiverId: 1, createdAt: -1 });

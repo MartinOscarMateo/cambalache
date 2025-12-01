@@ -122,6 +122,7 @@ export async function uploadToCloudinary(file) {
   if (!res.ok || !json.secure_url) throw new Error(json.error?.message || 'Error subiendo imagen');
   return json.secure_url;
 }
+
 export async function uploadMany(files) {
   const arr = Array.from(files || []);
   if (!arr.length) throw new Error('Sin archivos');
@@ -228,7 +229,6 @@ export async function fetchUserPosts(userId, { page = 1, limit = 12 } = {}) {
     `${API}/api/posts?userId=${encodeURIComponent(uid)}&page=${page}&limit=${limit}`
   ];
 
-
   for (const url of urls) {
     try {
       const res = await fetch(url, { headers });
@@ -333,6 +333,7 @@ export async function updateTradeStatus(id, action) {
 
   return json;
 }
+
 export async function rateTrade(tradeId, rating) {
   const token = localStorage.getItem('token') || '';
 
@@ -356,6 +357,75 @@ export async function rateTrade(tradeId, rating) {
   if (!res.ok) throw new Error(parsedJson?.error || parsedJson?.message || 'No se pudo enviar la calificación');
 
   return parsedJson;
+}
+
+// para sugerir punto de entuentro xd
+export async function suggestTradeMeeting(tradeId, payload = {}) {
+  const token = localStorage.getItem('token') || '';
+
+  const res = await fetch(`${API}/api/trades/${tradeId}/meeting/suggest`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    },
+    body: JSON.stringify(payload || {})
+  });
+
+  const json = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(json?.error || json?.message || 'Error sugiriendo punto de encuentro');
+  return json;
+}
+
+export async function acceptTradeMeeting(tradeId) {
+  const token = localStorage.getItem('token') || '';
+
+  const res = await fetch(`${API}/api/trades/${tradeId}/meeting/accept`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    },
+    body: JSON.stringify({})
+  });
+
+  const json = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(json?.error || json?.message || 'Error aceptando punto de encuentro');
+  return json;
+}
+
+export async function rejectTradeMeeting(tradeId, note = '') {
+  const token = localStorage.getItem('token') || '';
+
+  const res = await fetch(`${API}/api/trades/${tradeId}/meeting/reject`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    },
+    body: JSON.stringify(note ? { note } : {})
+  });
+
+  const json = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(json?.error || json?.message || 'Error rechazando punto de encuentro');
+  return json;
+}
+
+export async function cancelTradeMeeting(tradeId, note = '') {
+  const token = localStorage.getItem('token') || '';
+
+  const res = await fetch(`${API}/api/trades/${tradeId}/meeting/cancel`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    },
+    body: JSON.stringify(note ? { note } : {})
+  });
+
+  const json = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(json?.error || json?.message || 'Error cancelando punto de encuentro');
+  return json;
 }
 
 export async function getBarrios() {

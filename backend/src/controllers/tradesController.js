@@ -36,6 +36,42 @@ function parsePageLimit(q) {
   return { page, limit };
 }
 
+async function ensureChatForTrade(trade) {
+  const p1 = viewId(trade.proposerId);
+  const p2 = viewId(trade.receiverId);
+
+  if (trade.chatId) {
+    const existing = await Chat.findById(trade.chatId);
+    if (existing) return existing;
+  }
+
+  let chat = await Chat.findOne({ participants: { $all: [p1, p2] } });
+  if (!chat) {
+    chat = await Chat.create({ participants: [p1, p2] });
+  }
+  trade.chatId = chat._id;
+  return chat;
+}
+
+function buildMeetingSummary(meeting, fallbackArea = '') {
+  if (!meeting) return fallbackArea || 'un punto de encuentro';
+  const parts = [];
+  if (meeting.placeName) parts.push(meeting.placeName);
+  if (meeting.barrio) parts.push(meeting.barrio);
+  if (meeting.placeAddress) parts.push(meeting.placeAddress);
+  if (!parts.length && fallbackArea) return fallbackArea;
+  return parts.join(' · ') || 'un punto de encuentro';
+}
+
+async function postSystemMessage(chatId, senderId, text) {
+  if (!chatId || !text) return;
+  await Message.create({ chatId, sender: senderId, text });
+  await Chat.findByIdAndUpdate(chatId, {
+    lastMessage: text,
+    updatedAt: new Date()
+  });
+}
+
 export async function createTrade(req, res) {
   try {
     const userId = req.user.id;
@@ -92,30 +128,7 @@ export async function createTrade(req, res) {
       chatId: chat._id,
       meetingArea: finalMeetingArea || undefined
     });
-
-    const parts = [];
-    parts.push(`Hola! Te envié una solicitud de trueque por tu publicación "${postRequested.title}".`);
-    if (postOffered) {
-      parts.push(`Te ofrezco: "${postOffered.title}".`);
-    } else if (itemsText && String(itemsText).trim()) {
-      parts.push(`Oferta: ${String(itemsText).trim()}.`);
-    }
-    if (finalMeetingArea) {
-      parts.push(`Zona sugerida para encontrarnos: ${finalMeetingArea}.`);
-    }
-    const autoText = parts.join(' ');
-
-    await Message.create({
-      chatId: chat._id,
-      sender: userId,
-      text: autoText
-    });
     
-    await Chat.findByIdAndUpdate(chat._id, {
-      lastMessage: autoText,
-      updatedAt: new Date()
-    });
-
     const notifyUser = String(trade.proposerId) === String(userId) ? trade.receiverId : trade.proposerId;
 
     await Notification.create({
@@ -149,11 +162,11 @@ export async function listTrades(req, res) {
     const skip = (page - 1) * limit;
     const [items, total] = await Promise.all([
       Trade.find(q).sort({ createdAt: -1 }).skip(skip).limit(limit)
-      .populate('proposerId', 'name')
-      .populate('receiverId', 'name')
-      .populate('postRequestedId', 'title barrio')
-      .populate('postOfferedId', 'title barrio')
-      .lean(),
+        .populate('proposerId', 'name')
+        .populate('receiverId', 'name')
+        .populate('postRequestedId', 'title barrio images')
+        .populate('postOfferedId', 'title barrio images')
+        .lean(),
       Trade.countDocuments(q)
     ]);
 
@@ -168,11 +181,11 @@ export async function getTrade(req, res) {
     const userId = req.user.id;
     assert(mongoose.isValidObjectId(req.params.id), 'BAD_ID', 'ID inválido');
     const trade = await Trade.findById(req.params.id)
-    .populate('proposerId', 'name')
-    .populate('receiverId', 'name')
-    .populate('postRequestedId', 'title barrio')
-    .populate('postOfferedId', 'title barrio')
-    .lean();
+      .populate('proposerId', 'name')
+      .populate('receiverId', 'name')
+      .populate('postRequestedId', 'title barrio images')
+      .populate('postOfferedId', 'title barrio images')
+      .lean();
     assert(trade, 'NOT_FOUND', 'Trueque no encontrado');
     assert([viewId(trade.proposerId?._id), viewId(trade.receiverId?._id)].includes(userId), 'FORBIDDEN', 'No autorizado');
     res.json(trade);
@@ -213,7 +226,6 @@ export async function changeStatus(req, res) {
     const from = trade.status;
     let to;
 
-    // --- Cambios de estado ---
     if (action === 'cancel') {
       if (trade.status === "pending") {
         assert(
@@ -243,7 +255,6 @@ export async function changeStatus(req, res) {
     trade.status = to;
     trade.history.push({ by: userId, action: actionNames[action], from, to });
 
-    // --- Mensajes personalizados ---
     const statusMessages = {
       accepted: "El receptor aceptó tu propuesta de trueque.",
       rejected: "Tu propuesta de trueque fue rechazada.",
@@ -299,6 +310,244 @@ export async function counterOffer(req, res) {
     res.json(trade.toJSON());
   } catch (err) {
     res.status(400).json({ code: err.code || 'TRADE_COUNTER_ERROR', error: err.message });
+  }
+}
+
+export async function suggestMeeting(req, res) {
+  try {
+    const userId = req.user.id;
+    const { meetingPlaceId, placeName, placeAddress, barrio, lat, lng, note } = req.body;
+
+    const trade = await Trade.findById(req.params.id);
+    assert(trade, 'NOT_FOUND', 'Trueque no encontrado');
+    assert([viewId(trade.proposerId), viewId(trade.receiverId)].includes(userId), 'FORBIDDEN', 'No autorizado');
+    assert(!TERMINAL.has(trade.status), 'TRADE_CLOSED', 'El trueque está cerrado, no se pueden proponer puntos de encuentro');
+
+    const hasLocationData =
+      meetingPlaceId ||
+      placeName ||
+      barrio ||
+      (typeof lat === 'number' && typeof lng === 'number');
+
+    assert(hasLocationData, 'MEETING_PLACE_REQUIRED', 'Debés indicar al menos un lugar o barrio');
+
+    if (trade.meeting && trade.meeting.status === 'confirmed') {
+      assert(false, 'MEETING_ALREADY_CONFIRMED', 'Ya hay un punto de encuentro confirmado, cancelalo antes de proponer otro');
+    }
+
+    trade.meeting = trade.meeting || {};
+    trade.meeting.status = 'proposed';
+    trade.meeting.placeId = meetingPlaceId || undefined;
+    trade.meeting.placeName = placeName || '';
+    trade.meeting.placeAddress = placeAddress || '';
+    trade.meeting.barrio = barrio || '';
+    if (typeof lat === 'number') trade.meeting.lat = lat;
+    if (typeof lng === 'number') trade.meeting.lng = lng;
+    trade.meeting.suggestedBy = userId;
+    trade.meeting.acceptedBy = [userId];
+    trade.meeting.suggestedAt = new Date();
+    trade.meeting.confirmedAt = undefined;
+
+    if (!trade.meetingArea && barrio) {
+      trade.meetingArea = barrio;
+    }
+
+    const from = trade.status;
+    trade.history.push({
+      by: userId,
+      action: 'meeting_suggested',
+      from,
+      to: from,
+      note: note && String(note).trim() ? String(note).trim() : undefined
+    });
+
+    const chat = await ensureChatForTrade(trade);
+    const summary = buildMeetingSummary(trade.meeting, trade.meetingArea);
+    const sender = await User.findById(userId).select('name').lean();
+    const autoText = `${sender?.name || 'Alguien'} sugirió encontrarse en ${summary}.`;
+
+    await postSystemMessage(chat._id, userId, autoText);
+
+    const notifyUser = String(trade.proposerId) === String(userId) ? trade.receiverId : trade.proposerId;
+
+    await Notification.create({
+      user: notifyUser,
+      type: "TRADE_MEETING",
+      title: "Nueva propuesta de punto de encuentro",
+      message: autoText,
+      link: `/chat/${userId}`
+    });
+
+    await trade.save();
+    res.json(trade.toJSON());
+  } catch (err) {
+    res.status(400).json({ code: err.code || 'TRADE_MEETING_SUGGEST_ERROR', error: err.message });
+  }
+}
+
+export async function acceptMeeting(req, res) {
+  try {
+    const userId = req.user.id;
+
+    const trade = await Trade.findById(req.params.id);
+    assert(trade, 'NOT_FOUND', 'Trueque no encontrado');
+    assert([viewId(trade.proposerId), viewId(trade.receiverId)].includes(userId), 'FORBIDDEN', 'No autorizado');
+    assert(!TERMINAL.has(trade.status), 'TRADE_CLOSED', 'El trueque está cerrado, no se pueden aceptar puntos de encuentro');
+
+    assert(trade.meeting && trade.meeting.status === 'proposed', 'NO_MEETING_PROPOSED', 'No hay un punto de encuentro propuesto');
+
+    if (!Array.isArray(trade.meeting.acceptedBy)) {
+      trade.meeting.acceptedBy = [];
+    }
+
+    const alreadyAccepted = trade.meeting.acceptedBy.some(id => viewId(id) === viewId(userId));
+    if (!alreadyAccepted) {
+      trade.meeting.acceptedBy.push(userId);
+    }
+
+    const participants = [viewId(trade.proposerId), viewId(trade.receiverId)];
+    const acceptedSet = new Set(trade.meeting.acceptedBy.map(id => viewId(id)));
+    const bothAccepted = participants.every(id => acceptedSet.has(id));
+
+    let noteText = 'El usuario aceptó el punto de encuentro propuesto.';
+    if (bothAccepted) {
+      trade.meeting.status = 'confirmed';
+      trade.meeting.confirmedAt = new Date();
+      noteText = 'Ambas partes aceptaron el punto de encuentro. Quedó confirmado.';
+    }
+
+    const from = trade.status;
+    trade.history.push({
+      by: userId,
+      action: 'meeting_accepted',
+      from,
+      to: from,
+      note: noteText
+    });
+
+    const chat = await ensureChatForTrade(trade);
+    const summary = buildMeetingSummary(trade.meeting, trade.meetingArea);
+    const sender = await User.findById(userId).select('name').lean();
+
+    let autoText;
+    if (bothAccepted) {
+      autoText = `${sender?.name || 'Alguien'} aceptó el punto de encuentro. Ambas partes se encontrarán en ${summary}.`;
+    } else {
+      autoText = `${sender?.name || 'Alguien'} aceptó el punto de encuentro propuesto. Falta que la otra parte confirme.`;
+    }
+
+    await postSystemMessage(chat._id, userId, autoText);
+
+    const notifyUser = String(trade.proposerId) === String(userId) ? trade.receiverId : trade.proposerId;
+
+    await Notification.create({
+      user: notifyUser,
+      type: "TRADE_MEETING",
+      title: bothAccepted ? "Punto de encuentro confirmado" : "Aceptaron tu propuesta de encuentro",
+      message: autoText,
+      link: `/chat/${userId}`
+    });
+
+    await trade.save();
+    res.json(trade.toJSON());
+  } catch (err) {
+    res.status(400).json({ code: err.code || 'TRADE_MEETING_ACCEPT_ERROR', error: err.message });
+  }
+}
+
+export async function rejectMeeting(req, res) {
+  try {
+    const userId = req.user.id;
+    const { note } = req.body;
+
+    const trade = await Trade.findById(req.params.id);
+    assert(trade, 'NOT_FOUND', 'Trueque no encontrado');
+    assert([viewId(trade.proposerId), viewId(trade.receiverId)].includes(userId), 'FORBIDDEN', 'No autorizado');
+    assert(!TERMINAL.has(trade.status), 'TRADE_CLOSED', 'El trueque está cerrado, no se pueden rechazar puntos de encuentro');
+
+    assert(trade.meeting && trade.meeting.status === 'proposed', 'NO_MEETING_PROPOSED', 'No hay un punto de encuentro propuesto');
+
+    trade.meeting = { status: 'none' };
+
+    const from = trade.status;
+    trade.history.push({
+      by: userId,
+      action: 'meeting_rejected',
+      from,
+      to: from,
+      note: note && String(note).trim() ? String(note).trim() : 'El usuario rechazó el punto de encuentro propuesto.'
+    });
+
+    const chat = await ensureChatForTrade(trade);
+    const sender = await User.findById(userId).select('name').lean();
+    const autoText = `${sender?.name || 'Alguien'} rechazó el punto de encuentro propuesto. Podés sugerir otro lugar.`;
+
+    await postSystemMessage(chat._id, userId, autoText);
+
+    const notifyUser = String(trade.proposerId) === String(userId) ? trade.receiverId : trade.proposerId;
+
+    await Notification.create({
+      user: notifyUser,
+      type: "TRADE_MEETING",
+      title: "Rechazaron tu punto de encuentro",
+      message: autoText,
+      link: `/chat/${userId}`
+    });
+
+    await trade.save();
+    res.json(trade.toJSON());
+  } catch (err) {
+    res.status(400).json({ code: err.code || 'TRADE_MEETING_REJECT_ERROR', error: err.message });
+  }
+}
+
+export async function cancelMeeting(req, res) {
+  try {
+    const userId = req.user.id;
+    const { note } = req.body;
+
+    const trade = await Trade.findById(req.params.id);
+    assert(trade, 'NOT_FOUND', 'Trueque no encontrado');
+    assert([viewId(trade.proposerId), viewId(trade.receiverId)].includes(userId), 'FORBIDDEN', 'No autorizado');
+    assert(!TERMINAL.has(trade.status), 'TRADE_CLOSED', 'El trueque está cerrado, no se pueden cancelar puntos de encuentro');
+
+    assert(trade.meeting && trade.meeting.status === 'confirmed', 'NO_MEETING_CONFIRMED', 'No hay un punto de encuentro confirmado para cancelar');
+
+    trade.meeting = { status: 'none' };
+
+    const from = trade.status;
+    const noteText = note && String(note).trim()
+      ? String(note).trim()
+      : 'El usuario canceló el punto de encuentro acordado.';
+
+    trade.history.push({
+      by: userId,
+      action: 'meeting_cancelled',
+      from,
+      to: from,
+      note: noteText
+    });
+
+    const chat = await ensureChatForTrade(trade);
+    const sender = await User.findById(userId).select('name').lean();
+    const autoText = `${sender?.name || 'Alguien'} canceló el punto de encuentro acordado.`;
+
+    await postSystemMessage(chat._id, userId, autoText);
+
+    const notifyUser = String(trade.proposerId) === String(userId) ? trade.receiverId : trade.proposerId;
+
+    await Notification.create({
+      user: notifyUser,
+      type: "TRADE_MEETING",
+      title: "Se canceló el punto de encuentro",
+      message: autoText,
+      link: `/chat/${userId}`
+    });
+
+    await trade.save();
+    res.json(trade.toJSON());
+  } catch (err) {
+    res.status(400).json({ code: err.code || 'TRADE_MEETING_CANCEL_ERROR', error: err.message });
   }
 }
 
