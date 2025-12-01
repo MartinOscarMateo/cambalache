@@ -8,10 +8,14 @@ import '../styles/components/navbar.css';
 export default function NavBar() {
   const [open, setOpen] = useState(false); // estado drawer mobile
   const [me, setMe] = useState(() => {
-    try { return JSON.parse(localStorage.getItem('user') || 'null'); } catch { return null; }
+    try {
+      return JSON.parse(localStorage.getItem('user') || 'null');
+    } catch {
+      return null;
+    }
   });
   const [menuUserOpen, setMenuUserOpen] = useState(false); // estado menu avatar
-  const [unreadChats, setUnreadChats] = useState(0); // contador chats no leidos
+  const [unreadChats, setUnreadChats] = useState(0);
   const navigate = useNavigate();
   const location = useLocation();
   const menuRef = useRef(null);
@@ -37,7 +41,9 @@ export default function NavBar() {
       }
     }
     hydrate();
-    return () => { mounted = false; };
+    return () => {
+      mounted = false;
+    };
   }, [token]);
 
   useEffect(() => {
@@ -70,21 +76,33 @@ export default function NavBar() {
       ? me.avatar
       : 'https://i.pravatar.cc/40';
 
+  const latoHeading = {
+    fontFamily:
+      '"Lato", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
+  };
+
   return (
-    <header className="bg-[#2727d1] font-['lato']">
+    <header
+      className="shadow-[0_10px_30px_rgba(0,0,0,.45)] sticky top-0 z-[900]"
+      style={{ background: '#2727d1' }}
+    >
       {open && (
         <div
-          className="fixed inset-0 bg-black/40 z-[1000] md:hidden"
+          className="fixed inset-0 bg-black/40 z-[800] md:hidden"
           onClick={() => setOpen(false)}
           aria-hidden="true"
         />
       )}
 
-      <div className="py-3 md:py-4 relative z-[1001]">
-        <nav className="flex justify-between items-center w-[92%] mx-auto">
+      <div className="py-2 md:py-3">
+        <nav className="w-[92%] max-w-6xl mx-auto flex items-center justify-between">
           {/* izquierda: logo */}
           <div className="flex items-center">
-            <Link to="/" onClick={() => setOpen(false)} className="flex items-center gap-2">
+            <Link
+              to="/"
+              onClick={() => setOpen(false)}
+              className="flex items-center gap-2"
+            >
               <img
                 src={logo}
                 alt="Logo Cambalache"
@@ -94,13 +112,20 @@ export default function NavBar() {
           </div>
 
           {/* centro: links principales con pildora activa */}
-          <div className="hidden md:flex">
-            <ul className="flex items-center gap-2 text-[15px]">
+          <div className="hidden md:flex flex-1 justify-center">
+            <ul
+              className="flex items-center gap-2 text-[15px] px-2 py-1 rounded-full bg-white/10 backdrop-blur-sm border border-white/15"
+              style={latoHeading}
+            >
               <li>
                 <Link
                   to="/"
                   onClick={() => setOpen(false)}
-                  className={`nav-pill ${isActive('/') ? 'nav-pill--active' : 'text-[#f6f2ff] hover:text-[#ffdb3e]'}`}
+                  className={`nav-pill ${
+                    isActive('/')
+                      ? 'nav-pill--active'
+                      : 'text-[#f6f2ff] hover:text-[#ffdb3e]'
+                  }`}
                 >
                   Inicio
                 </Link>
@@ -109,7 +134,11 @@ export default function NavBar() {
                 <Link
                   to="/posts"
                   onClick={() => setOpen(false)}
-                  className={`nav-pill ${isActive('/posts') ? 'nav-pill--active' : 'text-[#f6f2ff] hover:text-[#ffdb3e]'}`}
+                  className={`nav-pill ${
+                    isActive('/posts')
+                      ? 'nav-pill--active'
+                      : 'text-[#f6f2ff] hover:text-[#ffdb3e]'
+                  }`}
                 >
                   Publicaciones
                 </Link>
@@ -118,7 +147,11 @@ export default function NavBar() {
                 <Link
                   to="/mapa"
                   onClick={() => setOpen(false)}
-                  className={`nav-pill ${isActive('/mapa') ? 'nav-pill--active' : 'text-[#f6f2ff] hover:text-[#ffdb3e]'}`}
+                  className={`nav-pill ${
+                    isActive('/mapa')
+                      ? 'nav-pill--active'
+                      : 'text-[#f6f2ff] hover:text-[#ffdb3e]'
+                  }`}
                 >
                   Mapa
                 </Link>
@@ -127,25 +160,55 @@ export default function NavBar() {
           </div>
 
           {/* derecha: botones e iconos */}
-          <div className="hidden md:flex items-center gap-4">
+          <div className="hidden md:flex items-center gap-3">
             {!token && (
               <>
-                <Link to="/register" className="btn-nav btn-nav--cyan">Registrarse</Link>
-                <Link to="/login" className="btn-nav btn-nav--pink">Ingresar</Link>
+                <Link
+                  to="/register"
+                  className="btn-nav btn-nav--cyan"
+                  style={latoHeading}
+                >
+                  Registrarse
+                </Link>
+                <Link
+                  to="/login"
+                  className="btn-nav btn-nav--pink"
+                  style={latoHeading}
+                >
+                  Ingresar
+                </Link>
               </>
             )}
 
             {token && (
               <>
                 {/* crear publicacion */}
-                <Link to="/posts/create" aria-label="crear publicacion" title="crear publicacion" className="relative nav-icon text-[#ff52b9]">
-                  <ion-icon name="add-circle" className="text-2xl align-middle"></ion-icon>
+                <Link
+                  to="/posts/create"
+                  aria-label="crear publicacion"
+                  title="crear publicacion"
+                  className="relative nav-icon text-[#ff52b9] rounded-full bg-white/5 hover:bg-white/15 px-2 py-1 transition"
+                >
+                  <ion-icon
+                    name="add-circle"
+                    className="text-2xl align-middle"
+                  ></ion-icon>
                 </Link>
 
                 {/* chats */}
-                <Link to="/chats" aria-label="chats" title="chats" className="relative nav-icon text-[#00afe7]">
-                  <ion-icon name="chatbubbles" className="text-2xl align-middle"></ion-icon>
-                  {unreadChats > 0 && <span className="nav-badge">{unreadChats}</span>}
+                <Link
+                  to="/chats"
+                  aria-label="chats"
+                  title="chats"
+                  className="relative nav-icon text-[#00afe7] rounded-full bg-white/5 hover:bg-white/15 px-2 py-1 transition"
+                >
+                  <ion-icon
+                    name="chatbubbles"
+                    className="text-2xl align-middle"
+                  ></ion-icon>
+                  {unreadChats > 0 && (
+                    <span className="nav-badge">{unreadChats}</span>
+                  )}
                 </Link>
 
                 {/* notificaciones */}
@@ -153,41 +216,55 @@ export default function NavBar() {
                   to="/notifications"
                   aria-label="notificaciones"
                   title="notificaciones"
-                  className="relative nav-icon text-[#ffdb3e] cursor-default opacity-90"
+                  className="relative nav-icon text-[#ffdb3e] cursor-default opacity-90 rounded-full bg-white/5 px-2 py-1"
                 >
-                  <ion-icon name="notifications" className="text-2xl align-middle"></ion-icon>
+                  <ion-icon
+                    name="notifications"
+                    className="text-2xl align-middle"
+                  ></ion-icon>
                 </Link>
 
                 {/* avatar y menu */}
                 <div className="relative" ref={menuRef}>
                   <button
-                    onClick={() => setMenuUserOpen(v => !v)}
+                    onClick={() => setMenuUserOpen((v) => !v)}
                     aria-haspopup="menu"
                     aria-expanded={menuUserOpen ? 'true' : 'false'}
                     aria-label="menu usuario"
-                    className="flex items-center"
+                    className="flex items-center rounded-full border border-white/30 bg-white/10 p-[2px] hover:bg-white/20 transition"
                   >
                     <img
                       src={avatarSrc}
                       alt="avatar"
-                      className="h-8 w-8 rounded-full ring-1 ring-white/30"
+                      className="h-8 w-8 rounded-full ring-1 ring-white/40"
                     />
                   </button>
 
                   {menuUserOpen && (
                     <div
                       role="menu"
-                      className="absolute right-0 mt-2 w-44 rounded-md bg-white text-sm text-gray-800 shadow-lg overflow-hidden"
+                      className="absolute right-0 mt-2 w-44 rounded-xl bg-white text-sm text-gray-800 shadow-[0_14px_35px_rgba(0,0,0,.35)] overflow-hidden border border-slate-100"
                     >
-                      <Link to="/profile" className="block px-3 py-2 hover:bg-gray-100" onClick={() => setMenuUserOpen(false)}>
+                      <Link
+                        to="/profile"
+                        className="block px-3 py-2 hover:bg-gray-100"
+                        onClick={() => setMenuUserOpen(false)}
+                      >
                         Perfil
                       </Link>
                       {me?.role === 'admin' && (
-                        <Link to="/admin/users" className="block px-3 py-2 hover:bg-gray-100" onClick={() => setMenuUserOpen(false)}>
+                        <Link
+                          to="/admin/users"
+                          className="block px-3 py-2 hover:bg-gray-100"
+                          onClick={() => setMenuUserOpen(false)}
+                        >
                           Admin
                         </Link>
                       )}
-                      <button className="w-full text-left px-3 py-2 hover:bg-gray-100" onClick={logout}>
+                      <button
+                        className="w-full text-left px-3 py-2 hover:bg-gray-100"
+                        onClick={logout}
+                      >
                         Salir
                       </button>
                     </div>
@@ -205,7 +282,10 @@ export default function NavBar() {
               aria-expanded={open ? 'true' : 'false'}
               aria-controls="mobile-drawer"
             >
-              <ion-icon name={open ? 'close' : 'menu'} className="text-3xl text-white"></ion-icon>
+              <ion-icon
+                name={open ? 'close' : 'menu'}
+                className="text-3xl text-white"
+              ></ion-icon>
             </button>
           </div>
         </nav>
@@ -214,21 +294,42 @@ export default function NavBar() {
       {/* drawer mobile */}
       <div
         id="mobile-drawer"
-        className={`md:hidden fixed left-0 ${open ? 'top-[56px]' : '-top-full'} w-full bg-[#2727d1] z-[1001] transition-all`}
+        className={`md:hidden fixed left-0 ${
+          open ? 'top-[56px]' : '-top-full'
+        } w-full z-[850] transition-all`}
+        style={{ background: '#2727d1' }} // mismo color plano
       >
         <ul className="flex flex-col gap-4 px-5 py-5 text-[#f6f2ff] text-base">
           <li>
-            <Link className={`hover:text-[#ffdb3e] ${isActive('/') ? 'text-[#ffdb3e] underline' : ''}`} to="/" onClick={() => setOpen(false)}>
+            <Link
+              className={`hover:text-[#ffdb3e] ${
+                isActive('/') ? 'text-[#ffdb3e] underline' : ''
+              }`}
+              to="/"
+              onClick={() => setOpen(false)}
+            >
               Inicio
             </Link>
           </li>
           <li>
-            <Link className={`hover:text-[#ffdb3e] ${isActive('/posts') ? 'text-[#ffdb3e] underline' : ''}`} to="/posts" onClick={() => setOpen(false)}>
+            <Link
+              className={`hover:text-[#ffdb3e] ${
+                isActive('/posts') ? 'text-[#ffdb3e] underline' : ''
+              }`}
+              to="/posts"
+              onClick={() => setOpen(false)}
+            >
               Publicaciones
             </Link>
           </li>
           <li>
-            <Link className={`hover:text-[#ffdb3e] ${isActive('/mapa') ? 'text-[#ffdb3e] underline' : ''}`} to="/mapa" onClick={() => setOpen(false)}>
+            <Link
+              className={`hover:text-[#ffdb3e] ${
+                isActive('/mapa') ? 'text-[#ffdb3e] underline' : ''
+              }`}
+              to="/mapa"
+              onClick={() => setOpen(false)}
+            >
               Mapa
             </Link>
           </li>
@@ -236,12 +337,20 @@ export default function NavBar() {
           {!token && (
             <>
               <li>
-                <Link className="btn-nav btn-nav--cyan inline-block w-max" to="/register" onClick={() => setOpen(false)}>
+                <Link
+                  className="btn-nav btn-nav--cyan inline-block w-max"
+                  to="/register"
+                  onClick={() => setOpen(false)}
+                >
                   Registrarse
                 </Link>
               </li>
               <li>
-                <Link className="btn-nav btn-nav--pink inline-block w-max" to="/login" onClick={() => setOpen(false)}>
+                <Link
+                  className="btn-nav btn-nav--pink inline-block w-max"
+                  to="/login"
+                  onClick={() => setOpen(false)}
+                >
                   Ingresar
                 </Link>
               </li>
@@ -251,27 +360,54 @@ export default function NavBar() {
           {token && (
             <>
               <li>
-                <Link className={`hover:text-[#ffdb3e] ${isActive('/posts/create') ? 'text-[#ffdb3e] underline' : ''}`} to="/posts/create" onClick={() => setOpen(false)}>
+                <Link
+                  className={`hover:text-[#ffdb3e] ${
+                    isActive('/posts/create')
+                      ? 'text-[#ffdb3e] underline'
+                      : ''
+                  }`}
+                  to="/posts/create"
+                  onClick={() => setOpen(false)}
+                >
                   Crear
                 </Link>
               </li>
               <li>
-                <Link className={`hover:text-[#ffdb3e] ${isActive('/chats') ? 'text-[#ffdb3e] underline' : ''}`} to="/chats" onClick={() => setOpen(false)}>
+                <Link
+                  className={`hover:text-[#ffdb3e] ${
+                    isActive('/chats') ? 'text-[#ffdb3e] underline' : ''
+                  }`}
+                  to="/chats"
+                  onClick={() => setOpen(false)}
+                >
                   Chats
                 </Link>
               </li>
               <li className="flex items-center gap-2 text-[#ffdb3e]">
-                <ion-icon name="notifications" className="text-xl align-middle"></ion-icon>
+                <ion-icon
+                  name="notifications"
+                  className="text-xl align-middle"
+                ></ion-icon>
                 <span>Notificaciones</span>
               </li>
               <li>
-                <Link className={`hover:text-[#ffdb3e] ${isActive('/profile') ? 'text-[#ffdb3e] underline' : ''}`} to="/profile" onClick={() => setOpen(false)}>
+                <Link
+                  className={`hover:text-[#ffdb3e] ${
+                    isActive('/profile') ? 'text-[#ffdb3e] underline' : ''
+                  }`}
+                  to="/profile"
+                  onClick={() => setOpen(false)}
+                >
                   Perfil
                 </Link>
               </li>
               {me?.role === 'admin' && (
                 <li>
-                  <Link className="hover:text-[#ffdb3e]" to="/admin/users" onClick={() => setOpen(false)}>
+                  <Link
+                    className="hover:text-[#ffdb3e]"
+                    to="/admin/users"
+                    onClick={() => setOpen(false)}
+                  >
                     Admin
                   </Link>
                 </li>
