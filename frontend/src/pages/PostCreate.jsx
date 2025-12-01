@@ -511,42 +511,9 @@ export default function PostCreate() {
               </div>
             </form>
 
-            {/* Columna lateral */}
+                      {/* Columna lateral */}
             <aside className="mt-6 lg:mt-0 lg:pl-4">
-              <div className="sticky top-4 space-y-4">
-                <div className="rounded-2xl bg-[color:var(--c-text)] text-white px-4 py-4 sm:px-5 sm:py-5 shadow-[0_18px_50px_rgba(0,0,0,.45)]">
-                  <p className="text-xs uppercase tracking-[0.18em] text-[color:var(--c-info)]/80">
-                    Vista rápida
-                  </p>
-                  <h3 className="mt-1 text-sm font-semibold">
-                    Así se va a ver tu publicación
-                  </h3>
-                  <div className="mt-3 rounded-xl bg-white/5 p-3 border border-white/15">
-                    <div className="h-32 w-full rounded-lg bg-gradient-to-tr from-[color:var(--c-brand)]/75 to-[color:var(--c-info)]/75 flex items-center justify-center text-4xl">
-                      {previews[0] ? (
-                        <img
-                          src={previews[0]}
-                          alt="preview"
-                          className="h-full w-full object-cover rounded-lg"
-                        />
-                      ) : (
-                        <span className="opacity-80">📸</span>
-                      )}
-                    </div>
-                    <div className="mt-3 space-y-1">
-                      <p className="text-[13px] font-semibold truncate">
-                        {form.title || 'Título de tu artículo'}
-                      </p>
-                      <p className="text-[11px] text-[color:var(--c-info)]/90">
-                        {form.barrio || 'Barrio de encuentro'} · {form.condition || 'Estado a definir'}
-                      </p>
-                      <p className="text-[11px] text-slate-200 line-clamp-2">
-                        {form.description || 'Escribí una descripción clara, honesta y concreta para generar confianza en el trueque.'}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
+              <div className="sticky top-4">
                 <div className="rounded-2xl bg-white/90 border border-[color:var(--c-brand)]/40 px-4 py-4 sm:px-5 sm:py-5">
                   <h4 className="text-sm font-semibold text-[color:var(--c-text)]">
                     Tip rápido para un buen trueque
@@ -560,6 +527,7 @@ export default function PostCreate() {
                 </div>
               </div>
             </aside>
+
           </div>
         </div>
       </section>
