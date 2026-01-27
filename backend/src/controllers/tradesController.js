@@ -310,7 +310,13 @@ export async function changeStatus(req, res) {
     await postSystemMessage(chat._id, userId, message);
 
     await trade.save();
-    res.json(trade.toJSON());
+    const populated = await Trade.findById(trade._id)
+      .populate('proposerId', 'name')
+      .populate('receiverId', 'name')
+      .populate('postRequestedId', 'title barrio images')
+      .populate('postOfferedId', 'title barrio images')
+      .lean();
+    res.json(populated);
   } catch (err) {
     res.status(400).json({ code: err.code || 'TRADE_STATUS_ERROR', error: err.message });
   }
@@ -350,7 +356,13 @@ export async function counterOffer(req, res) {
       link: `/chat/${userId}`
     });
     await trade.save();
-    res.json(trade.toJSON());
+    const populated = await Trade.findById(trade._id)
+      .populate('proposerId', 'name')
+      .populate('receiverId', 'name')
+      .populate('postRequestedId', 'title barrio images')
+      .populate('postOfferedId', 'title barrio images')
+      .lean();
+    res.json(populated);
   } catch (err) {
     res.status(400).json({ code: err.code || 'TRADE_COUNTER_ERROR', error: err.message });
   }
@@ -410,7 +422,13 @@ export async function suggestMeeting(req, res) {
       link: `/chat/${userId}`
     });
     await trade.save();
-    res.json(trade.toJSON());
+    const populated = await Trade.findById(trade._id)
+      .populate('proposerId', 'name')
+      .populate('receiverId', 'name')
+      .populate('postRequestedId', 'title barrio images')
+      .populate('postOfferedId', 'title barrio images')
+      .lean();
+    res.json(populated);
   } catch (err) {
     res.status(400).json({ code: err.code || 'TRADE_MEETING_SUGGEST_ERROR', error: err.message });
   }
@@ -467,7 +485,13 @@ export async function acceptMeeting(req, res) {
       link: `/chat/${userId}`
     });
     await trade.save();
-    res.json(trade.toJSON());
+    const populated = await Trade.findById(trade._id)
+      .populate('proposerId', 'name')
+      .populate('receiverId', 'name')
+      .populate('postRequestedId', 'title barrio images')
+      .populate('postOfferedId', 'title barrio images')
+      .lean();
+    res.json(populated);
   } catch (err) {
     res.status(400).json({ code: err.code || 'TRADE_MEETING_ACCEPT_ERROR', error: err.message });
   }
@@ -504,7 +528,13 @@ export async function rejectMeeting(req, res) {
       link: `/chat/${userId}`
     });
     await trade.save();
-    res.json(trade.toJSON());
+    const populated = await Trade.findById(trade._id)
+      .populate('proposerId', 'name')
+      .populate('receiverId', 'name')
+      .populate('postRequestedId', 'title barrio images')
+      .populate('postOfferedId', 'title barrio images')
+      .lean();
+    res.json(populated);
   } catch (err) {
     res.status(400).json({ code: err.code || 'TRADE_MEETING_REJECT_ERROR', error: err.message });
   }
@@ -544,7 +574,13 @@ export async function cancelMeeting(req, res) {
       link: `/chat/${userId}`
     });
     await trade.save();
-    res.json(trade.toJSON());
+    const populated = await Trade.findById(trade._id)
+      .populate('proposerId', 'name')
+      .populate('receiverId', 'name')
+      .populate('postRequestedId', 'title barrio images')
+      .populate('postOfferedId', 'title barrio images')
+      .lean();
+    res.json(populated);
   } catch (err) {
     res.status(400).json({ code: err.code || 'TRADE_MEETING_CANCEL_ERROR', error: err.message });
   }

@@ -110,9 +110,9 @@ export default function Chat() {
       let statusText = ''
       const newStatus = updated?.status
 
-      if (action === 'accept') statusText = 'Aceptaste un trueque.'
-      else if (action === 'reject') statusText = 'Rechazaste un trueque.'
-      else if (action === 'cancel') statusText = 'Cancelaste un trueque.'
+      if (action === 'accept') statusText = 'Acepté tu propuesta de trueque.'
+      else if (action === 'reject') statusText = 'Rechacé tu propuesta de trueque.'
+      else if (action === 'cancel') statusText = 'Cancelé tu propuesta de trueque.'
       else if (action === 'finish') {
         if (newStatus === 'finished') {
           statusText = 'El trueque se completó. Ambas partes lo marcaron como realizado.'
@@ -462,7 +462,7 @@ export default function Chat() {
           <header className="mb-4 sm:mb-6 flex items-center justify-between gap-4">
             <div className="text-left">
               <p className="text-[11px] uppercase tracking-[0.18em] text-[color:var(--c-info)]/90">
-                Conversacion de trueque
+                Conversación de trueque
               </p>
               <h1
                 className="mt-1 text-2xl sm:text-3xl font-bold"
@@ -619,160 +619,276 @@ export default function Chat() {
                     : 'bg-slate-200/80 text-slate-700'
 
                 return (
-                  <div
-                    key={id}
-                    className={`flex ${isMine ? 'justify-end' : 'justify-start'}`}
-                  >
-                    <div
-                      className={`flex max-w-[90%] gap-3 ${
-                        isMine ? 'flex-row-reverse' : 'flex-row'
-                      }`}
-                    >
-                      <div className="mt-1 h-7 w-7 rounded-full bg-white shadow-[0_8px_20px_rgba(0,0,0,.18)] border border-[color:var(--c-mid-blue)]/30 flex items-center justify-center text-[10px] font-semibold text-[color:var(--c-text)]/80">
-                        {(nameLabel || 'U').trim()[0] || 'U'}
-                      </div>
-                      <div className="flex-1">
-                        <div className="flex items-baseline justify-between mb-1">
-                          <div>
-                            <p className="text-[11px] text-[color:var(--c-text)]/70">
-                              {nameLabel}
-                            </p>
-                            <p className="text-[10px] text-[color:var(--c-text)]/60">
-                              {isMine ? 'Propusiste un trueque' : 'Te propusieron un trueque'}
-                            </p>
+                  <>
+                    <div className='flex flex-col gap-3 bg-white rounded-2xl'>
+                      <div className='flex justify-between items-center border-b border-[color:var(--c-mid-blue)]/30 px-3 py-2'>
+                        <div className='flex gap-1 items-center'>
+                          <div className="h-7 w-7 rounded-full bg-white shadow border border-[color:var(--c-mid-blue)]/30 flex items-center justify-center text-[10px] font-semibold text-[color:var(--c-text)]/80">
+                            {(nameLabel || 'U').trim()[0] || 'U'}
                           </div>
-                          <span
-                            className={`px-2 py-0.5 rounded-full text-[10px] font-semibold ${statusBadgeClass}`}
-                          >
-                            {statusLabel}
-                          </span>
-                        </div>
-
-                        <div
-                          className={`rounded-2xl shadow-[0_14px_35px_rgba(0,0,0,.14)] border border-[color:var(--c-mid-blue)]/20 bg-white/95 px-3 py-2 ${
-                            isMine ? 'rounded-br-none' : 'rounded-bl-none'
-                          }`}
-                        >
-                          <div className="mt-1 grid grid-cols-1 sm:grid-cols-2 gap-2">
-                            <div className="rounded-xl bg-[color:var(--c-mid-blue)]/5 border border-[color:var(--c-mid-blue)]/25 px-2.5 py-2 flex gap-2">
-                              {requestedImage && (
-                                <button
-                                  type="button"
-                                  onClick={() => requestedId && navigate(`/posts/${requestedId}`)}
-                                  className="flex-shrink-0 w-12 h-12 rounded-lg overflow-hidden border border-[color:var(--c-mid-blue)]/40 bg-white"
-                                >
-                                  <img
-                                    src={requestedImage}
-                                    alt={requestedTitle}
-                                    className="w-full h-full object-cover"
-                                  />
-                                </button>
-                              )}
-                              <div className="min-w-0">
-                                <p className="text-[10px] uppercase tracking-[0.12em] text-[color:var(--c-info)] mb-0.5">
-                                  Publicacion
-                                </p>
-                                <p className="text-[11px] font-semibold truncate">
-                                  {requestedId ? (
-                                    <button
-                                      type="button"
-                                      onClick={() => navigate(`/posts/${requestedId}`)}
-                                      className="underline text-[color:var(--c-brand)] hover:text-[color:var(--c-mid-pink)]"
-                                    >
-                                      {requestedTitle}
-                                    </button>
-                                  ) : (
-                                    requestedTitle
-                                  )}
-                                </p>
-                                {barrioRequested && (
-                                  <p className="text-[10px] text-[color:var(--c-text)]/70">
-                                    Barrio: {barrioRequested}
-                                  </p>
-                                )}
-                              </div>
-                            </div>
-
-                            <div className="rounded-xl bg-[color:var(--c-accent)]/15 border border-[color:var(--c-accent)]/40 px-2.5 py-2 flex gap-2">
-                              {offeredImage && (
-                                <button
-                                  type="button"
-                                  onClick={() => offeredId && navigate(`/posts/${offeredId}`)}
-                                  className="flex-shrink-0 w-12 h-12 rounded-lg overflow-hidden border border-[color:var(--c-accent)]/60 bg-white"
-                                >
-                                  <img
-                                    src={offeredImage}
-                                    alt={offeredTitle}
-                                    className="w-full h-full object-cover"
-                                  />
-                                </button>
-                              )}
-                              <div className="min-w-0">
-                                <p className="text-[10px] uppercase tracking-[0.12em] text-[color:var(--c-info)] mb-0.5">
-                                  Tu oferta
-                                </p>
-                                <p className="text-[11px] font-semibold truncate">
-                                  {offeredId ? (
-                                    <button
-                                      type="button"
-                                      onClick={() => navigate(`/posts/${offeredId}`)}
-                                      className="underline text-[color:var(--c-brand)] hover:text-[color:var(--c-mid-pink)]"
-                                    >
-                                      {offeredTitle}
-                                    </button>
-                                  ) : (
-                                    offeredTitle
-                                  )}
-                                </p>
-                                {barrioOffered && (
-                                  <p className="text-[10px] text-[color:var(--c-text)]/70">
-                                    Barrio: {barrioOffered}
-                                  </p>
-                                )}
-                              </div>
-                            </div>
-                          </div>
-
-                          {(barrioRequested || barrioOffered) && (
-                            <p className="text-[10px] text-[color:var(--c-text)]/70 mt-2">
-                              Zonas del trueque: {barrioOffered || '?'} ↔ {barrioRequested || '?'}
-                            </p>
-                          )}
-
-                          <div className="flex flex-wrap gap-2 mt-3 justify-end">
-                            {showAcceptReject && (
-                              <>
-                                <button
-                                  onClick={() => handleTradeAction(id, 'accept')}
-                                  className="px-2.5 py-1 rounded-xl text-[11px] font-semibold bg-[color:var(--c-mid-cyan)] text-white hover:bg-[color:var(--c-mid-cyan)]/90"
-                                >
-                                  Aceptar
-                                </button>
-                                <button
-                                  onClick={() => handleTradeAction(id, 'reject')}
-                                  className="px-2.5 py-1 rounded-xl text-[11px] font-semibold bg-red-500 text-white hover:bg-red-600"
-                                >
-                                  Rechazar
-                                </button>
-                              </>
-                            )}
-                            {showCancel && (
-                              <button
-                                onClick={() => handleTradeAction(id, 'cancel')}
-                                className="px-2.5 py-1 rounded-xl text-[11px] font-semibold bg-white border border-[color:var(--c-mid-blue)]/40 text-[color:var(--c-text)] hover:bg-[color:var(--c-mid-blue)]/5"
-                              >
-                                Cancelar
-                              </button>
-                            )}
-                          </div>
-
-                          <p className="mt-2 text-[10px] text-[color:var(--c-text)]/60 text-right">
-                            {time}
+                          <p className="text-[11px] text-[color:var(--c-text)]/70 align-middle h-4 items-center">
+                            {nameLabel}
                           </p>
                         </div>
+                        <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold h-5 ${statusBadgeClass}`}>
+                          {statusLabel}
+                        </span>
+                      </div>
+                      <div className='grid grid-cols-1 sm:grid-cols-2 gap-3 px-3'>
+                        <a href={`/posts/${requestedId}`} className="flex gap-2 border rounded-xl bg-[color:var(--c-mid-blue)]/5 hover:bg-[color:var(--c-mid-blue)]/15 border-[color:var(--c-mid-blue)]/30 p-3">
+                          <div className='h-[80px] md:h-[100px] w-[80px] md:w-[100px]'>
+                            <img
+                              src={requestedImage}
+                              alt={requestedTitle}
+                              className="w-full h-full object-cover rounded border border-[color:var(--c-mid-blue)]/30 bg-white" />
+                          </div>
+                          <div>
+                            <p className="text-[0.7rem] md:text-[1rem] uppercase tracking-[0.12em] text-[color:var(--c-info)] mb-0.5">
+                              Publicación
+                            </p>
+                            <p className="text-[0.7rem] md:text-[1rem] font-semibold truncate">
+                              {requestedId ? (
+                                <button
+                                  type="button"
+                                  onClick={() => navigate(`/posts/${requestedId}`)}
+                                  className="underline text-[color:var(--c-brand)] hover:text-[color:var(--c-mid-pink)]"
+                                >
+                                  {requestedTitle}
+                                </button>
+                              ) : (
+                                offeredTitle
+                              )}
+                            </p>
+                            {barrioRequested && (
+                              <p className="text-[0.6rem] md:text-[0.7rem] text-[color:var(--c-text)]/70 mt-1">
+                                Barrio: {barrioRequested}
+                              </p>
+                            )}
+                          </div>
+                        </a>
+                        <a href={`/posts/${offeredId}`} className="flex gap-2 bg-[color:var(--c-accent)]/15 border hover:bg-[color:var(--c-accent)]/20 border-[color:var(--c-accent)]/30 rounded-xl p-3">
+                          <div className='h-[80px] md:h-[100px] w-[80px] md:w-[100px]'>
+                            <img
+                              src={offeredImage}
+                              alt={offeredTitle}
+                              className="w-full h-full object-cover rounded border border-[color:var(--c-mid-blue)]/30 bg-white" />
+                          </div>
+                          <div>
+                            <p className="text-[0.7rem] md:text-[1rem] uppercase tracking-[0.12em] text-[color:var(--c-info)] mb-0.5">
+                              {isMine ? 'Tu oferta' : 'Oferta'}
+                            </p>
+                            <p className="text-[0.7rem] md:text-[1rem] font-semibold truncate">
+                              {offeredId ? (
+                                <button
+                                  type="button"
+                                  onClick={() => navigate(`/posts/${offeredId}`)}
+                                  className="underline text-[color:var(--c-brand)] hover:text-[color:var(--c-mid-pink)]"
+                                >
+                                  {offeredTitle}
+                                </button>
+                              ) : (
+                                offeredTitle
+                              )}
+                            </p>
+                            {barrioOffered && (
+                              <p className="text-[0.6rem] md:text-[0.7rem] text-[color:var(--c-text)]/70 mt-1">
+                                Barrio: {barrioOffered}
+                              </p>
+                            )}
+                          </div>
+                        </a>
+                      </div>
+                      <div className='px-3'>
+                        {(barrioRequested || barrioOffered) && (
+                          <p className="text-[0.7rem] text-[color:var(--c-text)]/70">
+                            Zonas del trueque: {barrioOffered || '?'} ↔ {barrioRequested || '?'}
+                          </p>
+                        )}
+                      </div>
+                      <div className='px-3 pb-3 flex justify-between'>
+                        <div className='flex gap-1'>
+                          {showAcceptReject && (
+                            <>
+                              <button
+                                onClick={() => handleTradeAction(id, 'accept')}
+                                className="px-3 py-2 rounded-xl text-[0.8rem] font-semibold bg-green-500 text-white hover:bg-green-600"
+                              >
+                                Aceptar
+                              </button>
+                              <button
+                                onClick={() => handleTradeAction(id, 'reject')}
+                                className="px-3 py-2 rounded-xl text-[0.8rem] font-semibold bg-red-500 text-white hover:bg-red-600"
+                              >
+                                Rechazar
+                              </button>
+                            </>
+                          )}
+                          {showCancel && (
+                            <button
+                              onClick={() => handleTradeAction(id, 'cancel')}
+                              className="px-3 py-2 rounded-xl text-[0.8rem] font-semibold bg-white border border-[color:var(--c-mid-blue)]/40 text-[color:var(--c-text)] hover:bg-[color:var(--c-mid-blue)]/5"
+                            >
+                              Cancelar
+                            </button>
+                          )}
+                        </div>
+                        <p className="mt-2 text-[10px] text-[color:var(--c-text)]/60 text-right">
+                          {time}
+                        </p>
                       </div>
                     </div>
-                  </div>
+
+
+                  
+                    {/* <div
+                      key={id}
+                      className={`flex ${isMine ? 'justify-end' : 'justify-start'}`}
+                    >
+                      <div
+                        className={`flex max-w-[90%] gap-3 ${isMine ? 'flex-row-reverse' : 'flex-row'}`}
+                      >
+                        <div className="mt-1 h-7 w-7 rounded-full bg-white shadow-[0_8px_20px_rgba(0,0,0,.18)] border border-[color:var(--c-mid-blue)]/30 flex items-center justify-center text-[10px] font-semibold text-[color:var(--c-text)]/80">
+                          {(nameLabel || 'U').trim()[0] || 'U'}
+                        </div>
+                        <div className="flex-1">
+                          <div className="flex items-baseline justify-between mb-1">
+                            <div>
+                              <p className="text-[11px] text-[color:var(--c-text)]/70">
+                                {nameLabel}
+                              </p>
+                              <p className="text-[10px] text-[color:var(--c-text)]/60">
+                                {isMine ? 'Propusiste un trueque' : 'Te propusieron un trueque'}
+                              </p>
+                            </div>
+                            <span
+                              className={`px-2 py-0.5 rounded-full text-[10px] font-semibold ${statusBadgeClass}`}
+                            >
+                              {statusLabel}
+                            </span>
+                          </div>
+
+                          <div
+                            className={`rounded-2xl shadow-[0_14px_35px_rgba(0,0,0,.14)] border border-[color:var(--c-mid-blue)]/20 bg-white/95 px-3 py-2 ${isMine ? 'rounded-br-none' : 'rounded-bl-none'}`}
+                          >
+                            <div className="mt-1 grid grid-cols-1 sm:grid-cols-2 gap-2">
+                              <div className="rounded-xl bg-[color:var(--c-mid-blue)]/5 border border-[color:var(--c-mid-blue)]/25 px-2.5 py-2 flex gap-2">
+                                {requestedImage && (
+                                  <button
+                                    type="button"
+                                    onClick={() => requestedId && navigate(`/posts/${requestedId}`)}
+                                    className="flex-shrink-0 w-12 h-12 rounded-lg overflow-hidden border border-[color:var(--c-mid-blue)]/40 bg-white"
+                                  >
+                                    <img
+                                      src={requestedImage}
+                                      alt={requestedTitle}
+                                      className="w-full h-full object-cover" />
+                                  </button>
+                                )}
+                                <div className="min-w-0">
+                                  <p className="text-[10px] uppercase tracking-[0.12em] text-[color:var(--c-info)] mb-0.5">
+                                    Publicacion
+                                  </p>
+                                  <p className="text-[11px] font-semibold truncate">
+                                    {requestedId ? (
+                                      <button
+                                        type="button"
+                                        onClick={() => navigate(`/posts/${requestedId}`)}
+                                        className="underline text-[color:var(--c-brand)] hover:text-[color:var(--c-mid-pink)]"
+                                      >
+                                        {requestedTitle}
+                                      </button>
+                                    ) : (
+                                      requestedTitle
+                                    )}
+                                  </p>
+                                  {barrioRequested && (
+                                    <p className="text-[10px] text-[color:var(--c-text)]/70">
+                                      Barrio: {barrioRequested}
+                                    </p>
+                                  )}
+                                </div>
+                              </div>
+
+                              <div className="rounded-xl bg-[color:var(--c-accent)]/15 border border-[color:var(--c-accent)]/40 px-2.5 py-2 flex gap-2">
+                                {offeredImage && (
+                                  <button
+                                    type="button"
+                                    onClick={() => offeredId && navigate(`/posts/${offeredId}`)}
+                                    className="flex-shrink-0 w-12 h-12 rounded-lg overflow-hidden border border-[color:var(--c-accent)]/60 bg-white"
+                                  >
+                                    <img
+                                      src={offeredImage}
+                                      alt={offeredTitle}
+                                      className="w-full h-full object-cover" />
+                                  </button>
+                                )}
+                                <div className="min-w-0">
+                                  <p className="text-[10px] uppercase tracking-[0.12em] text-[color:var(--c-info)] mb-0.5">
+                                    Tu oferta
+                                  </p>
+                                  <p className="text-[11px] font-semibold truncate">
+                                    {offeredId ? (
+                                      <button
+                                        type="button"
+                                        onClick={() => navigate(`/posts/${offeredId}`)}
+                                        className="underline text-[color:var(--c-brand)] hover:text-[color:var(--c-mid-pink)]"
+                                      >
+                                        {offeredTitle}
+                                      </button>
+                                    ) : (
+                                      offeredTitle
+                                    )}
+                                  </p>
+                                  {barrioOffered && (
+                                    <p className="text-[10px] text-[color:var(--c-text)]/70">
+                                      Barrio: {barrioOffered}
+                                    </p>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+
+                            {(barrioRequested || barrioOffered) && (
+                              <p className="text-[10px] text-[color:var(--c-text)]/70 mt-2">
+                                Zonas del trueque: {barrioOffered || '?'} ↔ {barrioRequested || '?'}
+                              </p>
+                            )}
+
+                            <div className="flex flex-wrap gap-2 mt-3 justify-end">
+                              {showAcceptReject && (
+                                <>
+                                  <button
+                                    onClick={() => handleTradeAction(id, 'accept')}
+                                    className="px-2.5 py-1 rounded-xl text-[11px] font-semibold bg-[color:var(--c-mid-cyan)] text-white hover:bg-[color:var(--c-mid-cyan)]/90"
+                                  >
+                                    Aceptar
+                                  </button>
+                                  <button
+                                    onClick={() => handleTradeAction(id, 'reject')}
+                                    className="px-2.5 py-1 rounded-xl text-[11px] font-semibold bg-red-500 text-white hover:bg-red-600"
+                                  >
+                                    Rechazar
+                                  </button>
+                                </>
+                              )}
+                              {showCancel && (
+                                <button
+                                  onClick={() => handleTradeAction(id, 'cancel')}
+                                  className="px-2.5 py-1 rounded-xl text-[11px] font-semibold bg-white border border-[color:var(--c-mid-blue)]/40 text-[color:var(--c-text)] hover:bg-[color:var(--c-mid-blue)]/5"
+                                >
+                                  Cancelar
+                                </button>
+                              )}
+                            </div>
+
+                            <p className="mt-2 text-[10px] text-[color:var(--c-text)]/60 text-right">
+                              {time}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    </div> */}
+                  </>
                 )
               })}
 

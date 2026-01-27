@@ -40,12 +40,12 @@ export default function Register() {
       <section className="w-full max-w-sm">
         <div className="rounded-2xl bg-white p-6 sm:p-8 shadow-[0_20px_60px_rgba(0,0,0,.25)] border border-[color:var(--c-mid-blue)]/50">
           <header className="text-center">
-            <h1
+            <h2
               className="text-3xl font-bold tracking-tight"
               style={{ color: 'var(--c-brand)' }}
             >
               Crear cuenta
-            </h1>
+            </h2>
             <p className="mt-1 text-sm" style={{ color: 'var(--c-text)' }}>
               Sumate a la comunidad de trueque.
             </p>
@@ -152,7 +152,7 @@ export default function Register() {
 
             <p className="text-center text-sm mt-2">
               <Link to="/login" className="underline underline-offset-2 hover:opacity-90" style={{ color: 'var(--c-brand)' }}>
-                ¿Ya tenés cuenta? Iniciá sesión
+                ¿Ya tenes cuenta? Inicia sesión
               </Link>
             </p>
           </form>
