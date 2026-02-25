@@ -145,9 +145,9 @@ export default function PostCreate() {
     >
       <section className="w-full max-w-5xl">
         {isTradeOfferMode && (
-          <div className="mb-3 rounded-2xl bg-[color:var(--c-info)]/10 border border-[color:var(--c-info)]/50 px-4 py-3 text-sm text-[color:var(--c-text)]">
+          <div className="mb-3 rounded-2xl bg-white/95 border border-[color:var(--c-info)]/50 px-4 py-3 text-sm text-[color:var(--c-text)]">
             <p className="font-semibold text-[color:var(--c-info)]">
-              Estás creando una publicación para ofrecerla en un trueque.
+              Estás creando una publicación para ofrecer en un trueque.
             </p>
             <p className="mt-1 text-xs text-slate-600">
               Al publicar, vamos a enviar esta publicación como oferta para otra publicación.
@@ -182,7 +182,7 @@ export default function PostCreate() {
           <div className="grid gap-6 lg:grid-cols-[minmax(0,2.1fr)_minmax(260px,1fr)] lg:items-start">
             {/* Columna formulario */}
             <form onSubmit={onSubmit} className="space-y-6">
-              {/* Imagenes xd */}
+              {/* Imágenes xd */}
               <section
                 className="rounded-2xl border border-dashed p-4 sm:p-5 bg-white/95"
                 style={{
@@ -296,7 +296,7 @@ export default function PostCreate() {
                     disabled={loading}
                     maxLength={LIMITS.titleMax}
                     aria-describedby="title-help"
-                    className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 outline-none ring-2 ring-transparent focus:ring-[color:var(--c-info)] focus:border-[color:var(--c-info)] text-sm"
+                    className="w-full rounded-md border border-slate-200 bg-white px-4 py-3 outline-none ring-2 ring-transparent focus:ring-[color:var(--c-info)] focus:border-[color:var(--c-info)] text-sm"
                     placeholder="Ej: Bicicleta urbana rodado 28"
                   />
                   <div id="title-help" className="mt-1 flex items-center justify-between text-xs text-slate-500">
@@ -315,7 +315,7 @@ export default function PostCreate() {
                     disabled={loading}
                     maxLength={LIMITS.descMax}
                     aria-describedby="desc-help"
-                    className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 outline-none ring-2 ring-transparent focus:ring-[color:var(--c-info)] focus:border-[color:var(--c-info)] text-sm"
+                    className="w-full rounded-md border border-slate-200 bg-white px-4 py-3 outline-none ring-2 ring-transparent focus:ring-[color:var(--c-info)] focus:border-[color:var(--c-info)] text-sm"
                     rows={4}
                     placeholder="Contá el estado, usos, qué incluye y si tiene algo para revisar…"
                   />
@@ -336,7 +336,7 @@ export default function PostCreate() {
                       disabled={loading}
                       maxLength={LIMITS.catMax}
                       aria-describedby="cat-help"
-                      className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 outline-none ring-2 ring-transparent focus:ring-[color:var(--c-info)] focus:border-[color:var(--c-info)] text-sm"
+                      className="w-full rounded-md border border-slate-200 bg-white px-4 py-3 outline-none ring-2 ring-transparent focus:ring-[color:var(--c-info)] focus:border-[color:var(--c-info)] text-sm"
                       placeholder="Ej: bicicletas"
                     />
                     <div id="cat-help" className="mt-1 flex items-center justify-between text-xs text-slate-500">
@@ -345,7 +345,7 @@ export default function PostCreate() {
                     </div>
                   </div>
 
-                  <div className="grid gap-1">
+                  <div className="grid grid-rows-[20px_1fr] gap-1 sm:grid-rows-[20px_1fr_20px]">
                     <label htmlFor="condition" className="text-sm font-medium" style={{ color: 'var(--c-text)' }}>Estado</label>
                     <select
                       id="condition"
@@ -353,7 +353,7 @@ export default function PostCreate() {
                       value={form.condition}
                       onChange={onChange}
                       disabled={loading}
-                      className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 outline-none ring-2 ring-transparent focus:ring-[color:var(--c-info)] focus:border-[color:var(--c-info)] text-sm"
+                      className="w-full rounded-md border border-slate-200 bg-white px-4 py-3 outline-none ring-2 ring-transparent focus:ring-[color:var(--c-info)] focus:border-[color:var(--c-info)] text-sm"
                     >
                       <option value="">Seleccionar…</option>
                       <option value="nuevo">Nuevo</option>
@@ -386,7 +386,7 @@ export default function PostCreate() {
 
                 <div>
                   <span className="text-sm font-medium" style={{ color: 'var(--c-text)' }}>¿Tiene detalles?</span>
-                  <div className="mt-1 flex gap-4 text-sm" style={{ color: 'var(--c-text)' }}>
+                  <div className="flex gap-4 text-sm mt-3" style={{ color: 'var(--c-text)' }}>
                     <label className="inline-flex items-center gap-2">
                       <input type="radio" name="hasDetails" value="yes" checked={form.hasDetails === 'yes'} onChange={onChange} />
                       Sí, tiene marcas / fallas
@@ -426,7 +426,7 @@ export default function PostCreate() {
                       value={form.barrio}
                       onChange={onChange}
                       disabled={loading || barriosLoading}
-                      className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 outline-none ring-2 ring-transparent focus:ring-[color:var(--c-info)] focus:border-[color:var(--c-info)] text-sm"
+                      className="w-full rounded-md border border-slate-200 bg-white px-4 py-3 outline-none ring-2 ring-transparent focus:ring-[color:var(--c-info)] focus:border-[color:var(--c-info)] text-sm"
                     >
                       <option value="">{barriosLoading ? 'Cargando barrios…' : 'Seleccionar barrio…'}</option>
                       {!barriosLoading && barrios.map((b, i) => (
@@ -438,18 +438,9 @@ export default function PostCreate() {
               </section>
 
               {/* Preferencias de intercambio */}
-              <section
-                className="grid gap-4 rounded-2xl border p-4 sm:p-5"
-                style={{
-                  background: 'rgba(0,175,231,0.04)',
-                  borderColor: 'rgba(0,175,231,0.24)'
-                }}
-              >
+              <section className="grid gap-4 rounded-2xl border p-4 sm:p-5 bg-[var(--c-info)]/5 border-[var(--c-info)]/30">
                 <div className="flex items-center justify-between gap-3">
-                  <h2
-                    className="text-base font-semibold"
-                    style={{ color: 'var(--c-brand)' }}
-                  >
+                  <h2 className="text-base font-semibold text-[var(--c-brand)]">
                     Preferencias de intercambio
                   </h2>
                   <span className="text-[11px] uppercase tracking-[0.18em] text-[color:var(--c-info)]/90">
@@ -458,8 +449,8 @@ export default function PostCreate() {
                 </div>
 
                 <div>
-                  <span className="text-sm font-medium" style={{ color: 'var(--c-text)' }}>¿Abierto a ofertas?</span>
-                  <div className="mt-1 flex flex-wrap gap-4 text-sm" style={{ color: 'var(--c-text)' }}>
+                  <span className="text-sm font-medium text-[var(--c-text)]">¿Abierto a ofertas?</span>
+                  <div className="flex flex-wrap gap-4 text-sm mt-3 text-[var(--c-text)]">
                     <label className="inline-flex items-center gap-2">
                       <input type="radio" name="openToOffers" value="yes" checked={form.openToOffers === 'yes'} onChange={onChange} />
                       Sí, escucho propuestas
@@ -511,7 +502,7 @@ export default function PostCreate() {
               </div>
             </form>
 
-                      {/* Columna lateral */}
+            {/* Columna lateral */}
             <aside className="mt-6 lg:mt-0 lg:pl-4">
               <div className="sticky top-4">
                 <div className="rounded-2xl bg-white/90 border border-[color:var(--c-brand)]/40 px-4 py-4 sm:px-5 sm:py-5">

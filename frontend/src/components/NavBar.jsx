@@ -216,7 +216,7 @@ export default function NavBar() {
                   to="/notifications"
                   aria-label="notificaciones"
                   title="notificaciones"
-                  className="relative nav-icon text-[#ffdb3e] cursor-default opacity-90 rounded-full bg-white/5 px-2 py-1"
+                  className="relative nav-icon text-[#ffdb3e] rounded-full bg-white/5 hover:bg-white/15 px-2 py-1 transition"
                 >
                   <ion-icon
                     name="notifications"
