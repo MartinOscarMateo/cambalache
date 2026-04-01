@@ -26,7 +26,8 @@ export default function Noticications() {
   useEffect(() => {
     getNotifications()
       .then(res => {
-        setNotifications(Array.isArray(res) ? res : []);
+        const arr = Array.isArray(res) ? res : [];
+        setNotifications(arr);
       })
       .catch(e => setError(e.message || 'Error al cargar notificaciones'))
       .finally(() => setLoading(false));

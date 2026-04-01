@@ -32,6 +32,11 @@
 .nav-icon { transition: opacity 0.15s ease; }
 .nav-icon:hover { opacity: 0.9; }
 
+/* marca de notificaciones no leídas: borde / halo amarillo */
+.nav-icon--unread {
+  border: yellow solid 2px;
+}
+
 /* badge sobre icono de chats */
 .nav-badge {
   position: absolute;

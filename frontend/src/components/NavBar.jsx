@@ -2,7 +2,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import logo from '../assets/logo-svg.svg';
-import { getMe } from '../lib/api.js';
+import { getMe, getNotifications } from '../lib/api.js';
 import '../styles/components/navbar.css';
 
 export default function NavBar() {
@@ -16,6 +16,7 @@ export default function NavBar() {
   });
   const [menuUserOpen, setMenuUserOpen] = useState(false); // estado menu avatar
   const [unreadChats, setUnreadChats] = useState(0);
+  const [unreadNotifications, setUnreadNotifications] = useState(0);
   const navigate = useNavigate();
   const location = useLocation();
   const menuRef = useRef(null);
@@ -46,6 +47,8 @@ export default function NavBar() {
     };
   }, [token]);
 
+  
+
   useEffect(() => {
     // cierra menu usuario al click fuera
     function onDocClick(e) {
@@ -55,6 +58,32 @@ export default function NavBar() {
     document.addEventListener('click', onDocClick);
     return () => document.removeEventListener('click', onDocClick);
   }, []);
+
+  // 
+  useEffect(() => {
+    let mounted = true;
+    async function fetchNotifications() {
+      if (!token) {
+        setUnreadNotifications(0);
+        return;
+      }
+      try {
+        const res = await getNotifications();
+        if (!mounted) return;
+        const arr = Array.isArray(res) ? res : [];
+        const unread = arr.filter(n => !n.read).length;
+        setUnreadNotifications(unread);
+      } catch {
+        setUnreadNotifications(0);
+      }
+    }
+
+    fetchNotifications();
+
+    return () => {
+      mounted = false;
+    };
+  }, [token]);
 
   function logout() {
     localStorage.removeItem('token');
@@ -216,7 +245,13 @@ export default function NavBar() {
                   to="/notifications"
                   aria-label="notificaciones"
                   title="notificaciones"
-                  className="relative nav-icon text-[#ffdb3e] rounded-full bg-white/5 hover:bg-white/15 px-2 py-1 transition"
+                  onClick={() => {
+                    setUnreadNotifications(0);
+                    setOpen(false);
+                  }}
+                  className={`relative nav-icon text-[#ffdb3e] rounded-full bg-white/5 hover:bg-white/15 px-2 py-1 transition ${
+                    unreadNotifications > 0 ? 'nav-icon--unread' : ''
+                  }`}
                 >
                   <ion-icon
                     name="notifications"
@@ -383,12 +418,23 @@ export default function NavBar() {
                   Chats
                 </Link>
               </li>
-              <li className="flex items-center gap-2 text-[#ffdb3e]">
-                <ion-icon
-                  name="notifications"
-                  className="text-xl align-middle"
-                ></ion-icon>
-                <span>Notificaciones</span>
+              <li>
+                <Link
+                  to="/notifications"
+                  onClick={() => {
+                    setOpen(false);
+                    setUnreadNotifications(0);
+                  }}
+                  className="flex items-center gap-2 text-[#ffdb3e]"
+                >
+                  <ion-icon
+                    name="notifications"
+                    className={`text-xl align-middle ${
+                      unreadNotifications > 0 ? 'nav-icon--unread' : ''
+                    }`}
+                  ></ion-icon>
+                  <span>Notificaciones</span>
+                </Link>
               </li>
               <li>
                 <Link

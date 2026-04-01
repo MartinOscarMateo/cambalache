@@ -30,7 +30,7 @@ export default function Chat() {
     const name = m.senderName ?? m.sender?.name ?? 'Usuario'
     return {
       from,
-      senderName: from === myId ? 'Tú' : name,
+      senderName: from === myId ? 'Yo' : name,
       text: m.text ?? '',
       createdAt: m.createdAt ?? new Date().toISOString()
     }
@@ -429,7 +429,7 @@ export default function Chat() {
 
       const localMsg = normalizeMessage({
         from: myId,
-        senderName: 'Tú',
+        senderName: 'Yo',
         to: otherUserId,
         text: message
       })
@@ -598,7 +598,7 @@ export default function Chat() {
                   : null
 
                 const time = formatTime(t.createdAt)
-                const nameLabel = isMine ? 'Tú' : partnerName || 'Usuario'
+                const nameLabel = isMine ? 'Yo' : partnerName || 'Usuario'
                 const statusLabel =
                   t.status === 'pending'
                     ? 'Pendiente de respuesta'
@@ -1005,7 +1005,7 @@ export default function Chat() {
               {messages.map((msg, i) => {
                 const isMine = msg.from === myId
                 const time = formatTime(msg.createdAt)
-                const nameLabel = isMine ? 'Tú' : msg.senderName || 'Usuario'
+                const nameLabel = isMine ? 'Yo' : msg.senderName || 'Usuario'
 
                 return (
                   <div
