@@ -47,6 +47,16 @@ export default function NavBar() {
     };
   }, [token]);
 
+  useEffect(() => {
+    function onNotificationsUpdate(e) {
+      const unread = e?.detail?.unread ?? 0;
+      setUnreadNotifications(unread);
+    }
+
+    window.addEventListener('cambalache:notifications', onNotificationsUpdate);
+    return () => window.removeEventListener('cambalache:notifications', onNotificationsUpdate);
+  }, []);
+
   
 
   useEffect(() => {
@@ -59,7 +69,7 @@ export default function NavBar() {
     return () => document.removeEventListener('click', onDocClick);
   }, []);
 
-  // 
+  // Esto guarda la cantidad de read = true de la db
   useEffect(() => {
     let mounted = true;
     async function fetchNotifications() {
@@ -73,6 +83,7 @@ export default function NavBar() {
         const arr = Array.isArray(res) ? res : [];
         const unread = arr.filter(n => !n.read).length;
         setUnreadNotifications(unread);
+        console.log(unread);
       } catch {
         setUnreadNotifications(0);
       }
@@ -246,7 +257,6 @@ export default function NavBar() {
                   aria-label="notificaciones"
                   title="notificaciones"
                   onClick={() => {
-                    setUnreadNotifications(0);
                     setOpen(false);
                   }}
                   className={`relative nav-icon text-[#ffdb3e] rounded-full bg-white/5 hover:bg-white/15 px-2 py-1 transition ${

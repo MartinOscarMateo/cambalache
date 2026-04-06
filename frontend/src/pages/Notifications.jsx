@@ -28,6 +28,12 @@ export default function Noticications() {
       .then(res => {
         const arr = Array.isArray(res) ? res : [];
         setNotifications(arr);
+        const unread = arr.filter(n => !n.read).length;
+        try {
+          window.dispatchEvent(new CustomEvent('cambalache:notifications', { detail: { unread } }));
+        } catch {
+          console.log(unread);
+        }
       })
       .catch(e => setError(e.message || 'Error al cargar notificaciones'))
       .finally(() => setLoading(false));
@@ -37,11 +43,16 @@ export default function Noticications() {
     if (n.read) return;
     try {
       await markNotificationAsRead(n._id);
-      setNotifications(prev =>
-        prev.map(item =>
-          item._id === n._id ? { ...item, read: true } : item
-        )
-      );
+      setNotifications(prev => {
+        const next = prev.map(item => (item._id === n._id ? { ...item, read: true } : item));
+        const unread = next.filter(i => !i.read).length;
+        try {
+          window.dispatchEvent(new CustomEvent('cambalache:notifications', { detail: { unread } }));
+        } catch {
+          console.log(unread);
+        }
+        return next;
+      });
     } catch (e) {
       // si falla, no rompemos la navegacion
       console.error(e);
@@ -128,7 +139,9 @@ export default function Noticications() {
                 <Link
                   key={n._id}
                   to={n.link}
-                  onClick={() => handleOpenNotification(n)}
+                  onClick={() => {
+                    handleOpenNotification(n)
+                  }}
                   className="block"
                 >
                   <article
