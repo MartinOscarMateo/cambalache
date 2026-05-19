@@ -1,6 +1,6 @@
 // frontend/src/pages/PostDetail.jsx
 import { useEffect, useState } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useParams, useNavigate, Link, useLocation } from 'react-router-dom';
 import { getPostById, getPostsByUser, createTrade } from '../lib/api.js';
 
 function idOf(v) {
@@ -40,6 +40,7 @@ export default function PostDetail() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [info, setInfo] = useState('');
+  const location = useLocation();
 
   // modal
   const [showModal, setShowModal] = useState(false);
@@ -113,6 +114,16 @@ export default function PostDetail() {
       active = false;
     };
   }, [id]);
+
+  useEffect(() => {
+    if (location.state?.openTradeModal) {
+      setShowModal(true);
+      setOfferType('');
+      setSelectedPostId('');
+      setOfferText('');
+      loadMyPosts();
+    }
+  }, [location.state]);
 
   // mas posts del duenio
   useEffect(() => {

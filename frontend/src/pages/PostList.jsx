@@ -137,12 +137,18 @@ export default function PostList() {
           </div>
 
           {/* accion */}
-          <div className="mt-auto flex items-center justify-between">
+          <div className="mt-auto flex items-center gap-2">
             <button
               onClick={() => navigate(`/posts/${pid(p)}`)}
               className="px-4 py-2 rounded-xl border border-[color:var(--c-mid-blue)]/60 hover:bg-[color:var(--c-mid-blue)]/10 transition text-xs sm:text-sm font-medium text-[color:var(--c-text)]"
             >
               Ver detalle
+            </button>
+            <button
+              onClick={() => navigate(`/posts/${pid(p)}`, { state: { openTradeModal: true } })}
+              className="px-4 py-2 rounded-xl bg-[color:var(--c-brand)] text-white hover:brightness-110 transition text-xs sm:text-sm font-medium"
+            >
+              Trueque
             </button>
           </div>
         </div>
