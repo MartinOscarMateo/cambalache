@@ -568,7 +568,7 @@ export default function PostDetail() {
       </section>
 
       {showModal && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
+        <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-1000">
           <div className="bg-white/98 rounded-2xl shadow-[0_20px_60px_rgba(0,0,0,.45)] w-[92%] max-w-md p-5 space-y-4 border border-[color:var(--c-mid-blue)]/60">
             <h2
               className="text-lg font-bold text-center"
