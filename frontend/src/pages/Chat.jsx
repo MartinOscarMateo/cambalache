@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { io } from 'socket.io-client'
 import { useParams, useNavigate } from 'react-router-dom'
 import { listTrades, updateTradeStatus, getMeetingPlaces, suggestTradeMeeting, acceptTradeMeeting, rejectTradeMeeting, cancelTradeMeeting } from '../lib/api.js'
@@ -14,6 +14,7 @@ export default function Chat() {
   const [trades, setTrades] = useState([])
   const [tradesLoading, setTradesLoading] = useState(false)
   const [meetingProcessingId, setMeetingProcessingId] = useState('')
+  const [selectedPlaceId, setSelectedPlaceId] = useState('')
   const [menuOpen, setMenuOpen] = useState(false)
   const [meetingSelectorTrade, setMeetingSelectorTrade] = useState(null)
   const [meetingOptions, setMeetingOptions] = useState([])
@@ -23,6 +24,9 @@ export default function Chat() {
   const token = localStorage.getItem('token')
   const currentUser = JSON.parse(localStorage.getItem('user') || '{}')
   const myId = String(currentUser._id || currentUser.id || '')
+  const menuRef = useRef(null);
+
+
 
   function normalizeMessage(m) {
     const rawFrom = m.from ?? m.senderId ?? m.sender?._id ?? m.sender ?? m.authorId
@@ -247,7 +251,6 @@ export default function Chat() {
   }
 
   function handleOpenFinishFromMenu() {
-    setMenuOpen(false)
     const activeTrade = findActiveTrade()
     if (!activeTrade) {
       window.alert('No hay trueques activos en este chat para marcar como realizados.')
@@ -403,6 +406,21 @@ export default function Chat() {
     if (otherUserId) loadChat()
   }, [otherUserId, token])
 
+  {/* Para cerrar presionando fuera del menu ;) */}
+  useEffect(() => {
+    function handleClickOutside(e) {
+      if (menuOpen && menuRef.current && !menuRef.current.contains(e.target)) {
+        setMenuOpen(false)
+      }
+    }
+
+    document.addEventListener('click', handleClickOutside)
+
+    return () => {
+      document.removeEventListener('click', handleClickOutside)
+    }
+  }, [menuOpen])
+
   const sendMessage = async () => {
     if (!message.trim() || !otherUserId) return
     try {
@@ -458,19 +476,32 @@ export default function Chat() {
       className="px-4 py-8"
       style={{ background: 'linear-gradient(180deg, var(--c-text) 0%, #15158f 55%, #05004c 100%)' }}
     >
-      {menuOpen && (
+      {meetingSelectorTrade && (
         <div 
           className="fixed inset-0 flex items-center justify-center bg-black/50 z-1000"
-          onClick={() => setMenuOpen(false)}
+          onClick={() => setMeetingSelectorTrade(null)}
         >
           <div 
-            className='bg-white p-3 rounded-xl'
+            className='bg-white p-4 rounded-xl'
             onClick={e => e.stopPropagation()}
           >
-            <h3 className='text-center'>Seleccionar lugar de encuentro</h3>
+            <h3 className='text-center mb-1'>Seleccionar lugar de encuentro</h3>
             <form
               onSubmit={async (e) => {
                 e.preventDefault()
+
+                const chosenPlace = meetingOptions.find(opt => opt.id === selectedPlaceId)
+
+                if (!chosenPlace) {
+                  window.alert('Por favor, selecciona un lugar antes de proponer.')
+                  return
+                }
+
+                await handleSuggestMeeting(meetingSelectorTrade, chosenPlace)
+                
+                setMeetingSelectorTrade(null)
+                setSelectedPlaceId('')
+                console.log('Lugar Propuesto:', chosenPlace)
               }}
             >
               <div className="flex flex-col gap-1 overflow-y-auto max-h-60">
@@ -489,8 +520,10 @@ export default function Chat() {
                         type="radio"
                         id={option.id}
                         name="meeting-option"
-                        value={option.name}
+                        value={option.id}
                         className="sr-only"
+                        checked={String(selectedPlaceId) === String(option.id)}
+                        onChange={e => {setSelectedPlaceId(e.target.value)}}
                         />
                       <div className="flex flex-col gap-0.5">
                         <span className="text-sm font-medium text-[color:var(--c-text)]">
@@ -513,7 +546,7 @@ export default function Chat() {
               <div>
                 <button
                   type="submit"
-                  className='bg-[color:var(--c-brand)] hover:bg-[color:var(--c-brand)]/80 text-white mt-2 py-1 rounded-xl w-100'
+                  className='mt-3 py-1 bg-[color:var(--c-brand)] hover:bg-[color:var(--c-brand)]/80 text-white rounded-xl w-100'
                 >
                   Proponer
                 </button>
@@ -529,12 +562,12 @@ export default function Chat() {
             <div className="flex justify-between px-4 py-3 w-[100%] rounded-2xl bg-white/95 text-left">
               <div className='flex gap-2'>
                 <button className='px-3 hover:bg-gray-200 rounded-xl' onClick={() => navigate(-1)}>
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-6">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="size-6">
                     <path fill-rule="evenodd" d="M11.03 3.97a.75.75 0 0 1 0 1.06l-6.22 6.22H21a.75.75 0 0 1 0 1.5H4.81l6.22 6.22a.75.75 0 1 1-1.06 1.06l-7.5-7.5a.75.75 0 0 1 0-1.06l7.5-7.5a.75.75 0 0 1 1.06 0Z" clip-rule="evenodd" />
                   </svg>
                 </button>
                 <h1
-                  className="m-0! text-[2rem]! font-bold"
+                  className="m-0! text-[1.7rem]! font-bold"
                   style={{ color: 'var(--c-brand)' }}
                 >
                   {trades.length > 0 && trades[0].proposerId?.name
@@ -544,14 +577,34 @@ export default function Chat() {
                     : 'Chat'}
                 </h1>
               </div>
-              <button className='px-3 hover:bg-gray-200 rounded-xl'>
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-6">
+              <button 
+                className='px-3 hover:bg-gray-200 rounded-xl'
+                onClick={(e) => {
+                  setMenuOpen(prev => !prev)
+                  e.stopPropagation()
+                }}
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="size-6">
                   <path fill-rule="evenodd" d="M10.5 6a1.5 1.5 0 1 1 3 0 1.5 1.5 0 0 1-3 0Zm0 6a1.5 1.5 0 1 1 3 0 1.5 1.5 0 0 1-3 0Zm0 6a1.5 1.5 0 1 1 3 0 1.5 1.5 0 0 1-3 0Z" clip-rule="evenodd" />
                 </svg>
               </button>
+              {menuOpen && (
+                <div 
+                  ref={menuRef}
+                  className="absolute right-7 top-11 mt-2 w-56 rounded-xl bg-gray-200 text-xs z-1000"
+                >
+                  <button
+                    type="button"
+                    onClick={handleOpenFinishFromMenu}
+                    className="w-full text-left px-4 py-3 hover:bg-[color:var(--c-mid-blue)]/5 text-[color:var(--c-text)]"
+                  >
+                    Marcar trueque como realizado
+                  </button>
+                </div>
+              )}
             </div>
           </header>
-          <div className="flex flex-col max-h-[70vh]">
+          <div className="flex flex-col max-h-[71vh]">
             <div className="flex-1 overflow-y-auto p-4 space-y-4">
               {tradesLoading && (
                 <p className="text-[11px] text-[color:var(--c-text)]/70 text-center mb-2">
@@ -816,7 +869,7 @@ export default function Chat() {
         </div>
 
         {finishConfirmTrade && (
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-999">
             <div className="w-[92%] max-w-sm rounded-2xl bg-white p-6 border border-[color:var(--c-mid-blue)]/60 shadow-[0_20px_60px_rgba(0,0,0,.25)]">
               <h2
                 className="text-lg font-bold text-center"

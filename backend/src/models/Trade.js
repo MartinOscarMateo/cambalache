@@ -25,7 +25,7 @@ const RatingScchema = new Schema({
 const MeetingSchema = new Schema({
   status: { type: String, enum: MEETING_STATUS, default: 'none' },
 
-  placeId: { type: Types.ObjectId, ref: 'MeetingPlace' },
+  placeId: { type: String },
   placeName: { type: String, trim: true, maxlength: 200 },
   placeAddress: { type: String, trim: true, maxlength: 200 },
   barrio: { type: String, trim: true, maxlength: 120 },
