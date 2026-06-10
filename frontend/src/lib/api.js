@@ -358,7 +358,6 @@ export async function rateTrade(tradeId, rating) {
   try {
     parsedJson = await res.json();
   } catch (e) {
-    // parsing error fallback — keep minimal logging to help debugging
     console.debug('rateTrade parse error', e);
   }
 
@@ -368,8 +367,34 @@ export async function rateTrade(tradeId, rating) {
 }
 
 // para sugerir punto de entuentro xd
-export async function suggestTradeMeeting(tradeId, payload = {}) {
+export async function suggestTradeMeeting(tradeId, placeData = {}) {
   const token = localStorage.getItem('token') || '';
+  let bodyData = {};
+
+  if (placeData.properties || placeData.geometry) {
+    const props = placeData.properties || {};
+    const geometry = placeData.geometry || {};
+
+    bodyData = {
+      meetingPlaceId: props.id ? String(props.id) : undefined,
+      placeName: props.nombre || props.nom_mapa || 'Espacio Público',
+      placeAddress: props.ubicacion || '',
+      barrio: props.barrio || '',
+      lng: geometry.coordinates?.[0]?.[0]?.[0]?.[0] || undefined,
+      lat: geometry.coordinates?.[0]?.[0]?.[0]?.[1] || undefined,
+    };
+  } else {
+    bodyData = {
+      meetingPlaceId: placeData.id ? String(placeData.id) : undefined,
+      placeName: placeData.name || placeData.placeName || 'Espacio Público',
+      placeAddress: placeData.address && placeData.address.trim() !== "" 
+        ? placeData.address 
+        : `${placeData.name || 'Espacio Público'}, ${placeData.barrio || 'CABA'}`,
+      barrio: placeData.barrio || '',
+      lng: placeData.lng || undefined,
+      lat: placeData.lat || undefined,
+    };
+  }
 
   const res = await fetch(`${API}/api/trades/${tradeId}/meeting/suggest`, {
     method: 'POST',
@@ -377,7 +402,7 @@ export async function suggestTradeMeeting(tradeId, payload = {}) {
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${token}`
     },
-    body: JSON.stringify(payload || {})
+    body: JSON.stringify(bodyData)
   });
 
   const json = await res.json().catch(() => ({}));

@@ -385,6 +385,9 @@ export async function suggestMeeting(req, res) {
     if (trade.meeting && trade.meeting.status === 'confirmed') {
       assert(false, 'MEETING_ALREADY_CONFIRMED', 'Ya hay un punto de encuentro confirmado, cancelalo antes de proponer otro');
     }
+    if (trade.meeting && trade.meeting.status === 'proposed') {
+      assert(false, 'MEETING_ALREADY_PROPOSED', 'Ya hay un punto de encuentro propuesto, cancelalo antes de proponer otro')
+    }
     trade.meeting = trade.meeting || {};
     trade.meeting.status = 'proposed';
     trade.meeting.placeId = meetingPlaceId || undefined;
@@ -412,7 +415,7 @@ export async function suggestMeeting(req, res) {
     const summary = buildMeetingSummary(trade.meeting, trade.meetingArea);
     const sender = await User.findById(userId).select('name').lean();
     const autoText = `${sender?.name || 'Alguien'} sugirió encontrarse en ${summary}.`;
-    await postSystemMessage(chat._id, userId, autoText);
+    // await postSystemMessage(chat._id, userId, autoText);
     const notifyUser = String(trade.proposerId) === String(userId) ? trade.receiverId : trade.proposerId;
     await Notification.create({
       user: notifyUser,
@@ -475,7 +478,7 @@ export async function acceptMeeting(req, res) {
     } else {
       autoText = `${sender?.name || 'Alguien'} aceptó el punto de encuentro propuesto. Falta que la otra parte confirme.`;
     }
-    await postSystemMessage(chat._id, userId, autoText);
+    //await postSystemMessage(chat._id, userId, autoText);
     const notifyUser = String(trade.proposerId) === String(userId) ? trade.receiverId : trade.proposerId;
     await Notification.create({
       user: notifyUser,
@@ -548,7 +551,13 @@ export async function cancelMeeting(req, res) {
     assert(trade, 'NOT_FOUND', 'Trueque no encontrado');
     assert([viewId(trade.proposerId), viewId(trade.receiverId)].includes(userId), 'FORBIDDEN', 'No autorizado');
     assert(!TERMINAL.has(trade.status), 'TRADE_CLOSED', 'El trueque está cerrado, no se pueden cancelar puntos de encuentro');
-    assert(trade.meeting && trade.meeting.status === 'confirmed', 'NO_MEETING_CONFIRMED', 'No hay un punto de encuentro confirmado para cancelar');
+    const actualStatus = trade.meeting?.status;
+    // Para cancelar Propurstas Accidentales ;(
+    assert(
+      actualStatus === 'confirmed' || actualStatus === 'proposed', 
+      'NO_MEETING_TO_CANCEL', 
+      'No hay ninguna propuesta ni acuerdo activo para cancelar'
+    );
     trade.meeting = { status: 'none' };
     const from = trade.status;
     const noteText = note && String(note).trim()

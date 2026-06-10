@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from 'react'
 import { io } from 'socket.io-client'
-import { useParams, useNavigate } from 'react-router-dom'
+import { useParams, useNavigate, UNSAFE_useFogOFWarDiscovery } from 'react-router-dom'
 import { listTrades, updateTradeStatus, getMeetingPlaces, suggestTradeMeeting, acceptTradeMeeting, rejectTradeMeeting, cancelTradeMeeting } from '../lib/api.js'
 
 export default function Chat() {
@@ -25,8 +25,6 @@ export default function Chat() {
   const currentUser = JSON.parse(localStorage.getItem('user') || '{}')
   const myId = String(currentUser._id || currentUser.id || '')
   const menuRef = useRef(null);
-
-
 
   function normalizeMessage(m) {
     const rawFrom = m.from ?? m.senderId ?? m.sender?._id ?? m.sender ?? m.authorId
@@ -207,28 +205,14 @@ export default function Chat() {
     try {
       setMeetingProcessingId(String(tradeId))
 
-      const payload = {
-        meetingPlaceId: place.id,
-        placeName: place.name,
-        placeAddress: place.address || undefined,
-        barrio: place.barrio || undefined
-      }
-
-      const updated = await suggestTradeMeeting(tradeId, payload)
-      setTrades(prev =>
+      const updated = await suggestTradeMeeting(tradeId, place)
+      setTrades(prev => 
         prev.map(t => {
           const tid = t.id || t._id
           const uid = updated.id || updated._id
           return String(tid) === String(uid) ? { ...t, ...updated } : t
         })
       )
-
-      const text = place.name
-        ? `Propusiste encontrarse en ${place.name}.`
-        : 'Propusiste un punto de encuentro.'
-      const localMsg = normalizeMessage({ from: myId, text })
-      setMessages(prev => [...prev, localMsg])
-      socket?.emit('private_message', { to: otherUserId, text })
 
       setMeetingSelectorTrade(null)
       setMeetingOptions([])
@@ -271,7 +255,7 @@ export default function Chat() {
           return String(tid) === String(uid) ? { ...t, ...updated } : t
         })
       )
-      const text = 'Aceptaste el punto de encuentro.'
+      const text = 'Acepté el punto de encuentro.'
       const localMsg = normalizeMessage({ from: myId, text })
       setMessages(prev => [...prev, localMsg])
       socket?.emit('private_message', { to: otherUserId, text })
@@ -604,7 +588,7 @@ export default function Chat() {
               )}
             </div>
           </header>
-          <div className="flex flex-col max-h-[71vh]">
+          <div className="flex flex-col h-[71vh]">
             <div className="flex-1 overflow-y-auto p-4 space-y-4">
               {tradesLoading && (
                 <p className="text-[11px] text-[color:var(--c-text)]/70 text-center mb-2">
@@ -785,56 +769,189 @@ export default function Chat() {
                 )
               })}
 
-              {/* Burbuja de punto de encuentro */}
-              {trades.map(t => {
-                t
-              })
 
+              {/* Mensajes de texto y propuestas de encuentro */}
+              {
+                //array de mensajes y meetings
+                [
+                  ...messages.map(m => ({ ...m, type: 'text' })),
+                  ...trades
+                    .filter(t => t.meeting && t.meeting.status !== 'none')
+                    .map(t => ({
+                      ...t,
+                      type: 'meeting_event',
+                      createdAt: t.meeting.suggestedAt || t.createdAt 
+                    }))
+                ]
+                .sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt))
 
-              }
+                .map((msg, i) => {
 
-              {/* mensajes normales */}
-              {messages.map((msg, i) => {
-                const isMine = msg.from === myId
-                const time = formatTime(msg.createdAt)
-                const nameLabel = isMine ? 'Yo' : msg.senderName || 'Usuario'
-
-                return (
-                  <div
-                    key={i}
-                    className={`flex ${isMine ? 'justify-end' : 'justify-start'}`}
-                  >
-                    <div
-                      className={`flex max-w-[75%] gap-3 ${
-                        isMine ? 'flex-row-reverse' : 'flex-row'
-                      }`}
-                    >
-                      <div className="mt-1 h-7 w-7 rounded-full bg-white/95 flex items-center justify-center text-[10px] font-semibold text-[color:var(--c-text)]/80">
-                        {(nameLabel || 'U').trim()[0] || 'U'}
-                      </div>
-                      <div className="flex-1">
+                  // Mensajes Normales
+                  if (msg.type === 'text') {
+                    const isMyMessage = msg.from === myId;
+                    const nameLabel = isMyMessage ? 'Yo' : msg.senderName || 'Usuario'
+                    
+                    return (
+                      <div
+                        key={i}
+                        className={`flex ${isMyMessage ? 'justify-end' : 'justify-start'}`}
+                      >
                         <div
-                          className={`px-4 py-2 rounded-2xl max-w-full break-words ${
-                            isMine
-                              ? 'bg-[color:var(--c-brand)] text-white rounded-br-none'
-                              : 'bg-white text-[color:var(--c-text)] rounded-bl-none'
+                          className={`flex max-w-[75%] gap-3 ${
+                            isMyMessage ? 'flex-row-reverse' : 'flex-row'
                           }`}
                         >
-                          <p className="text-[11px]">
-                            {nameLabel}
-                          </p>
-                          <p className="text-[13px] leading-snug">
-                            {msg.text}
-                          </p>
-                          <p className="text-[10px]">
-                            {time}
-                          </p>
+                          <div className="mt-1 h-7 w-7 rounded-full bg-white/95 flex items-center justify-center text-[10px] font-semibold text-[color:var(--c-text)]/80">
+                            {(nameLabel || 'U').trim()[0] || 'U'}
+                          </div>
+                          <div className="flex-1">
+                            <div
+                              className={`px-4 py-2 rounded-2xl max-w-full break-words ${
+                                isMyMessage
+                                  ? 'bg-[color:var(--c-brand)] text-white rounded-tr-none'
+                                  : 'bg-white text-[color:var(--c-text)] rounded-tl-none'
+                              }`}
+                            >
+                              <p className="text-[11px]">
+                                {nameLabel}
+                              </p>
+                              <p className="text-[13px] leading-snug">
+                                {msg.text}
+                              </p>
+                              <p className="text-[10px]">
+                                {formatTime(msg.createdAt)}
+                              </p>
+                            </div>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  </div>
-                )
-              })}
+                    );
+                  }
+                
+                  // Propuesta de Encuentro
+                  if (msg.type === 'meeting_event') {
+                    const meeting = msg.meeting
+                    const id = msg.id || msg._id
+
+                    const suggesterId = idOf(msg.meeting?.suggestedBy || msg.proposerId)
+                    const isSuggestedByMe = String(suggesterId) === String(myId)
+                    const proposerName = msg.proposerId?.name || 'Usuario'
+                    const receiverName = msg.receiverId?.name || 'Usuario'
+                    const nameLabel = isSuggestedByMe
+                      ? 'Yo'
+                      : String(idOf(msg.proposerId) === String(myId) ? receiverName : proposerName)
+
+                    const isMeetingProposed = meeting.status === 'proposed'
+                    const isMeetingConfirmed = meeting.status === 'confirmed'
+                    const showAcceptReject = isMeetingProposed && !isSuggestedByMe
+                    const time = formatTime(msg.createdAt)
+                  
+                    return (
+                      <div 
+                        key={`meeting-event-${id}`} 
+                        className={`flex ${
+                          isSuggestedByMe ? 'justify-end' : 'justify-start'
+                        }`}
+                      >
+                        <div className={`flex gap-3 max-w-[75%] ${
+                          isSuggestedByMe 
+                            ? 'flex-row-reverse' 
+                            : 'flex-row'
+                        }`}>
+                          <div className="mt-1 h-7 w-8 rounded-full bg-white/95 flex items-center justify-center text-[10px] font-semibold text-[color:var(--c-text)]/80">
+                            {(nameLabel || 'U').trim()[0] || 'U'}
+                          </div>
+                          <div className={`bg-white rounded-2xl w-full max-w-sm shadow-sm overflow-hidden ${
+                            isSuggestedByMe 
+                              ? 'rounded-tr-none' 
+                              : 'rounded-tl-none'
+                          }`}>
+
+                            {/* Encabezado dinámico según estado */}
+                            <div className={`px-4 py-2 text-xs font-semibold flex items-center justify-between ${
+                              isMeetingConfirmed ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-700'
+                            }`}>
+                              <span>
+                                {isMeetingConfirmed ? '✓ Punto de encuentro confirmado' : '📍 Punto de encuentro propuesto'}
+                              </span>
+                              <span className="text-[10px] opacity-70">{time}</span>
+                            </div>
+                          
+                            {/* Detalles del lugar público */}
+                            <div className="p-4 bg-white flex flex-col gap-1">
+                              <p className="text-sm font-semibold text-slate-800">
+                                {meeting.placeName || 'Espacio Público'}
+                              </p>
+                              {meeting.placeAddress && (
+                                <p className="text-xs text-slate-600">🏠 {meeting.placeAddress}</p>
+                              )}
+                              {meeting.barrio && (
+                                <p className="text-xs text-slate-400">Barrio: {meeting.barrio}</p>
+                              )}
+
+                              {isMeetingProposed && (
+                                <p className="text-[11px] text-slate-400 italic mt-1">
+                                  {isSuggestedByMe 
+                                    ? 'Esperando respuesta de la otra persona.' 
+                                    : 'Te propusieron este lugar.'}
+                                </p>
+                              )}
+                            </div>
+                            
+                            {/* Botonera de acción */}
+                            <div className="px-4 py-2.5 bg-slate-50 border-t border-slate-100 flex gap-2 justify-end">
+                              {showAcceptReject && (
+                                <>
+                                  <button
+                                    type="button"
+                                    onClick={() => handleRejectMeeting(id)}
+                                    disabled={meetingProcessingId === String(id)}
+                                    className="px-3 py-1.5 rounded-xl text-xs font-semibold bg-rose-50 text-rose-600 hover:bg-rose-100 transition"
+                                  >
+                                    Rechazar
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => handleAcceptMeeting(id)}
+                                    disabled={meetingProcessingId === String(id)}
+                                    className="px-3 py-1.5 rounded-xl text-xs font-semibold bg-[color:var(--c-brand)] text-white hover:opacity-90 transition"
+                                  >
+                                    Aceptar
+                                  </button>
+                                </>
+                              )}
+
+                              {isMeetingConfirmed && (
+                                <button
+                                  type="button"
+                                  onClick={() => handleCancelMeeting(id)}
+                                  disabled={meetingProcessingId === String(id)}
+                                  className="px-3 py-1.5 rounded-xl text-xs font-medium text-slate-500 border border-slate-200 bg-white hover:bg-slate-50 transition w-full"
+                                >
+                                  Cancelar punto acordado
+                                </button>
+                              )}
+
+                              {isMeetingProposed && isSuggestedByMe && (
+                                <button
+                                  type="button"
+                                  onClick={() => handleCancelMeeting(id)}
+                                  disabled={meetingProcessingId === String(id)}
+                                  className="px-3 py-1.5 rounded-xl text-xs font-medium text-slate-500 border border-slate-200 bg-white hover:bg-slate-50 transition w-full"
+                                >
+                                  Cancelar propuesta
+                                </button>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  }
+                  return null;
+                })
+              }
             </div>
 
             <div className="flex gap-2 bg.white/90 px-3 py-3 items-center">

@@ -1,6 +1,10 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+
+const currentUser = JSON.parse(localStorage.getItem('user') || '{}')
+const myId = String(currentUser._id || currentUser.id || '')
+
 // id valido
 function pid(p) {
   return p._id || p.id;
@@ -144,12 +148,14 @@ export default function PostList() {
             >
               Ver detalle
             </button>
-            <button
-              onClick={() => navigate(`/posts/${pid(p)}`, { state: { openTradeModal: true } })}
-              className="px-4 py-2 rounded-xl bg-[color:var(--c-brand)] text-white hover:brightness-110 transition text-xs sm:text-sm font-medium"
-            >
-              Trueque
-            </button>
+            {String(p.ownerId?._id || p.ownerId) !== String(myId) && (
+              <button
+                onClick={() => navigate(`/posts/${pid(p)}`, { state: { openTradeModal: true } })}
+                className="px-4 py-2 rounded-xl bg-[color:var(--c-brand)] text-white hover:brightness-110 transition text-xs sm:text-sm font-medium"
+              >
+                Trueque
+              </button>
+            )}
           </div>
         </div>
       </article>
